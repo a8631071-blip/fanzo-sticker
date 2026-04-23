@@ -983,6 +983,18 @@
         <button class="btn-main btn-copy" id="copy-btn" onclick="copyPrompt()">📋 複製 Prompt</button>
       </div>
 
+      <div class="action-row" style="margin-top:10px;">
+        <button class="btn-main btn-gemini" id="generate-btn" onclick="generateWithAPI()" style="width:100%;background:linear-gradient(135deg,#06d6a0,#0099cc);">✨ 直接生成貼圖（API）</button>
+      </div>
+
+      <div id="api-result-area" style="display:none;margin-top:16px;">
+        <div id="api-status" style="font-size:13px;color:var(--accent2);margin-bottom:10px;"></div>
+        <div id="api-grid" style="display:grid;gap:4px;margin-bottom:12px;"></div>
+        <div id="api-download-row" style="display:none;">
+          <button class="btn-main btn-copy" onclick="downloadAPIResults()" style="width:100%;">📦 下載全部貼圖（ZIP）</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -1600,7 +1612,12 @@
 
     const themes = getThemeContent();
 
-    const prompt = `請生成一張包含 20 個不同內容的貼圖集，也不要使用任何emoji表情符號。${dualNote}
+    const prompt = `【執行指令】
+這是最終版指令，無需優化、無需建議、無需補充說明。
+請直接生成圖片，不要輸出任何文字回應、修改建議或提案。
+生成完畢後只需說「完成」，其餘免談。
+
+請生成一張包含 20 個不同內容的貼圖集，也不要使用任何emoji表情符號。${dualNote}
 
 [重要角色設定]
 角色外型必須嚴格依照使用者上傳的參考圖及以下角色描述，不得自行創作或更改角色外型。
@@ -2497,7 +2514,7 @@ ${actionDesc}
   renderAnimActionInputs();
 
     // ===== Gemini API 直接生成 =====
-  const GEMINI_API_KEY = 'AIzaSyD2YZbjq3rnvBT01LkCQNWY1OwPz-qon7c';
+  const GEMINI_API_KEY = ''; // 請填入你的 Gemini API Key
   let apiSplitResults = [];
 
   async function generateWithAPI() {
@@ -2524,7 +2541,7 @@ ${actionDesc}
 
     try {
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key=${GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${GEMINI_API_KEY}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
