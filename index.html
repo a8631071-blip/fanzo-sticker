@@ -1941,13 +1941,22 @@ ${themes}
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
+        const previewSize = 120;
         const cell = document.createElement('canvas');
-        cell.width = 60; cell.height = 60;
+        cell.width = previewSize; cell.height = previewSize;
         const cCtx = cell.getContext('2d');
-        cCtx.drawImage(canvas, c * cellW, r * cellH, cellW, cellH, 0, 0, 60, 60);
+        // 棋盤格背景（讓透明區域可見）
+        const sq = 8;
+        for (let py = 0; py < previewSize; py += sq) {
+          for (let px = 0; px < previewSize; px += sq) {
+            cCtx.fillStyle = ((px/sq + py/sq) % 2 === 0) ? '#cccccc' : '#ffffff';
+            cCtx.fillRect(px, py, sq, sq);
+          }
+        }
+        cCtx.drawImage(canvas, c * cellW, r * cellH, cellW, cellH, 0, 0, previewSize, previewSize);
         const img2 = document.createElement('img');
         img2.src = cell.toDataURL();
-        img2.style.cssText = 'width:100%;display:block;border-radius:3px;';
+        img2.style.cssText = 'width:100%;display:block;border-radius:3px;image-rendering:auto;';
         grid.appendChild(img2);
       }
     }
@@ -2065,14 +2074,25 @@ ${themes}
         splitResults.push({ canvas: cell, num });
 
         const wrapper = document.createElement('div');
-        wrapper.style.cssText = 'position:relative;background:var(--bg3);border:1px solid var(--border);border-radius:6px;overflow:hidden;';
-        const preview = document.createElement('img');
-        preview.src = cell.toDataURL('image/png');
-        preview.style.cssText = 'width:100%;display:block;';
+        wrapper.style.cssText = 'position:relative;border:1px solid var(--border);border-radius:6px;overflow:hidden;';
+        // 建立帶棋盤格的預覽 canvas
+        const previewCanvas = document.createElement('canvas');
+        previewCanvas.width = 370; previewCanvas.height = 320;
+        previewCanvas.style.cssText = 'width:100%;display:block;image-rendering:auto;';
+        const pCtx = previewCanvas.getContext('2d');
+        // 棋盤格背景
+        const sq = 12;
+        for (let py = 0; py < 320; py += sq) {
+          for (let px = 0; px < 370; px += sq) {
+            pCtx.fillStyle = ((px/sq + py/sq) % 2 === 0) ? '#aaaaaa' : '#dddddd';
+            pCtx.fillRect(px, py, sq, sq);
+          }
+        }
+        pCtx.drawImage(cell, 0, 0);
         const label = document.createElement('div');
-        label.style.cssText = 'text-align:center;font-size:10px;color:var(--text2);padding:2px;';
+        label.style.cssText = 'text-align:center;font-size:10px;color:var(--text2);padding:2px;background:var(--bg3);';
         label.textContent = `${num}（370×320）`;
-        wrapper.appendChild(preview);
+        wrapper.appendChild(previewCanvas);
         wrapper.appendChild(label);
         grid.appendChild(wrapper);
       }
@@ -2514,7 +2534,7 @@ ${actionDesc}
   renderAnimActionInputs();
 
     // ===== Gemini API 直接生成 =====
-  const GEMINI_API_KEY = ''; // 請填入你的 Gemini API Key
+  const GEMINI_API_KEY = 'AIzaSyD2YZbjq3rnvBT01LkCQNWY1OwPz-qon7c';
   let apiSplitResults = [];
 
   async function generateWithAPI() {
@@ -2588,14 +2608,23 @@ ${actionDesc}
             apiSplitResults.push({ canvas: cell, num: idx + 1 });
 
             const wrapper = document.createElement('div');
-            wrapper.style.cssText = 'position:relative;background:var(--bg3);border:1px solid var(--border);border-radius:6px;overflow:hidden;';
-            const preview = document.createElement('img');
-            preview.src = cell.toDataURL('image/png');
-            preview.style.cssText = 'width:100%;display:block;';
+            wrapper.style.cssText = 'position:relative;border:1px solid var(--border);border-radius:6px;overflow:hidden;';
+            const previewCanvas2 = document.createElement('canvas');
+            previewCanvas2.width = 370; previewCanvas2.height = 320;
+            previewCanvas2.style.cssText = 'width:100%;display:block;image-rendering:auto;';
+            const pCtx2 = previewCanvas2.getContext('2d');
+            const sq2 = 12;
+            for (let py = 0; py < 320; py += sq2) {
+              for (let px = 0; px < 370; px += sq2) {
+                pCtx2.fillStyle = ((px/sq2 + py/sq2) % 2 === 0) ? '#aaaaaa' : '#dddddd';
+                pCtx2.fillRect(px, py, sq2, sq2);
+              }
+            }
+            pCtx2.drawImage(cell, 0, 0);
             const label = document.createElement('div');
-            label.style.cssText = 'text-align:center;font-size:10px;color:var(--text2);padding:2px;';
+            label.style.cssText = 'text-align:center;font-size:10px;color:var(--text2);padding:2px;background:var(--bg3);';
             label.textContent = `${idx + 1}`;
-            wrapper.appendChild(preview);
+            wrapper.appendChild(previewCanvas2);
             wrapper.appendChild(label);
             gridEl.appendChild(wrapper);
           }
