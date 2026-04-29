@@ -505,24 +505,21 @@
 </head>
 <body>
 
-<header>
+<header style="position:relative;">
   <div class="logo">煩躁胖子<span>貼圖工廠</span></div>
   <div class="tagline">煩躁胖子 × AI 貼圖生成系統</div>
+  <div style="position:absolute;top:10px;right:20px;font-size:10px;color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:2px 8px;letter-spacing:0.5px;user-select:none;">04291330V1</div>
   <div class="steps">
     <div class="step-item active" id="step-nav-1" onclick="switchStep(1)" style="cursor:pointer;">
-      <div class="step-num">1</div> AI提示詞大師
-    </div>
-    <div class="step-line"></div>
-    <div class="step-item" id="step-nav-2" onclick="switchStep(2)" style="cursor:pointer;">
-      <div class="step-num">2</div> 上傳分割
-    </div>
-    <div class="step-line"></div>
-    <div class="step-item" id="step-nav-3" onclick="switchStep(3)" style="cursor:pointer;">
-      <div class="step-num">3</div> 去背打包
+      <div class="step-num">1</div> 🎨 靜態貼圖
     </div>
     <div class="step-line"></div>
     <div class="step-item" id="step-nav-4" onclick="switchStep(4)" style="cursor:pointer;">
-      <div class="step-num">4</div> 🎬 動態幀指令
+      <div class="step-num">2</div> 🎬 動態幀
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item" id="step-nav-5" onclick="switchStep(5)" style="cursor:pointer;">
+      <div class="step-num">3</div> 😄 表情貼
     </div>
   </div>
 </header>
@@ -990,149 +987,6 @@
   </div>
 </main>
 
-<!-- Step 2: 上傳分割 -->
-<div id="page-step2" style="display:none;max-width:1200px;margin:0 auto;padding:32px 24px;">
-  <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;">
-    <div>
-      <div class="card">
-        <div class="section-title">上傳貼圖原始檔</div>
-        <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">請上傳 Gemini 生成的 5×4 網格圖（JPG/PNG），總尺寸 2560×1664 px。</p>
-
-        <div class="upload-area" id="step2-upload-area" style="min-height:180px;" onclick="document.getElementById(&#39;step2-input&#39;).click()">
-          <input type="file" id="step2-input" accept="image/*" style="display:none" onchange="handleStep2Upload(event)">
-          <div id="step2-preview-area">
-            <div class="upload-icon">📁</div>
-            <p>點此選擇或拖曳圖片<br><span style="font-size:11px;color:#666">支援 JPG、PNG</span></p>
-          </div>
-        </div>
-
-        <!-- 設定 -->
-        <div id="step2-settings" style="display:none;margin-top:20px;">
-          <div class="option-label" style="margin-bottom:12px;">設定</div>
-          
-          <!-- 邊界裁切調整 -->
-          <div style="margin-bottom:20px;">
-            <div style="font-size:13px;color:var(--text2);margin-bottom:10px;">邊界裁切調整 <span style="font-size:11px;color:#666;">（調整後即時預覽）</span></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-              <label style="font-size:12px;color:var(--text2);">上邊界
-                <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
-                  <input type="range" id="crop-top" min="0" max="300" value="0" style="flex:1;accent-color:var(--accent);" oninput="updateCropPreview()">
-                  <span id="crop-top-val" style="font-size:12px;color:var(--accent2);width:35px;">0px</span>
-                </div>
-              </label>
-              <label style="font-size:12px;color:var(--text2);">下邊界
-                <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
-                  <input type="range" id="crop-bottom" min="0" max="300" value="0" style="flex:1;accent-color:var(--accent);" oninput="updateCropPreview()">
-                  <span id="crop-bottom-val" style="font-size:12px;color:var(--accent2);width:35px;">0px</span>
-                </div>
-              </label>
-              <label style="font-size:12px;color:var(--text2);">左邊界
-                <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
-                  <input type="range" id="crop-left" min="0" max="300" value="0" style="flex:1;accent-color:var(--accent);" oninput="updateCropPreview()">
-                  <span id="crop-left-val" style="font-size:12px;color:var(--accent2);width:35px;">0px</span>
-                </div>
-              </label>
-              <label style="font-size:12px;color:var(--text2);">右邊界
-                <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
-                  <input type="range" id="crop-right" min="0" max="300" value="0" style="flex:1;accent-color:var(--accent);" oninput="updateCropPreview()">
-                  <span id="crop-right-val" style="font-size:12px;color:var(--accent2);width:35px;">0px</span>
-                </div>
-              </label>
-            </div>
-            <button onclick="resetCrop()" style="font-size:12px;padding:4px 12px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text2);cursor:pointer;">重置邊界</button>
-            <span style="font-size:11px;color:var(--text2);margin-left:10px;">輸出每格固定 370×320 px</span>
-          </div>
-
-          <!-- 即時切割預覽 -->
-          <div id="crop-preview-wrap" style="margin-bottom:16px;display:none;">
-            <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">即時切割預覽 <span id="crop-size-hint" style="color:var(--accent2);"></span></div>
-            <div id="crop-preview-grid" style="display:grid;gap:3px;background:var(--bg3);padding:6px;border-radius:8px;border:1px solid var(--border);"></div>
-          </div>
-
-          <!-- 尺寸處理模式 -->
-          <div style="margin-bottom:16px;">
-            <div style="font-size:13px;color:var(--text2);margin-bottom:8px;">尺寸處理方式</div>
-            <div class="btn-group">
-              <button class="btn-opt active" data-group="sizemode" data-val="scale" onclick="setSizeMode(&#39;scale&#39;)">A｜縮放到標準尺寸再切<span style="font-size:10px;display:block;color:var(--text2);">強制2560×1664，切割最準確</span></button>
-              <button class="btn-opt" data-group="sizemode" data-val="direct" onclick="setSizeMode(&#39;direct&#39;)">B｜直接等分切割<span style="font-size:10px;display:block;color:var(--text2);">任何尺寸都能用</span></button>
-            </div>
-          </div>
-          <div style="margin-bottom:16px;">
-            <div style="font-size:13px;color:var(--text2);margin-bottom:8px;">切割格數</div>
-            <div class="btn-group" id="grid-mode-group">
-              <button class="btn-opt" data-group="gridmode" data-val="3x3" onclick="setGrid(3,3)">3×3（9張）</button>
-              <button class="btn-opt" data-group="gridmode" data-val="4x4" onclick="setGrid(4,4)">4×4（16張）</button>
-              <button class="btn-opt active" data-group="gridmode" data-val="5x4" onclick="setGrid(5,4)">5×4（20張）</button>
-              <button class="btn-opt" data-group="gridmode" data-val="custom" onclick="setGrid(0,0)">自訂</button>
-            </div>
-            <div id="custom-grid-row" style="display:none;margin-top:8px;display:flex;align-items:center;gap:8px;">
-              <span style="font-size:13px;color:var(--text2);">欄數</span>
-              <input type="number" id="custom-cols" value="5" min="1" max="10" style="width:55px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;" onchange="updateCustomGrid()">
-              <span style="font-size:13px;color:var(--text2);">×</span>
-              <span style="font-size:13px;color:var(--text2);">列數</span>
-              <input type="number" id="custom-rows" value="4" min="1" max="10" style="width:55px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;" onchange="updateCustomGrid()">
-              <span id="custom-grid-total" style="font-size:12px;color:var(--accent2);">= 20張</span>
-            </div>
-          </div>
-
-          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px;">
-            <label style="font-size:13px;color:var(--text2);display:flex;align-items:center;gap:8px;">
-              <input type="checkbox" id="remove-bg" checked="" style="width:16px;height:16px;accent-color:var(--accent);">
-              自動去除綠幕背景（#00FF00）
-            </label>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;">
-            <span style="font-size:13px;color:var(--text2);">起始編號：</span>
-            <input type="number" id="start-num" value="1" min="1" style="width:70px;padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;">
-            <span style="font-size:12px;color:var(--text2);">（第二組填下一個編號）</span>
-          </div>
-          <button onclick="processImage()" class="btn-main btn-gemini" style="width:100%;">✂️ 開始分割（輸出512×512）</button>
-        </div>
-      </div>
-
-      <!-- 預覽結果 -->
-      <div class="card" id="step2-result" style="display:none;">
-        <div class="section-title">分割結果預覽</div>
-        <div id="step2-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;"></div>
-        <div style="display:flex;gap:12px;">
-          <button onclick="downloadAll()" class="btn-main btn-gemini" style="flex:1;">📦 下載全部 ZIP</button>
-          <button onclick="switchStep(3)" class="btn-main btn-copy" style="flex:1;">→ 前往去背打包</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 右側說明 -->
-    <div>
-      <div class="instruction-card">
-        <div class="section-title">使用說明</div>
-        <div class="instruction-step">
-          <h4>Step 1｜生成圖片</h4>
-          <p>用AI提示詞大師生成Prompt，貼到Gemini生成5×4網格圖。</p>
-        </div>
-        <div class="instruction-step">
-          <h4>Step 2｜上傳分割</h4>
-          <p>上傳生成的大圖，系統自動去星星、去綠幕、切成20張。</p>
-          <div class="highlight">⚠️ 如圖片尺寸不是2560×1664，分割可能不準確</div>
-        </div>
-        <div class="instruction-step">
-          <h4>Step 3｜下載上架</h4>
-          <p>選好Main和Tab封面，打包下載，直接上傳LINE Creators Market。</p>
-        </div>
-      </div>
-      <div class="instruction-card">
-        <div class="section-title">規格提醒</div>
-        <div style="font-size:13px;color:var(--text2);line-height:2;">
-          📐 總尺寸：2560 × 1664 px<br>
-          🔲 格數：5欄 × 4列 = 20格<br>
-          📏 每格：512 × 416 px<br>
-          🟩 背景：#00FF00 綠幕<br>
-          ✦ 浮水印位置：右下角固定
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Step 4: 動態幀指令產生器 -->
 <div id="page-step4" style="display:none;max-width:960px;margin:0 auto;padding:32px 24px;">
   <div class="card">
@@ -1289,14 +1143,1399 @@
     </div>
   </div>
 </div>
-<div id="page-step3" style="display:none;max-width:800px;margin:0 auto;padding:32px 24px;text-align:center;">
-  <div class="card">
-    <div style="font-size:48px;margin-bottom:16px;">🚧</div>
-    <div class="section-title" style="justify-content:center;">去背打包</div>
-    <p style="color:var(--text2);margin-top:12px;">即將推出！完成分割後可在這裡選擇 Main / Tab 封面並打包下載。</p>
-    <button onclick="switchStep(2)" class="btn-main btn-copy" style="margin-top:20px;width:200px;">← 返回分割</button>
-  </div>
+
+<!-- Step 5: 表情貼指令產生器 -->
+<div id="page-step5" style="display:none;max-width:1280px;margin:0 auto;padding:24px;">
+  <iframe title="表情貼指令產生器" srcdoc="<!DOCTYPE html>
+<html lang=&quot;zh-Hant&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+<title>表情貼指令產生器 v2</title>
+<link href=&quot;https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Share+Tech+Mono&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+<style>
+:root {
+  --bg: #0d0d14;
+  --bg2: #13131e;
+  --bg3: #1a1a28;
+  --card: #181825;
+  --border: rgba(255,255,255,0.07);
+  --accent: #ff6b35;
+  --accent2: #ffd166;
+  --accent3: #06d6a0;
+  --text: #eeeeff;
+  --text2: #8888aa;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+header {
+  background: linear-gradient(135deg, #12121f, #1e1030 50%, #121f1e);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo { font-size: 20px; font-weight: 900; }
+.logo span { color: var(--accent); }
+.logo small { font-size: 11px; color: var(--text2); font-family: 'Share Tech Mono', monospace; margin-left: 10px; }
+
+.layout { display: grid; grid-template-columns: 340px 1fr; gap: 0; min-height: calc(100vh - 61px); }
+
+.left-panel {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  overflow-y: auto;
+  height: calc(100vh - 61px);
+  position: sticky; top: 0;
+}
+.right-panel { padding: 20px; overflow-y: auto; }
+
+.section { margin-bottom: 22px; }
+.section-label {
+  font-size: 11px; font-weight: 700; color: var(--accent2);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.btn-group { display: flex; flex-wrap: wrap; gap: 5px; }
+.btn-opt {
+  padding: 6px 12px; font-size: 12px; font-weight: 700;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: 8px; color: var(--text2); cursor: pointer;
+  font-family: 'Noto Sans TC', sans-serif; transition: all 0.15s;
+  text-align: center; line-height: 1.4;
+}
+.btn-opt:hover { border-color: var(--accent); color: var(--text); }
+.btn-opt.active { background: rgba(255,107,53,0.15); border-color: var(--accent); color: var(--accent); }
+
+.batch-btn {
+  padding: 8px 10px; font-size: 11px; font-weight: 700;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: 8px; color: var(--text2); cursor: pointer;
+  font-family: 'Noto Sans TC', sans-serif; transition: all 0.15s;
+  text-align: left; width: 100%; margin-bottom: 4px;
+}
+.batch-btn:hover { border-color: var(--accent2); color: var(--text); }
+.batch-btn.active { background: rgba(255,209,102,0.12); border-color: var(--accent2); color: var(--accent2); }
+.batch-btn .batch-symbols { font-size: 10px; color: var(--text2); font-family: 'Share Tech Mono', monospace; margin-top: 2px; }
+
+/* Type selector A/B/C */
+.type-btn {
+  width: 100%; padding: 10px 12px; text-align: left;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: 10px; color: var(--text); cursor: pointer;
+  font-family: 'Noto Sans TC', sans-serif; transition: all 0.15s;
+}
+.type-btn:hover { border-color: var(--accent); }
+.type-btn.active { background: rgba(255,107,53,0.1); border-color: var(--accent); }
+
+/* 模式切換 大按鈕 */
+.mode-toggle { display: flex; gap: 8px; margin-bottom: 4px; }
+.mode-btn {
+  flex: 1; padding: 12px 8px; font-size: 12px; font-weight: 700;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: 10px; color: var(--text2);
+  cursor: pointer; font-family: 'Noto Sans TC', sans-serif;
+  transition: all 0.15s; text-align: center; line-height: 1.5;
+}
+.mode-btn:hover { border-color: var(--accent); color: var(--text); }
+.mode-btn.active { background: rgba(255,107,53,0.15); border-color: var(--accent); color: var(--accent); }
+.mode-btn .mode-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.mode-btn .mode-sub { font-size: 9px; font-weight: 400; color: var(--text2); display: block; margin-top: 2px; }
+.mode-btn.active .mode-sub { color: rgba(255,107,53,0.7); }
+
+.slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.slider-label { font-size: 11px; color: var(--text2); width: 60px; flex-shrink: 0; }
+.slider-val { font-size: 11px; color: var(--accent2); width: 36px; text-align: right; font-family: 'Share Tech Mono', monospace; flex-shrink: 0; }
+input[type=range] {
+  flex: 1; accent-color: var(--accent); height: 4px;
+  appearance: none; background: var(--bg3);
+  border-radius: 4px; outline: none; cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  appearance: none; width: 14px; height: 14px;
+  border-radius: 50%; background: var(--accent); cursor: pointer;
+}
+
+.color-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+.color-swatch {
+  width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+  border: 2px solid transparent; transition: all 0.15s; flex-shrink: 0;
+}
+.color-swatch.active, .color-swatch:hover { border-color: #fff; transform: scale(1.1); }
+.hex-input {
+  padding: 5px 10px; background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: 6px; color: var(--text); font-size: 12px;
+  font-family: 'Share Tech Mono', monospace; width: 90px;
+}
+
+.emotion-grid {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;
+  margin-bottom: 10px;
+}
+.emotion-cell {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; padding: 6px 4px; text-align: center;
+}
+.emotion-cell .sym { font-size: 15px; font-weight: 900; color: var(--accent2); line-height: 1; }
+.emotion-cell .num { font-size: 9px; color: var(--text2); font-family: 'Share Tech Mono', monospace; margin: 2px 0; }
+.emotion-cell select {
+  width: 100%; padding: 2px 3px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text); font-size: 9px;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+
+.btn-auto {
+  padding: 6px 14px; font-size: 11px; font-weight: 700;
+  background: rgba(6,214,160,0.12); border: 1.5px solid var(--accent3);
+  border-radius: 8px; color: var(--accent3); cursor: pointer;
+  font-family: 'Noto Sans TC', sans-serif; margin-right: 6px;
+}
+.btn-clear {
+  padding: 6px 14px; font-size: 11px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text2); cursor: pointer;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px; margin-bottom: 16px;
+}
+.card-title {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+}
+
+.prompt-box {
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 10px; padding: 16px; font-size: 12px;
+  font-family: 'Share Tech Mono', monospace; color: var(--text2);
+  white-space: pre-wrap; line-height: 1.7; min-height: 300px;
+  max-height: 600px; overflow-y: auto;
+}
+
+.action-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.btn-main {
+  padding: 10px 20px; font-size: 13px; font-weight: 700;
+  border: none; border-radius: 10px; cursor: pointer;
+  font-family: 'Noto Sans TC', sans-serif; transition: all 0.15s;
+}
+.btn-copy { background: var(--accent); color: #fff; }
+.btn-copy:hover { background: #ff8555; }
+.btn-copy.copied { background: var(--accent3); }
+.btn-outline {
+  background: transparent; border: 1.5px solid var(--border);
+  color: var(--text2);
+}
+.btn-outline:hover { border-color: var(--accent2); color: var(--accent2); }
+
+.ratio-visual {
+  display: flex; height: 32px; border-radius: 8px; overflow: hidden;
+  margin-top: 8px; margin-bottom: 4px; border: 1px solid var(--border);
+}
+.ratio-char { background: rgba(255,107,53,0.3); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--accent); transition: flex 0.2s; }
+.ratio-sym { background: rgba(255,209,102,0.3); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--accent2); transition: flex 0.2s; }
+
+.info-box {
+  background: rgba(255,209,102,0.07); border: 1px solid rgba(255,209,102,0.2);
+  border-radius: 8px; padding: 10px 14px; font-size: 11px;
+  color: var(--text2); line-height: 1.7; margin-bottom: 12px;
+}
+.warn-box {
+  background: rgba(255,107,53,0.07); border: 1px solid rgba(255,107,53,0.25);
+  border-radius: 8px; padding: 10px 14px; font-size: 11px;
+  color: #ff9a6c; line-height: 1.7; margin-bottom: 12px;
+}
+
+.upload-area {
+  border: 2px dashed var(--border); border-radius: 10px;
+  padding: 16px; text-align: center; cursor: pointer;
+  transition: all 0.2s; background: var(--bg3);
+  font-size: 12px; color: var(--text2);
+}
+.upload-area:hover, .upload-area.drag { border-color: var(--accent); color: var(--accent); }
+.upload-area img { max-height: 80px; max-width: 100%; border-radius: 6px; margin-top: 8px; }
+
+/* 模式標籤 */
+.mode-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; margin-left: 8px;
+}
+.mode-badge.ref { background: rgba(255,107,53,0.2); color: var(--accent); }
+.mode-badge.sym { background: rgba(6,214,160,0.2); color: var(--accent3); }
+
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+  .left-panel { height: auto; position: static; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class=&quot;logo&quot;>😄 <span>表情貼</span>指令產生器 <small>v5 · 2026-04-27</small></div>
+  <div style=&quot;font-size:11px;color:var(--text2);font-family:'Share Tech Mono',monospace;&quot;>LINE Sticker Prompt Builder</div>
+</header>
+
+<div class=&quot;layout&quot;>
+
+  <!-- ===== LEFT PANEL ===== -->
+  <div class=&quot;left-panel&quot;>
+
+    <!-- 1. 貼圖類型 A/B/C -->
+    <div class=&quot;section&quot;>
+      <div class=&quot;section-label&quot;>1. 貼圖類型</div>
+      <div style=&quot;display:flex;flex-direction:column;gap:5px;&quot;>
+        <button class=&quot;type-btn active&quot; id=&quot;type-A&quot; onclick=&quot;setType('A')&quot;>
+          <div style=&quot;display:flex;align-items:center;gap:8px;&quot;>
+            <span style=&quot;font-size:18px;font-weight:900;color:var(--accent);width:22px;&quot;>A</span>
+            <div>
+              <div style=&quot;font-weight:700;font-size:12px;&quot;>字母表情貼（英文字母數字）</div>
+              <div style=&quot;font-size:10px;color:var(--text2);margin-top:1px;&quot;>104張，6批，純符號／字母／數字圖形</div>
+            </div>
+          </div>
+        </button>
+        <button class=&quot;type-btn&quot; id=&quot;type-B&quot; onclick=&quot;setType('B')&quot;>
+          <div style=&quot;display:flex;align-items:center;gap:8px;&quot;>
+            <span style=&quot;font-size:18px;font-weight:900;color:var(--accent2);width:22px;&quot;>B</span>
+            <div>
+              <div style=&quot;font-weight:700;font-size:12px;&quot;>表情貼</div>
+              <div style=&quot;font-size:10px;color:var(--text2);margin-top:1px;&quot;>8-40張，最多2批，純圖象有角色，無文字</div>
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. 生成模式（A/C才顯示） -->
+    <div class=&quot;section&quot; id=&quot;mode-section&quot;>
+      <div class=&quot;section-label&quot;>2. 生成模式</div>
+      <div class=&quot;mode-toggle&quot;>
+        <button class=&quot;mode-btn active&quot; id=&quot;mode-ref-btn&quot; onclick=&quot;setMode('reference')&quot;>
+          <span class=&quot;mode-icon&quot;>🐻</span>
+          母圖＋符號
+          <span class=&quot;mode-sub&quot;>上傳角色母圖<br>搭配字母符號</span>
+        </button>
+        <button class=&quot;mode-btn&quot; id=&quot;mode-sym-btn&quot; onclick=&quot;setMode('symbol')&quot;>
+          <span class=&quot;mode-icon&quot;>🔤</span>
+          純符號設計
+          <span class=&quot;mode-sub&quot;>無角色<br>純字母視覺設計</span>
+        </button>
+      </div>
+    </div><!-- end mode-toggle -->
+    </div><!-- end mode-section -->
+
+    <!-- ===== B模式：表情貼設定 ===== -->
+    <div id=&quot;b-mode-section&quot; style=&quot;display:none;&quot;>
+      <!-- B. 母圖提醒 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>1. 角色母圖</div>
+        <div class=&quot;warn-box&quot;>
+          📎 請在 GPT / Gemini 那邊上傳母圖。<br>
+          複製 Prompt 後，到 AI 工具同時貼上 Prompt ＋ 上傳母圖。
+        </div>
+      </div>
+      <!-- B. 角色名稱 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>2. 角色名稱（選填）</div>
+        <input type=&quot;text&quot; id=&quot;b-char-name&quot; placeholder=&quot;例：煩躁胖子、小白飄&quot;
+          style=&quot;width:100%;padding:7px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;font-family:'Noto Sans TC',sans-serif;&quot;
+          oninput=&quot;generatePrompt()&quot;>
+      </div>
+      <!-- B. 畫風 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>3. 畫風</div>
+        <div class=&quot;btn-group&quot; id=&quot;b-style-group&quot;>
+          <button class=&quot;btn-opt active&quot; data-style=&quot;3D卡通風，毛茸茸質感，圓潤光影&quot; onclick=&quot;selectBStyle(this)&quot;>3D卡通</button>
+          <button class=&quot;btn-opt&quot; data-style=&quot;可愛Q版，2D平面貼紙風格，輪廓清晰&quot; onclick=&quot;selectBStyle(this)&quot;>2D Q版</button>
+          <button class=&quot;btn-opt&quot; data-style=&quot;扁平插畫風格，色塊分明，簡潔&quot; onclick=&quot;selectBStyle(this)&quot;>扁平插畫</button>
+          <button class=&quot;btn-opt&quot; data-style=&quot;黏土質感，立體手工感，軟Q&quot; onclick=&quot;selectBStyle(this)&quot;>黏土質感</button>
+          <button class=&quot;btn-opt&quot; data-style=&quot;水彩手繪風，透明柔和筆觸&quot; onclick=&quot;selectBStyle(this)&quot;>水彩手繪</button>
+          <button class=&quot;btn-opt&quot; data-style=&quot;Chibi大頭小身可愛風格&quot; onclick=&quot;selectBStyle(this)&quot;>Chibi</button>
+        </div>
+      </div>
+      <!-- B. 背景色 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>4. 背景色</div>
+        <div class=&quot;btn-group&quot; id=&quot;b-bg-group&quot;>
+          <button class=&quot;btn-opt active&quot; data-bg=&quot;#FFFFFF&quot; onclick=&quot;selectBBg(this,'#FFFFFF')&quot;>⬜ 白色</button>
+          <button class=&quot;btn-opt&quot; data-bg=&quot;#00FF00&quot; onclick=&quot;selectBBg(this,'#00FF00')&quot;>🟩 綠幕</button>
+          <button class=&quot;btn-opt&quot; data-bg=&quot;#000000&quot; onclick=&quot;selectBBg(this,'#000000')&quot;>⬛ 黑色</button>
+        </div>
+      </div>
+      <!-- B. 角色結構鎖定開關 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>5. 角色結構鎖定</div>
+        <div style=&quot;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;&quot;>
+          <label style=&quot;display:flex;align-items:flex-start;gap:10px;cursor:pointer;&quot;>
+            <input type=&quot;checkbox&quot; id=&quot;anatomical-lock&quot; onchange=&quot;generatePrompt()&quot; style=&quot;accent-color:var(--accent);margin-top:2px;width:16px;height:16px;flex-shrink:0;&quot;>
+            <div>
+              <div style=&quot;font-size:12px;font-weight:700;color:var(--text);&quot;>🔒 HARD ANATOMICAL LOCK</div>
+              <div style=&quot;font-size:10px;color:var(--text2);margin-top:3px;line-height:1.6;&quot;>
+                母圖無身體時開啟。鎖定角色結構，AI 不得新增四肢，所有情緒僅透過臉部表情＋特效呈現。
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div><!-- end b-mode-section -->
+
+    <div id=&quot;ref-mode-section&quot;>
+
+      <!-- 2. 母圖提醒 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>2. 角色母圖</div>
+        <div class=&quot;warn-box&quot;>
+          📎 請在 GPT / Gemini 那邊上傳母圖，不是在這裡。<br>
+          複製 Prompt 後，到 AI 工具同時貼上 Prompt ＋ 上傳母圖，AI 才能依照你的角色生成。
+        </div>
+      </div>
+
+      <!-- 3. 角色名稱 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>3. 角色名稱（選填）</div>
+        <input type=&quot;text&quot; id=&quot;ref-char-name&quot; placeholder=&quot;例：煩躁胖子、小白飄、柴柴&quot;
+          style=&quot;width:100%;padding:7px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;font-family:'Noto Sans TC',sans-serif;&quot;
+          oninput=&quot;generatePrompt()&quot;>
+      </div>
+
+      <!-- 4. 畫風（母圖模式） -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>4. 畫風（參考母圖風格）</div>
+        <div class=&quot;btn-group&quot; id=&quot;ref-style-group&quot;>
+          <button class=&quot;btn-opt active&quot; data-style=&quot;3D卡通風，毛茸茸質感，圓潤光影&quot; onclick=&quot;selectRefStyle(this)&quot;>3D卡通</button>
+          <button class=&quot;btn-opt&quot; data-style=&quot;可愛Q版，2D平面貼紙風格，輪廓清晰&quot; onclick=&quot;selectRefStyle(this)&quot;>2D Q版</button>
+          <button class=&quot;btn-opt&quot; data-style=&quot;扁平插畫風格，色塊分明，簡潔&quot; onclick=&quot;selectRefStyle(this)&quot;>扁平插畫</button>
+          <button class=&quot;btn-opt&quot; data-style=&quot;黏土質感，立體手工感，軟Q&quot; onclick=&quot;selectRefStyle(this)&quot;>黏土質感</button>
+          <button class=&quot;btn-opt&quot; data-style=&quot;水彩手繪風，透明柔和筆觸&quot; onclick=&quot;selectRefStyle(this)&quot;>水彩手繪</button>
+          <button class=&quot;btn-opt&quot; data-style=&quot;Chibi大頭小身可愛風格&quot; onclick=&quot;selectRefStyle(this)&quot;>Chibi</button>
+        </div>
+      </div>
+
+      <!-- 5. 構圖方式（母圖模式） -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>5. 構圖方式</div>
+        <div class=&quot;btn-group&quot;>
+          <button class=&quot;btn-opt active&quot; id=&quot;comp-split&quot; onclick=&quot;setComposition('split',this)&quot;>
+            分兩邊<br><span style=&quot;font-size:9px;font-weight:400;&quot;>符號╱角色各一側</span>
+          </button>
+          <button class=&quot;btn-opt&quot; id=&quot;comp-merge&quot; onclick=&quot;setComposition('merge',this)&quot;>
+            攀爬<br><span style=&quot;font-size:9px;font-weight:400;&quot;>角色攀附在符號上</span>
+          </button>
+          <button class=&quot;btn-opt&quot; id=&quot;comp-dissolve&quot; onclick=&quot;setComposition('dissolve',this)&quot;>
+            溶入<br><span style=&quot;font-size:9px;font-weight:400;&quot;>角色臉融進符號內</span>
+          </button>
+        </div>
+        <div id=&quot;ratio-section&quot;>
+          <!-- 融入模式隱藏佔比設定 -->
+        </div>
+      </div>
+
+      <!-- 符號佔比（分兩邊模式才顯示） -->
+      <div class=&quot;section&quot; id=&quot;ratio-section-wrap&quot;>
+        <div class=&quot;section-label&quot;>6. 符號佔比（符號 vs 角色）</div>
+        <div class=&quot;btn-group&quot; style=&quot;margin-bottom:8px;&quot;>
+          <button class=&quot;btn-opt active&quot; onclick=&quot;setRatioPreset(this,30,70)&quot;>30/70<br><span style=&quot;font-size:9px;font-weight:400;&quot;>符號小</span></button>
+          <button class=&quot;btn-opt&quot; onclick=&quot;setRatioPreset(this,50,50)&quot;>50/50<br><span style=&quot;font-size:9px;font-weight:400;&quot;>等比</span></button>
+          <button class=&quot;btn-opt&quot; onclick=&quot;setRatioPreset(this,70,30)&quot;>70/30<br><span style=&quot;font-size:9px;font-weight:400;&quot;>符號大</span></button>
+        </div>
+        <div class=&quot;ratio-visual&quot;>
+          <div class=&quot;ratio-char&quot; id=&quot;ratio-char-bar&quot; style=&quot;flex:70&quot;>角色 70%</div>
+          <div class=&quot;ratio-sym&quot; id=&quot;ratio-sym-bar&quot; style=&quot;flex:30&quot;>符號 30%</div>
+        </div>
+        <div class=&quot;slider-row&quot; style=&quot;margin-top:6px;&quot;>
+          <div class=&quot;slider-label&quot;>符號佔比</div>
+          <input type=&quot;range&quot; id=&quot;sym-ratio&quot; min=&quot;10&quot; max=&quot;80&quot; value=&quot;30&quot; oninput=&quot;updateRatioFromSlider(this.value)&quot;>
+          <div class=&quot;slider-val&quot; id=&quot;sym-ratio-val&quot;>30%</div>
+        </div>
+      </div>
+
+      <!-- 情緒強度（三種構圖都顯示） -->
+      <div class=&quot;section&quot; id=&quot;intensity-section-wrap&quot;>
+        <div class=&quot;section-label&quot;>6. 情緒強度</div>
+        <div class=&quot;btn-group&quot;>
+          <button class=&quot;btn-opt active&quot; id=&quot;intensity-b1&quot; onclick=&quot;setIntensity('b1',this)&quot;>
+            B1 自然<br><span style=&quot;font-size:9px;font-weight:400;&quot;>日常、溫和、好用</span>
+          </button>
+          <button class=&quot;btn-opt&quot; id=&quot;intensity-b2&quot; onclick=&quot;setIntensity('b2',this)&quot;>
+            B2 誇張<br><span style=&quot;font-size:9px;font-weight:400;&quot;>戲劇、強烈、有趣</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 6. 符號顏色（母圖模式） -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>6. 符號顏色</div>
+        <div class=&quot;color-row&quot; id=&quot;ref-color-row&quot;>
+          <div class=&quot;color-swatch active&quot; style=&quot;background:#FFD166;&quot; onclick=&quot;selectColor(this,'#FFD166','ref')&quot; title=&quot;亮黃&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#FF6B35;&quot; onclick=&quot;selectColor(this,'#FF6B35','ref')&quot; title=&quot;橘紅&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#06D6A0;&quot; onclick=&quot;selectColor(this,'#06D6A0','ref')&quot; title=&quot;翠綠&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#4FC3F7;&quot; onclick=&quot;selectColor(this,'#4FC3F7','ref')&quot; title=&quot;天藍&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#FF80AB;&quot; onclick=&quot;selectColor(this,'#FF80AB','ref')&quot; title=&quot;粉紅&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#CE93D8;&quot; onclick=&quot;selectColor(this,'#CE93D8','ref')&quot; title=&quot;淺紫&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#FFFFFF;border:1px solid #444;&quot; onclick=&quot;selectColor(this,'#FFFFFF','ref')&quot; title=&quot;白色&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#222222;&quot; onclick=&quot;selectColor(this,'#222222','ref')&quot; title=&quot;黑色&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:linear-gradient(135deg,#ff6b35,#ffd166,#06d6a0,#4fc3f7,#ff80ab);&quot; onclick=&quot;selectColor(this,'rainbow','ref')&quot; title=&quot;彩虹多色&quot;></div>
+        </div>
+        <div style=&quot;display:flex;align-items:center;gap:8px;margin-top:4px;&quot;>
+          <span style=&quot;font-size:11px;color:var(--text2);&quot;>自訂：</span>
+          <input type=&quot;color&quot; id=&quot;ref-color-picker&quot; value=&quot;#FFD166&quot; oninput=&quot;selectColor(null,this.value,'ref')&quot; style=&quot;width:32px;height:28px;border:none;border-radius:4px;cursor:pointer;background:none;&quot;>
+          <input type=&quot;text&quot; id=&quot;ref-color-hex&quot; class=&quot;hex-input&quot; value=&quot;#FFD166&quot; placeholder=&quot;#FFD166&quot; oninput=&quot;hexInputChange(this.value,'ref')&quot;>
+        </div>
+      </div>
+
+      <!-- 7. 符號字型風格（母圖模式） -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>7. 符號字型風格</div>
+        <div class=&quot;btn-group&quot; id=&quot;ref-font-group&quot;>
+          <button class=&quot;btn-opt active&quot; data-font=&quot;3D氣泡字（立體感、光澤高光、圓潤邊緣）&quot; onclick=&quot;selectFont(this,'ref')&quot;>3D氣泡</button>
+          <button class=&quot;btn-opt&quot; data-font=&quot;手寫塗鴉感（不規則線條、墨水感、略歪斜）&quot; onclick=&quot;selectFont(this,'ref')&quot;>手寫塗鴉</button>
+          <button class=&quot;btn-opt&quot; data-font=&quot;粗體印刷（方正、強力、粗黑）&quot; onclick=&quot;selectFont(this,'ref')&quot;>粗體印刷</button>
+          <button class=&quot;btn-opt&quot; data-font=&quot;木牌刻字感（木紋質感、粗糙邊緣）&quot; onclick=&quot;selectFont(this,'ref')&quot;>木牌刻字</button>
+          <button class=&quot;btn-opt&quot; data-font=&quot;霓虹發光（線條發光、賽博龐克感）&quot; onclick=&quot;selectFont(this,'ref')&quot;>霓虹發光</button>
+          <button class=&quot;btn-opt&quot; data-font=&quot;貼紙印刷（扁平設計感、強描邊、白邊）&quot; onclick=&quot;selectFont(this,'ref')&quot;>貼紙印刷</button>
+          <button class=&quot;btn-opt&quot; data-font=&quot;水彩渲染（色彩暈染、透明感）&quot; onclick=&quot;selectFont(this,'ref')&quot;>水彩渲染</button>
+          <button class=&quot;btn-opt&quot; data-font=&quot;像素格（8-bit像素感、方塊構成）&quot; onclick=&quot;selectFont(this,'ref')&quot;>像素格</button>
+        </div>
+      </div>
+
+      <!-- 8. 背景色（母圖模式） -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>8. 背景色</div>
+        <div class=&quot;btn-group&quot; id=&quot;ref-bg-group&quot;>
+          <button class=&quot;btn-opt active&quot; data-bg=&quot;#FFFFFF&quot; onclick=&quot;selectBg(this,'#FFFFFF','ref')&quot;>⬜ 白色</button>
+          <button class=&quot;btn-opt&quot; data-bg=&quot;#00FF00&quot; onclick=&quot;selectBg(this,'#00FF00','ref')&quot;>🟩 綠幕</button>
+          <button class=&quot;btn-opt&quot; data-bg=&quot;#000000&quot; onclick=&quot;selectBg(this,'#000000','ref')&quot;>⬛ 黑色</button>
+        </div>
+      </div>
+
+    </div><!-- end ref-mode-section -->
+
+    <!-- ===== 純符號模式區塊 ===== -->
+    <div id=&quot;sym-mode-section&quot; style=&quot;display:none;&quot;>
+
+      <!-- 2. 符號主題風格 -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>2. 符號主題風格</div>
+        <div class=&quot;btn-group&quot; id=&quot;sym-theme-group&quot;>
+          <button class=&quot;btn-opt active&quot; data-theme=&quot;3D氣泡字風格，圓潤立體，光澤高光感&quot; onclick=&quot;selectSymTheme(this)&quot;>3D氣泡</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;手寫塗鴉風格，不規則線條，墨水手繪感，略歪斜活潑&quot; onclick=&quot;selectSymTheme(this)&quot;>手寫塗鴉</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;木頭雕刻風格，木紋質感，粗糙邊緣，刀刻感&quot; onclick=&quot;selectSymTheme(this)&quot;>木頭雕刻</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;金屬科技風格，金屬光澤，冷色調，工業感&quot; onclick=&quot;selectSymTheme(this)&quot;>金屬科技</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;糖果果凍風格，半透明Q彈質感，鮮豔糖果色&quot; onclick=&quot;selectSymTheme(this)&quot;>糖果果凍</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;粉嫩馬卡龍風格，柔和粉彩色，圓潤溫柔&quot; onclick=&quot;selectSymTheme(this)&quot;>馬卡龍</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;霓虹發光風格，賽博龐克，線條發光，暗背景&quot; onclick=&quot;selectSymTheme(this)&quot;>霓虹發光</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;水彩渲染風格，色彩暈染，透明感，筆觸可見&quot; onclick=&quot;selectSymTheme(this)&quot;>水彩渲染</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;貼紙印刷風格，扁平設計，強描邊，白邊&quot; onclick=&quot;selectSymTheme(this)&quot;>貼紙印刷</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;像素格風格，8-bit像素感，方塊構成，遊戲感&quot; onclick=&quot;selectSymTheme(this)&quot;>像素格</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;塑膠玩具風格，亮面光澤，飽和色，玩具感&quot; onclick=&quot;selectSymTheme(this)&quot;>塑膠玩具</button>
+          <button class=&quot;btn-opt&quot; data-theme=&quot;黏土捏塑風格，手工軟Q感，略不均勻邊緣&quot; onclick=&quot;selectSymTheme(this)&quot;>黏土捏塑</button>
+        </div>
+        <textarea id=&quot;custom-sym-theme&quot; placeholder=&quot;或自訂風格描述...&quot; rows=&quot;2&quot;
+          style=&quot;width:100%;margin-top:6px;padding:7px 10px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;font-family:'Noto Sans TC',sans-serif;resize:none;&quot;
+          oninput=&quot;onCustomSymTheme()&quot;></textarea>
+      </div>
+
+      <!-- 3. 符號顏色（純符號模式） -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>3. 主色調</div>
+        <div class=&quot;color-row&quot; id=&quot;sym-color-row&quot;>
+          <div class=&quot;color-swatch active&quot; style=&quot;background:#FFD166;&quot; onclick=&quot;selectColor(this,'#FFD166','sym')&quot; title=&quot;亮黃&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#FF6B35;&quot; onclick=&quot;selectColor(this,'#FF6B35','sym')&quot; title=&quot;橘紅&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#06D6A0;&quot; onclick=&quot;selectColor(this,'#06D6A0','sym')&quot; title=&quot;翠綠&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#4FC3F7;&quot; onclick=&quot;selectColor(this,'#4FC3F7','sym')&quot; title=&quot;天藍&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#FF80AB;&quot; onclick=&quot;selectColor(this,'#FF80AB','sym')&quot; title=&quot;粉紅&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#CE93D8;&quot; onclick=&quot;selectColor(this,'#CE93D8','sym')&quot; title=&quot;淺紫&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#FFFFFF;border:1px solid #444;&quot; onclick=&quot;selectColor(this,'#FFFFFF','sym')&quot; title=&quot;白色&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:#222222;&quot; onclick=&quot;selectColor(this,'#222222','sym')&quot; title=&quot;黑色&quot;></div>
+          <div class=&quot;color-swatch&quot; style=&quot;background:linear-gradient(135deg,#ff6b35,#ffd166,#06d6a0,#4fc3f7,#ff80ab);&quot; onclick=&quot;selectColor(this,'rainbow','sym')&quot; title=&quot;彩虹多色&quot;></div>
+        </div>
+        <div style=&quot;display:flex;align-items:center;gap:8px;margin-top:4px;&quot;>
+          <span style=&quot;font-size:11px;color:var(--text2);&quot;>自訂：</span>
+          <input type=&quot;color&quot; id=&quot;sym-color-picker&quot; value=&quot;#FFD166&quot; oninput=&quot;selectColor(null,this.value,'sym')&quot; style=&quot;width:32px;height:28px;border:none;border-radius:4px;cursor:pointer;background:none;&quot;>
+          <input type=&quot;text&quot; id=&quot;sym-color-hex&quot; class=&quot;hex-input&quot; value=&quot;#FFD166&quot; placeholder=&quot;#FFD166&quot; oninput=&quot;hexInputChange(this.value,'sym')&quot;>
+        </div>
+      </div>
+
+      <!-- 4. 構圖密度（純符號模式） -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>4. 符號大小</div>
+        <div class=&quot;btn-group&quot; id=&quot;sym-size-group&quot;>
+          <button class=&quot;btn-opt&quot; data-size=&quot;偏小，留有大量呼吸空間&quot; onclick=&quot;selectSymSize(this)&quot;>偏小</button>
+          <button class=&quot;btn-opt active&quot; data-size=&quot;適中&quot; onclick=&quot;selectSymSize(this)&quot;>適中</button>
+          <button class=&quot;btn-opt&quot; data-size=&quot;偏大，視覺衝擊強&quot; onclick=&quot;selectSymSize(this)&quot;>偏大</button>
+          <button class=&quot;btn-opt&quot; data-size=&quot;超大Bold，強烈撐滿感&quot; onclick=&quot;selectSymSize(this)&quot;>超大Bold</button>
+        </div>
+      </div>
+
+      <!-- 5. 背景色（純符號模式） -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>5. 背景色</div>
+        <div class=&quot;btn-group&quot; id=&quot;sym-bg-group&quot;>
+          <button class=&quot;btn-opt active&quot; data-bg=&quot;#FFFFFF&quot; onclick=&quot;selectBg(this,'#FFFFFF','sym')&quot;>⬜ 白色</button>
+          <button class=&quot;btn-opt&quot; data-bg=&quot;#00FF00&quot; onclick=&quot;selectBg(this,'#00FF00','sym')&quot;>🟩 綠幕</button>
+          <button class=&quot;btn-opt&quot; data-bg=&quot;#000000&quot; onclick=&quot;selectBg(this,'#000000','sym')&quot;>⬛ 黑色</button>
+        </div>
+      </div>
+
+      <!-- 6. 裝飾元素（純符號模式） -->
+      <div class=&quot;section&quot;>
+        <div class=&quot;section-label&quot;>6. 裝飾元素（可複選）</div>
+        <div class=&quot;btn-group&quot; id=&quot;sym-deco-group&quot;>
+          <button class=&quot;btn-opt&quot; data-deco=&quot;星星點綴&quot; onclick=&quot;toggleDeco(this)&quot;>⭐ 星星</button>
+          <button class=&quot;btn-opt&quot; data-deco=&quot;愛心點綴&quot; onclick=&quot;toggleDeco(this)&quot;>❤️ 愛心</button>
+          <button class=&quot;btn-opt&quot; data-deco=&quot;音符點綴&quot; onclick=&quot;toggleDeco(this)&quot;>🎵 音符</button>
+          <button class=&quot;btn-opt&quot; data-deco=&quot;閃電點綴&quot; onclick=&quot;toggleDeco(this)&quot;>⚡ 閃電</button>
+          <button class=&quot;btn-opt&quot; data-deco=&quot;花朵點綴&quot; onclick=&quot;toggleDeco(this)&quot;>🌸 花朵</button>
+          <button class=&quot;btn-opt&quot; data-deco=&quot;氣泡點綴&quot; onclick=&quot;toggleDeco(this)&quot;>🫧 氣泡</button>
+          <button class=&quot;btn-opt&quot; data-deco=&quot;無裝飾，純符號&quot; onclick=&quot;toggleDeco(this)&quot;>🚫 無裝飾</button>
+        </div>
+      </div>
+
+    </div><!-- end sym-mode-section -->
+
+  </div><!-- end left-panel -->
+
+  <!-- ===== RIGHT PANEL ===== -->
+  <div class=&quot;right-panel&quot;>
+
+    <!-- 批次選擇 (A/C) -->
+    <div class=&quot;card&quot; id=&quot;batch-card&quot;>
+      <div class=&quot;card-title&quot; id=&quot;batch-card-title&quot;>📦 批次選擇（6批，共104個表情貼）</div>
+      <div id=&quot;batch-list&quot;></div>
+    </div>
+
+    <!-- B模式：批次選擇＋情緒分配 -->
+    <div class=&quot;card&quot; id=&quot;b-emotion-card&quot; style=&quot;display:none;&quot;>
+      <div class=&quot;card-title&quot;>📦 批次選擇（共2批，最多40張）</div>
+      <div id=&quot;b-batch-list&quot; style=&quot;margin-bottom:14px;&quot;></div>
+      <div class=&quot;card-title&quot; style=&quot;margin-top:4px;&quot;>😊 情緒分配表
+        <button class=&quot;btn-auto&quot; onclick=&quot;autoFillBEmotions()&quot;>🎲 自動填入</button>
+        <button class=&quot;btn-clear&quot; onclick=&quot;clearBEmotions()&quot;>清空</button>
+      </div>
+      <div style=&quot;font-size:11px;color:var(--text2);margin-bottom:10px;&quot;>每格指定情境＋強度（1級=輕微，5級=極度誇張）</div>
+      <div class=&quot;emotion-grid&quot; id=&quot;b-emotion-grid&quot; style=&quot;grid-template-columns:repeat(5,1fr);&quot;></div>
+    </div>
+
+    <!-- A/C模式：情緒分配表 -->
+    <div class=&quot;card&quot; id=&quot;emotion-card&quot;>
+      <div class=&quot;card-title&quot;>😊 情緒分配表
+        <button class=&quot;btn-auto&quot; onclick=&quot;autoFillEmotions()&quot;>🎲 自動填入</button>
+        <button class=&quot;btn-clear&quot; onclick=&quot;clearEmotions()&quot;>清空</button>
+      </div>
+      <div class=&quot;emotion-grid&quot; id=&quot;emotion-grid&quot;></div>
+    </div>
+
+    <!-- Prompt 輸出 -->
+    <div class=&quot;card&quot;>
+      <div class=&quot;card-title&quot;>
+        📋 生成的 Prompt
+        <span class=&quot;mode-badge ref&quot; id=&quot;mode-badge&quot;>🐻 母圖＋符號</span>
+      </div>
+      <div class=&quot;info-box&quot; id=&quot;prompt-info-box&quot;>
+        💡 複製後貼到 GPT / Gemini，並同時上傳角色母圖，AI才能依照你的角色生成。
+      </div>
+      <div class=&quot;prompt-box&quot; id=&quot;prompt-output&quot;>請完成左側設定...</div>
+      <div class=&quot;action-row&quot;>
+        <button class=&quot;btn-main btn-copy&quot; id=&quot;copy-btn&quot; onclick=&quot;copyPrompt()&quot;>📋 複製 Prompt</button>
+        <button class=&quot;btn-main btn-outline&quot; onclick=&quot;copyAndOpen('gpt')&quot;>→ 開 ChatGPT</button>
+        <button class=&quot;btn-main btn-outline&quot; onclick=&quot;copyAndOpen('gemini')&quot;>→ 開 Gemini</button>
+      </div>
+    </div>
+
+    <!-- 規格說明 -->
+    <div class=&quot;card&quot; style=&quot;font-size:12px;color:var(--text2);line-height:2;&quot;>
+      <div class=&quot;card-title&quot;>📐 規格說明</div>
+      總尺寸：2000 × 1600 px，5欄 × 4列 = 20格，每格 400×400 px<br>
+      最終輸出：每格去背縮至 <strong style=&quot;color:var(--text);&quot;>180×180 px</strong>，檔名 3碼（001～104）<br>
+      背景：白色（配合白幕去背工具）<br>
+      禁止：格線、說明文字、純打字符號、漸層背景
+    </div>
+
+  </div><!-- end right-panel -->
 </div>
+
+<script>
+// ===== STATE =====
+const state = {
+  type: 'A', // A / B / C
+  mode: 'reference',
+  refCharName: '',
+  refStyle: '3D卡通風，毛茸茸質感，圓潤光影',
+  refSymColor: '#FFD166',
+  refSymFont: '3D氣泡字（立體感、光澤高光、圓潤邊緣）',
+  refBg: '#FFFFFF',
+  symRatio: 30,
+  composition: 'split', // 'split' 分兩邊 / 'merge' 融入
+  intensity: 'b1',      // 'b1' 自然 / 'b2' 誇張
+
+  symTheme: '3D氣泡字風格，圓潤立體，光澤高光感',
+  symColor: '#FFD166',
+  symSize: '適中',
+  symBg: '#FFFFFF',
+  symDecos: [],
+
+  // B mode
+  bCharName: '',
+  bStyle: '3D卡通風，毛茸茸質感，圓潤光影',
+  bBg: '#FFFFFF',
+  bBatch: 1,
+  bEmotions: [
+    Array(20).fill({emo:'', level:4}),
+    Array(20).fill({emo:'', level:4}),
+  ],
+
+  batch: 1,
+  emotions: Array(20).fill(''),
+};
+
+const BATCHES = {
+  1: { label:'第1批 001-020', symbols:['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T'], start:1 },
+  2: { label:'第2批 021-040', symbols:['U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m','n'], start:21 },
+  3: { label:'第3批 041-060', symbols:['o','p','q','r','s','t','u','v','w','x','y','z','1','2','3','4','5','6','7','8'], start:41 },
+  4: { label:'第4批 061-080', symbols:['9','0','～','！','？','@','#','$','%','^','&amp;','*','(',')','+','÷','×','=','[',']'], start:61 },
+  5: { label:'第5批 081-100', symbols:['|',';',':',',','.','/','<','>','_','-','¥','·','「','」','、','…','♡','♪','↑','↓'], start:81 },
+  6: { label:'第6批 101-104', symbols:['→','←','○','〒'], start:101 },
+};
+
+const EMOTIONS = ['開心','生氣','傷心','驚訝','害羞','無奈','得意','崩潰','呆滯','嫌棄'];
+
+const EMOTION_FACE = {
+  '開心': '彎眼笑、嘴角上揚、腮紅',
+  '生氣': '倒V眉緊皺、嘴角下壓、額頭青筋',
+  '傷心': '眼角下垂、眼眶泛紅、淚珠',
+  '驚訝': '圓眼睜大、O型嘴、眉毛上揚',
+  '害羞': '低頭、厚腮紅、眼神躲避',
+  '無奈': '半閉眼、平嘴或微抿、眉毛平壓',
+  '得意': '單眼眨眼、嘴角一側歪笑、微仰頭',
+  '崩潰': '眼神渙散、嘴大張、頭上冒煙或星星',
+  '呆滯': '雙眼半閉無神、嘴微開、鬆弛感',
+  '嫌棄': '皺鼻、嘴角側歪、眼神斜視',
+};
+
+const PRESETS_BY_BATCH = {
+  1: ['開心','驚訝','得意','害羞','生氣','無奈','崩潰','開心','傷心','嫌棄','開心','驚訝','得意','害羞','生氣','無奈','崩潰','呆滯','傷心','嫌棄'],
+  2: ['開心','生氣','驚訝','崩潰','無奈','得意','害羞','嫌棄','傷心','呆滯','開心','生氣','驚訝','崩潰','無奈','得意','害羞','嫌棄','傷心','呆滯'],
+  3: ['得意','無奈','開心','嫌棄','崩潰','害羞','生氣','呆滯','驚訝','傷心','得意','無奈','開心','嫌棄','崩潰','害羞','生氣','呆滯','驚訝','傷心'],
+  4: ['生氣','開心','崩潰','驚訝','嫌棄','傷心','得意','呆滯','無奈','害羞','生氣','開心','崩潰','驚訝','嫌棄','傷心','得意','呆滯','無奈','害羞'],
+  5: ['傷心','崩潰','無奈','開心','呆滯','生氣','嫌棄','得意','害羞','驚訝','傷心','崩潰','無奈','開心','呆滯','生氣','嫌棄','得意','害羞','驚訝'],
+  6: ['開心','傷心','驚訝','無奈'],
+};
+
+// ===== INIT =====
+function init() {
+  renderBatchList();
+  renderEmotionGrid();
+  renderBBatchList();
+  renderBEmotionGrid();
+  generatePrompt();
+}
+
+// ===== TYPE A/B =====
+function setType(t) {
+  state.type = t;
+  ['A','B'].forEach(x => { const el = document.getElementById('type-'+x); if(el) el.classList.toggle('active', x===t); });
+  document.getElementById('mode-section').style.display = t==='B' ? 'none' : 'block';
+  document.getElementById('b-mode-section').style.display = t==='B' ? 'block' : 'none';
+  const showA = t !== 'B';
+  document.getElementById('ref-mode-section').style.display = showA &amp;&amp; state.mode==='reference' ? 'block' : 'none';
+  document.getElementById('sym-mode-section').style.display = showA &amp;&amp; state.mode==='symbol' ? 'block' : 'none';
+  document.getElementById('batch-card').style.display = t==='B' ? 'none' : 'block';
+  document.getElementById('b-emotion-card').style.display = t==='B' ? 'block' : 'none';
+  document.getElementById('emotion-card').style.display = (t!=='B' &amp;&amp; state.mode==='reference') ? 'block' : 'none';
+  generatePrompt();
+}
+
+// ===== B MODE =====
+const B_BATCHES = {
+  1: { label:'第1批 001-020', start:1 },
+  2: { label:'第2批 021-040', start:21 },
+};
+
+const B_EMOTIONS = ['開心','生氣','傷心','驚訝','害羞','無奈','得意','崩潰','呆滯','嫌棄','興奮','冷漠','疲憊','尷尬','驕傲','失落','緊張','放鬆','思念','期待'];
+
+const B_EMOTION_FACE = {
+  '開心':'彎眼笑、嘴角上揚、腮紅',
+  '生氣':'倒V眉、嘴角下壓、青筋',
+  '傷心':'眼角下垂、淚珠、嘴角微垂',
+  '驚訝':'圓眼睜大、O型嘴、眉上揚',
+  '害羞':'厚腮紅、眼神躲避、低頭',
+  '無奈':'半閉眼、平嘴、眉毛平壓',
+  '得意':'單眼眨眼、歪嘴笑、微仰頭',
+  '崩潰':'眼神渙散、嘴大張、頭上特效',
+  '呆滯':'雙眼半閉無神、嘴微開',
+  '嫌棄':'皺鼻、嘴角側歪、眼神斜視',
+  '興奮':'大眼發光、嘴巴大開笑',
+  '冷漠':'眼神空洞、嘴角平、面無表情',
+  '疲憊':'眼睛下垂、黑眼圈、無力感',
+  '尷尬':'冷汗、勉強微笑、眼神飄移',
+  '驕傲':'仰頭、閉眼微笑',
+  '失落':'耷拉腦袋、眼神向下、嘴角垂',
+  '緊張':'冷汗直流、眉毛上揚',
+  '放鬆':'閉眼微笑、幸福感',
+  '思念':'眼神遠眺、嘴角微揚',
+  '期待':'雙眼發光、嘴角上揚',
+};
+
+// 強度1-5對應英文形容詞
+const LEVEL_DESC = {
+  1: 'Subtle — barely visible, almost poker face',
+  2: 'Mild — slightly noticeable, gentle expression',
+  3: 'Clear — obvious and readable expression',
+  4: 'Strong — very expressive, exaggerated features',
+  5: 'Extreme — over-the-top, maximum exaggeration, cartoon-level dramatic',
+};
+const LEVEL_LABEL = ['','1級','2級','3級','4級','5級'];
+
+const B_PRESET = ['開心','生氣','傷心','驚訝','害羞','無奈','得意','崩潰','呆滯','嫌棄','興奮','冷漠','疲憊','尷尬','驕傲','失落','緊張','放鬆','思念','期待'];
+
+function renderBBatchList() {
+  const c = document.getElementById('b-batch-list');
+  if (!c) return;
+  c.innerHTML = '';
+  for (let i=1; i<=2; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'batch-btn' + (state.bBatch===i ? ' active' : '');
+    btn.innerHTML = '<strong>' + B_BATCHES[i].label + '</strong>';
+    btn.onclick = () => { state.bBatch=i; renderBBatchList(); renderBEmotionGrid(); generatePrompt(); };
+    c.appendChild(btn);
+  }
+}
+
+function renderBEmotionGrid() {
+  const grid = document.getElementById('b-emotion-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const emotions = state.bEmotions[state.bBatch-1];
+  const start = B_BATCHES[state.bBatch].start;
+  for (let i=0; i<20; i++) {
+    const fileNum = String(start+i).padStart(3,'0');
+    const cell = document.createElement('div');
+    cell.className = 'emotion-cell';
+    const emo = emotions[i] || {emo:'', level:4};
+
+    const sel = document.createElement('select');
+    sel.style.cssText = 'width:100%;padding:2px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:9px;font-family:\'Noto Sans TC\',sans-serif;margin-bottom:3px;';
+    sel.innerHTML = '<option value=&quot;&quot;>AI自由</option>' +
+      B_EMOTIONS.map(e=>'<option value=&quot;'+e+'&quot;'+(emo.emo===e?' selected':'')+'>'+e+'</option>').join('');
+    sel.onchange = () => { state.bEmotions[state.bBatch-1][i]={emo:sel.value,level:parseInt(lvlSel.value)}; generatePrompt(); };
+
+    // 強度下拉 1-5級
+    const lvlSel = document.createElement('select');
+    lvlSel.style.cssText = 'width:100%;padding:2px;background:var(--bg);border:1px solid var(--border);border-radius:4px;color:var(--accent2);font-size:9px;font-family:\'Noto Sans TC\',sans-serif;';
+    for (let lv=1; lv<=5; lv++) {
+      const opt = document.createElement('option');
+      opt.value = lv; opt.textContent = LEVEL_LABEL[lv];
+      if ((emo.level||4)===lv) opt.selected = true;
+      lvlSel.appendChild(opt);
+    }
+    lvlSel.onchange = () => { state.bEmotions[state.bBatch-1][i]={emo:sel.value,level:parseInt(lvlSel.value)}; generatePrompt(); };
+
+    cell.innerHTML = '<div class=&quot;num&quot;>'+fileNum+'</div>';
+    cell.appendChild(sel);
+    cell.appendChild(lvlSel);
+    grid.appendChild(cell);
+  }
+}
+
+function autoFillBEmotions() {
+  state.bEmotions[state.bBatch-1] = B_PRESET.map(e=>({emo:e, level:4}));
+  renderBEmotionGrid();
+  generatePrompt();
+}
+
+function clearBEmotions() {
+  state.bEmotions[state.bBatch-1] = Array(20).fill({emo:'', level:4});
+  renderBEmotionGrid();
+  generatePrompt();
+}
+
+function selectBStyle(btn) {
+  document.querySelectorAll('#b-style-group .btn-opt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state.bStyle = btn.dataset.style;
+  generatePrompt();
+}
+
+function selectBBg(btn, color) {
+  document.querySelectorAll('#b-bg-group .btn-opt').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state.bBg = color;
+  generatePrompt();
+}
+function setMode(m) {
+  state.mode = m;
+  document.getElementById('mode-ref-btn').classList.toggle('active', m === 'reference');
+  document.getElementById('mode-sym-btn').classList.toggle('active', m === 'symbol');
+  document.getElementById('ref-mode-section').style.display = m === 'reference' ? 'block' : 'none';
+  document.getElementById('sym-mode-section').style.display = m === 'symbol' ? 'block' : 'none';
+  document.getElementById('emotion-card').style.display = (state.type !== 'B' &amp;&amp; m === 'reference') ? 'block' : 'none';
+
+  const badge = document.getElementById('mode-badge');
+  const infoBox = document.getElementById('prompt-info-box');
+  if (m === 'reference') {
+    badge.textContent = '🐻 母圖＋符號';
+    badge.className = 'mode-badge ref';
+    infoBox.textContent = '💡 複製後貼到 GPT / Gemini，並同時上傳角色母圖，AI才能依照你的角色生成。';
+  } else {
+    badge.textContent = '🔤 純符號設計';
+    badge.className = 'mode-badge sym';
+    infoBox.textContent = '💡 純符號模式無需上傳母圖，直接複製Prompt貼到任何AI圖像生成工具即可。';
+  }
+  generatePrompt();
+}
+
+// ===== BATCH =====
+function renderBatchList() {
+  const container = document.getElementById('batch-list');
+  container.innerHTML = '';
+  for (let i = 1; i <= 6; i++) {
+    const b = BATCHES[i];
+    const btn = document.createElement('button');
+    btn.className = 'batch-btn' + (state.batch === i ? ' active' : '');
+    btn.innerHTML = '<strong>' + b.label + '</strong><div class=&quot;batch-symbols&quot;>' + b.symbols.join(' ') + '</div>';
+    btn.onclick = () => selectBatch(i);
+    container.appendChild(btn);
+  }
+}
+
+function selectBatch(n) {
+  state.batch = n;
+  const count = BATCHES[n].symbols.length;
+  state.emotions = Array(count).fill('');
+  renderBatchList();
+  renderEmotionGrid();
+  generatePrompt();
+}
+
+// ===== EMOTION GRID =====
+function renderEmotionGrid() {
+  const b = BATCHES[state.batch];
+  const grid = document.getElementById('emotion-grid');
+  grid.style.gridTemplateColumns = 'repeat(' + Math.min(5, b.symbols.length) + ', 1fr)';
+  grid.innerHTML = '';
+  b.symbols.forEach((sym, i) => {
+    const fileNum = String(b.start + i).padStart(3, '0');
+    const cell = document.createElement('div');
+    cell.className = 'emotion-cell';
+    const sel = document.createElement('select');
+    sel.innerHTML = '<option value=&quot;&quot;>AI自由</option>' +
+      EMOTIONS.map(e => '<option value=&quot;' + e + '&quot;' + (state.emotions[i]===e?' selected':'') + '>' + e + '</option>').join('');
+    sel.onchange = () => { state.emotions[i] = sel.value; generatePrompt(); };
+    cell.innerHTML = '<div class=&quot;sym&quot;>' + sym + '</div><div class=&quot;num&quot;>' + fileNum + '</div>';
+    cell.appendChild(sel);
+    grid.appendChild(cell);
+  });
+}
+
+function autoFillEmotions() {
+  const preset = PRESETS_BY_BATCH[state.batch];
+  const count = BATCHES[state.batch].symbols.length;
+  state.emotions = preset.slice(0, count);
+  renderEmotionGrid();
+  generatePrompt();
+}
+
+function clearEmotions() {
+  const count = BATCHES[state.batch].symbols.length;
+  state.emotions = Array(count).fill('');
+  renderEmotionGrid();
+  generatePrompt();
+}
+
+// ===== CONTROLS =====
+function setComposition(type, btn) {
+  state.composition = type;
+  document.querySelectorAll('#comp-split, #comp-merge, #comp-dissolve').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // 切換顯示：分兩邊顯示佔比，攀爬顯示強度，溶入顯示強度
+  document.getElementById('ratio-section-wrap').style.display = type === 'split' ? '' : 'none';
+  document.getElementById('intensity-section-wrap').style.display = ''; // 三種構圖都顯示強度
+  generatePrompt();
+}
+
+function setIntensity(level, btn) {
+  state.intensity = level;
+  document.querySelectorAll('#intensity-b1, #intensity-b2').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  generatePrompt();
+}
+
+function selectRefStyle(btn) {
+  document.querySelectorAll('#ref-style-group .btn-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.refStyle = btn.dataset.style;
+  generatePrompt();
+}
+
+function selectFont(btn, mode) {
+  const groupId = mode === 'ref' ? 'ref-font-group' : 'sym-font-group';
+  document.querySelectorAll('#' + groupId + ' .btn-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (mode === 'ref') state.refSymFont = btn.dataset.font;
+  generatePrompt();
+}
+
+function selectBg(btn, color, mode) {
+  const groupId = mode === 'ref' ? 'ref-bg-group' : 'sym-bg-group';
+  document.querySelectorAll('#' + groupId + ' .btn-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (mode === 'ref') state.refBg = color;
+  else state.symBg = color;
+  generatePrompt();
+}
+
+function selectColor(el, color, mode) {
+  const rowId = mode === 'ref' ? 'ref-color-row' : 'sym-color-row';
+  document.querySelectorAll('#' + rowId + ' .color-swatch').forEach(s => s.classList.remove('active'));
+  if (el) el.classList.add('active');
+  if (mode === 'ref') {
+    state.refSymColor = color;
+    document.getElementById('ref-color-hex').value = color === 'rainbow' ? '彩虹多色' : color;
+    if (color !== 'rainbow') document.getElementById('ref-color-picker').value = color;
+  } else {
+    state.symColor = color;
+    document.getElementById('sym-color-hex').value = color === 'rainbow' ? '彩虹多色' : color;
+    if (color !== 'rainbow') document.getElementById('sym-color-picker').value = color;
+  }
+  generatePrompt();
+}
+
+function hexInputChange(val, mode) {
+  if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+    if (mode === 'ref') { state.refSymColor = val; document.getElementById('ref-color-picker').value = val; }
+    else { state.symColor = val; document.getElementById('sym-color-picker').value = val; }
+    generatePrompt();
+  }
+}
+
+function setRatioPreset(btn, sym, char) {
+  document.querySelectorAll('[onclick*=&quot;setRatioPreset&quot;]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.symRatio = sym;
+  document.getElementById('sym-ratio').value = sym;
+  updateRatioDisplay(sym);
+  generatePrompt();
+}
+
+function updateRatioFromSlider(val) {
+  state.symRatio = parseInt(val);
+  document.querySelectorAll('[onclick*=&quot;setRatioPreset&quot;]').forEach(b => b.classList.remove('active'));
+  updateRatioDisplay(val);
+  generatePrompt();
+}
+
+function updateRatioDisplay(sym) {
+  const s = parseInt(sym);
+  const c = 100 - s;
+  document.getElementById('sym-ratio-val').textContent = s + '%';
+  document.getElementById('ratio-char-bar').style.flex = c;
+  document.getElementById('ratio-char-bar').innerHTML = '角色 ' + c + '%';
+  document.getElementById('ratio-sym-bar').style.flex = s;
+  document.getElementById('ratio-sym-bar').innerHTML = '符號 ' + s + '%';
+}
+
+function selectSymTheme(btn) {
+  document.querySelectorAll('#sym-theme-group .btn-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.symTheme = btn.dataset.theme;
+  document.getElementById('custom-sym-theme').value = '';
+  generatePrompt();
+}
+
+function onCustomSymTheme() {
+  const val = document.getElementById('custom-sym-theme').value.trim();
+  if (val) {
+    document.querySelectorAll('#sym-theme-group .btn-opt').forEach(b => b.classList.remove('active'));
+    state.symTheme = val;
+    generatePrompt();
+  }
+}
+
+function selectSymSize(btn) {
+  document.querySelectorAll('#sym-size-group .btn-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.symSize = btn.dataset.size;
+  generatePrompt();
+}
+
+function toggleDeco(btn) {
+  const deco = btn.dataset.deco;
+  if (deco === '無裝飾，純符號') {
+    document.querySelectorAll('#sym-deco-group .btn-opt').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.symDecos = [];
+  } else {
+    document.querySelectorAll('#sym-deco-group .btn-opt[data-deco=&quot;無裝飾，純符號&quot;]').forEach(b => b.classList.remove('active'));
+    btn.classList.toggle('active');
+    if (btn.classList.contains('active')) {
+      if (!state.symDecos.includes(deco)) state.symDecos.push(deco);
+    } else {
+      state.symDecos = state.symDecos.filter(d => d !== deco);
+    }
+  }
+  generatePrompt();
+}
+
+// ===== PROMPT GENERATION =====
+function generatePrompt() {
+  if (state.type === 'B') {
+    generateBPrompt();
+    return;
+  }
+  const b = BATCHES[state.batch];
+  const symbols = b.symbols;
+  const count = symbols.length;
+  if (state.mode === 'reference') {
+    generateRefPrompt(b, symbols, count);
+  } else {
+    generateSymPrompt(b, symbols, count);
+  }
+}
+
+function generateBPrompt() {
+  const charName = document.getElementById('b-char-name') ? document.getElementById('b-char-name').value.trim() : '';
+  const name = charName || '（請填入角色名稱）';
+  const anatomicalLock = document.getElementById('anatomical-lock') &amp;&amp; document.getElementById('anatomical-lock').checked;
+  const batchNum = state.bBatch;
+  const emotions = state.bEmotions[batchNum-1];
+  const start = B_BATCHES[batchNum].start;
+  const batchLabel = B_BATCHES[batchNum].label;
+
+  // 按列分組（每5格一組）
+  let cellDesc = '';
+  for (let row=0; row<4; row++) {
+    cellDesc += '--- Row '+(row+1)+' (Panels '+(row*5+1)+'-'+(row*5+5)+') ---\n';
+    for (let col=0; col<5; col++) {
+      const i = row*5+col;
+      const fileNum = String(start+i).padStart(3,'0');
+      const e = emotions[i] || {emo:'', level:4};
+      const emoText = e.emo
+        ? e.emo+'（'+B_EMOTION_FACE[e.emo]+'） / '+LEVEL_DESC[e.level||4]
+        : 'AI free choice / 由AI自由發揮，帶活潑感';
+      cellDesc += fileNum+' Panel '+(i+1)+' Col '+(col+1)+': '+emoText+'\n';
+    }
+    cellDesc += '\n';
+  }
+
+  const anatomicalSection = anatomicalLock ?
+'\n=== HARD ANATOMICAL LOCK ===\n'+
+'1. SOURCE TRUTH: The uploaded reference image is the ABSOLUTE boundary of the character\'s anatomy. Do NOT exceed this boundary.\n'+
+'2. ZERO ADDITION: STRICTLY FORBIDDEN to generate any body part not present in the reference image (including torso, limbs, hands, feet).\n'+
+'3. ADAPTIVE EXPRESSION: All emotional actions (e.g. &quot;waving&quot;, &quot;hands on hips&quot;, &quot;leaning forward&quot;) MUST be conveyed ONLY through facial muscle changes, head angle, micro-expressions, and visual effects (sparkles, teardrops, cold sweat, speed lines).\n'+
+'4. CONFLICT OVERRIDE: This structural constraint takes priority over ANY description implying a body exists. If an action requires limbs not present in the reference, AI MUST automatically convert it to a face/head-based alternative. Generating limbs is ABSOLUTELY FORBIDDEN.\n\n'
+: '';
+
+  const full =
+'Create ONE single image: 2000 × 1600 px\n'+
+'Layout: EXACT 5 columns × 4 rows = 20 panels, each 400×400 px\n'+
+batchLabel+'\n\n'+
+'=== CHARACTER LOCK ===\n'+
+'Character: '+name+'\n'+
+'Art style: '+state.bStyle+'\n'+
+'⚠️ Character appearance MUST match the uploaded reference image EXACTLY.\n'+
+'DO NOT redesign, DO NOT simplify, DO NOT reinterpret.\n'+
+'SAME face structure, SAME proportions, SAME colors, SAME outline thickness across ALL 20 panels.\n'+
+anatomicalSection+
+'=== LIGHTING &amp; BACKGROUND ===\n'+
+'Character: 3D lighting and shading on the CHARACTER ONLY is allowed — maintain volume, fur texture, and roundness.\n'+
+'Background: 100% pure flat '+state.bBg+' — NO shadow cast onto background, NO ambient occlusion, NO environment gradient.\n'+
+'Keep character\'s 3D volume while background stays perfectly clean.\n\n'+
+'=== LAYOUT LOCK ===\n'+
+'Canvas: 2000 × 1600 px, EXACT 5 columns × 4 rows = 20 panels, each 400×400 px\n'+
+'Character perfectly centered in each panel, ≥20px safe margin from all edges\n'+
+'NO grid lines, NO borders, NO separators, NO text labels, NO numbers\n'+
+'HARD BOUNDARY: Every element (character body, expression effects, decorations) MUST stay strictly within its own 400×400 panel. Nothing may cross into adjacent panels under any circumstance.\n\n'+
+'=== EXPRESSION LOCK ===\n'+
+'Facial STRUCTURE must remain identical across all panels — same face shape, same features.\n'+
+'ONLY change: eyes, eyebrows, mouth, and expression effects (tears, sweat drops, smoke, sparkles, fire, ZZZ, hearts).\n'+
+'Each panel must show a DISTINCT, clearly different expression — NO duplicate expressions.\n\n'+
+'=== PANEL DETAILS ===\n'+
+cellDesc+
+'=== FORBIDDEN ===\n'+
+'1. No explanatory text, no labels, no numbers, no grid lines\n'+
+'2. No character redesign or style drift between panels\n'+
+'3. No shadow or gradient on the background (character shading is OK)\n'+
+'4. No elements crossing panel boundaries\n'+
+'5. No duplicate expressions across panels\n\n'+
+'=== OUTPUT ===\n'+
+'Return ONE single 2000×1600 image, 20 expression panels, no text anywhere.';
+
+  document.getElementById('prompt-output').textContent = full;
+}
+
+function generateRefPrompt(b, symbols, count) {
+  const colorDesc = state.refSymColor === 'rainbow'
+    ? '彩虹多色（每個符號使用不同鮮豔顏色，整體繽紛活潑） / Rainbow multicolor (each symbol a different vivid color)'
+    : state.refSymColor + '（統一色調） / unified color tone';
+
+  const charName = document.getElementById('ref-char-name').value.trim() || '上傳的角色';
+  const intensityText = state.intensity === 'b1'
+    ? 'EXPRESSION STYLE: B1 Natural — subtle, natural, reusable for daily conversation.\n情緒強度：B1 自然、日常、溫和、好用。\n'
+    : 'EXPRESSION STYLE: B2 Dramatic — exaggerated, expressive, funny, highly noticeable.\n情緒強度：B2 誇張、戲劇、強烈、有記憶點。\n';
+
+  // 三種構圖完全獨立，避免 split / merge / dissolve 規則互相污染
+  let compositionBlock = '';
+
+  if (state.composition === 'dissolve') {
+    compositionBlock =
+'=== COMPOSITION MODE: DISSOLVE / 溶入模式（唯一規則）===\n' +
+'IMPORTANT: In this mode, there is NO separate character body and NO separate symbol object.\n' +
+'重點：此模式沒有獨立角色身體，也沒有獨立符號物件，最後只能像一個整體。\n\n' +
+'1. The symbol MUST be the ONLY visible outer silhouette.\n' +
+'   符號必須是唯一外輪廓。\n' +
+'2. The character face must be embedded INSIDE the symbol shape.\n' +
+'   角色臉部必須嵌入符號內部。\n' +
+'3. Facial features may be cropped, merged, stretched, compressed, or slightly deformed to fit the symbol.\n' +
+'   臉部五官可以裁切、融合、拉伸、壓縮或微變形，以符合符號形狀。\n' +
+'4. The face must NOT appear as a complete round head pasted on top.\n' +
+'   臉不能像一顆完整圓頭貼在符號上。\n' +
+'5. The face must have NO independent outline outside the symbol.\n' +
+'   臉不能有獨立外框跑出符號外。\n' +
+'6. If the result looks like “symbol + face”, it is WRONG. It must look like “a symbol containing facial features”.\n' +
+'   如果看起來像「符號＋臉」就是錯；必須像「符號本身長出五官」。\n\n' +
+'=== SYMBOL PRIORITY LOCK / 字母優先鎖 ===\n' +
+'The assigned symbol must be readable FIRST at a glance.\n' +
+'第一眼必須先看得出指定符號。\n' +
+'Facial features are secondary and must adapt to the symbol, not replace it.\n' +
+'五官是輔助，必須服從符號形狀，不可取代符號結構。\n' +
+'❌ Do NOT turn the symbol into a generic emoji face.\n' +
+'❌ 不可把符號變成普通表情臉。\n\n' +
+intensityText;
+  } else if (state.composition === 'merge') {
+    compositionBlock =
+'=== COMPOSITION MODE: CLIMBING / 攀爬模式（唯一規則）===\n' +
+'1. The symbol and character are TWO visible elements, but they must physically interact.\n' +
+'   符號與角色是兩個可見元素，但必須有明確互動。\n' +
+'2. The character may climb, hug, sit on, hang from, lean against, or wrap around the symbol.\n' +
+'   角色可以攀爬、抱住、坐上、懸掛、倚靠或環繞符號。\n' +
+'3. The character must touch the symbol; do NOT place them apart.\n' +
+'   角色必須接觸符號，不可分開擺放。\n' +
+'4. The symbol remains readable and larger than the character.\n' +
+'   符號仍須清楚可讀，且大於角色。\n' +
+'5. Character face must remain visible and not be covered by the symbol.\n' +
+'   角色臉部必須清楚，不可被符號遮住。\n\n' +
+intensityText;
+  } else {
+    const sym = state.symRatio || 30;
+    const char = 100 - sym;
+    compositionBlock =
+'=== COMPOSITION MODE: SPLIT / 分兩邊模式（唯一規則）===\n' +
+'1. The symbol and character are TWO separate elements in the same panel.\n' +
+'   符號與角色是同一格內的兩個獨立元素。\n' +
+'2. The symbol is the PRIMARY subject and first visual focus.\n' +
+'   符號是主體與第一視覺焦點。\n' +
+'3. The character is a secondary helper element.\n' +
+'   角色是輔助元素。\n' +
+'4. Target ratio: symbol about ' + sym + '% / character about ' + char + '%.\n' +
+'   目標比例：符號約 ' + sym + '%，角色約 ' + char + '%。\n' +
+'5. If space conflicts occur, reduce the character first; never reduce symbol readability.\n' +
+'   若空間衝突，優先縮小角色，不可犧牲符號辨識。\n' +
+'6. Character face must remain visible and not be covered by the symbol.\n' +
+'   角色臉部必須清楚，不可被符號遮住。\n\n' +
+intensityText;
+  }
+
+  const panelDetails = symbols.map((sym, i) => {
+    const fileNum = String(b.start + i).padStart(3, '0');
+    const emotion = state.emotions[i];
+    const faceDesc = emotion ? emotion + '（' + EMOTION_FACE[emotion] + '）' : 'varied emotion, AI自由發揮但不可重複';
+    const col = (i % 5) + 1;
+    const row = Math.floor(i / 5) + 1;
+    return fileNum + ' Panel ' + (i+1) + ' (Row ' + row + ' Col ' + col + '): Symbol「' + sym + '」Expression: ' + faceDesc;
+  }).join('\n');
+
+  const blankPanels = count < 20
+    ? '\n' + Array.from({length: 20 - count}, (_, i) => 'Panel ' + (count+i+1) + ': blank, background color only').join('\n')
+    : '';
+
+  const full =
+'Create ONE single image: 2000 × 1600 px\n' +
+'Layout: EXACT 5 columns × 4 rows = 20 panels\n' +
+'Each panel: EXACTLY 400 × 400 px\n' +
+'Background: PURE ' + state.refBg + '\n\n' +
+'=== CHARACTER / 角色設定 ===\n' +
+'Use the uploaded reference character as the style source.\n' +
+'請以上傳角色母圖作為風格來源。\n' +
+'Character name / 角色名稱：' + charName + '\n' +
+'Art style / 畫風：' + state.refStyle + '\n' +
+'Keep the same facial identity, colors, line weight, and overall style across all panels.\n' +
+'所有格子需保持相同角色辨識、顏色、描邊粗細與整體風格。\n' +
+'No redesign, no style drift.\n' +
+'禁止重新設計，禁止風格漂移。\n\n' +
+compositionBlock + '\n' +
+'=== SYMBOL DESIGN / 符號視覺規格 ===\n' +
+'Symbol style / 字型風格：' + state.refSymFont + '\n' +
+'Symbol color / 符號顏色：' + colorDesc + '\n' +
+'NEVER use system fonts, standard typography, or typed text.\n' +
+'嚴禁使用系統字體、標準字型、直接打字輸出。\n' +
+'Symbols must be hand-drawn graphic shapes, bold, thick, high-contrast, and readable at small emoji size.\n' +
+'符號必須是手繪圖形，粗、厚、高對比，縮小成表情貼尺寸仍清楚。\n\n' +
+'=== SYMBOL ACCURACY LOCK / 符號形狀鎖死 ===\n' +
+'Each symbol MUST match its assigned character exactly and remain immediately recognizable.\n' +
+'每個符號必須嚴格對應指定字元，且一眼可辨識。\n' +
+'No substitution. No over-stylization that distorts the assigned symbol.\n' +
+'禁止替換符號，禁止過度風格化導致形狀走樣。\n\n' +
+'=== LAYOUT / 佈局規格 ===\n' +
+'Canvas: 2000 × 1600 px, horizontal / 畫幅：2000 × 1600 px（橫向）\n' +
+'Structure: EXACT 5 columns × 4 rows = 20 panels, each 400 × 400 px\n' +
+'結構：5欄 × 4列 = 20格，每格 400 × 400 px\n' +
+(count < 20 ? 'Active panels: ' + count + '. Remaining ' + (20-count) + ' panels: fill with background color only.\n有效格數：' + count + ' 格，其餘留白。\n' : 'Active panels: 20 / 有效格數：20格\n') +
+'Safe margin: keep all visible elements at least 40px away from panel edges.\n' +
+'安全邊距：所有可見元素離格子邊緣至少 40px。\n' +
+'Content size: main content should occupy about 70–80% of each panel.\n' +
+'主體大小：每格主體約佔 70–80%。\n' +
+'No grid lines, no borders, no separators.\n' +
+'禁止格線、邊框、分隔線。\n\n' +
+'=== PANEL DETAILS / 各格詳細指定 ===\n' +
+ panelDetails + blankPanels + '\n\n' +
+'=== FORBIDDEN / 嚴格禁忌 ===\n' +
+'1. No labels, no grid lines, no borders, no numbers.\n' +
+'   禁止說明文字、格線、框線、數字編號。\n' +
+'2. Background must be 100% pure ' + state.refBg + '.\n' +
+'   背景必須為純淨 ' + state.refBg + '。\n' +
+'3. No system fonts for symbols.\n' +
+'   禁止符號以標準字型呈現。\n' +
+'4. Nothing may cross into adjacent panels.\n' +
+'   任何元素不得跨到相鄰格。\n' +
+'5. Do not mix rules from other composition modes. Follow ONLY the selected composition mode above.\n' +
+'   不可混用其他構圖模式規則，只能遵守上方選定模式。\n\n' +
+'=== OUTPUT / 輸出 ===\n' +
+'Return ONE single image: 2000 × 1600 px, 5×4 grid, background ' + state.refBg + ', no grid lines.\n' +
+'輸出一張圖：2000×1600 px，5欄×4列，背景 ' + state.refBg + '，無格線。';
+
+  document.getElementById('prompt-output').textContent = full;
+}
+
+function generateSymPrompt(b, symbols, count) {
+  const colorDesc = state.symColor === 'rainbow'
+    ? '彩虹多色（每個符號不同鮮豔顏色） / Rainbow multicolor (each symbol different vivid color)'
+    : state.symColor + '（統一色調） / unified color tone';
+
+  const decoDesc = state.symDecos.length > 0
+    ? '裝飾元素 / Decoration: ' + state.symDecos.join('、') + '\n'
+    : 'No extra decoration. Symbol is the only visual element. / 無額外裝飾，符號為唯一視覺元素\n';
+
+  const full =
+'Create ONE single image: 2000 × 1600 px\n' +
+'Layout: EXACT 5 columns × 4 rows = 20 panels\n' +
+'Each panel: EXACTLY 400 × 400 px\n' +
+'Background: PURE ' + state.symBg + '\n' +
+'NO characters, NO animals, NO people. Pure symbol visual design only.\n' +
+'無角色、無人物、無動物，純符號視覺設計。\n' +
+'\n' +
+'=== SYMBOL STYLE / 符號視覺風格 ===\n' +
+'Theme style / 主題風格：' + state.symTheme + '\n' +
+'Color / 主色調：' + colorDesc + '\n' +
+'Symbol size / 符號大小：' + state.symSize + '\n' +
+decoDesc +
+'⚠️ NEVER use system fonts, standard typography, or typed text.\n' +
+'⚠️ 嚴禁使用系統字體、標準字型、直接打字輸出。\n' +
+'Symbols must be hand-drawn graphic shapes, visually &quot;drawn&quot; not &quot;typed&quot;.\n' +
+'符號必須是手繪圖形，視覺上是「畫出來的」而非「打出來的」。\n' +
+'All 20 panels must share the exact same design style. No style drift.\n' +
+'所有格子必須維持同一套設計風格，禁止風格漂移。\n' +
+'Symbols must be clearly readable / 符號必須清楚可辨識\n' +
+'\n' +
+'=== SYMBOL ACCURACY LOCK / 符號形狀鎖死 ===\n' +
+'Each symbol MUST match its assigned character EXACTLY. Do not reinterpret, substitute, or stylize beyond recognition.\n' +
+'每個符號必須嚴格對應指定字元，禁止自行詮釋、替換或過度風格化導致無法辨識。\n' +
+'If the symbol is a letter: letterform must be correct and immediately recognizable as that specific letter.\n' +
+'如果是字母：字母形狀必須正確，一眼可認出是那個字母。\n' +
+'If the symbol is punctuation or special character: shape must precisely match the standard form.\n' +
+'如果是標點或特殊符號：形狀必須與標準字元精確一致，不得走樣。\n' +
+'\n' +
+'=== LAYOUT / 佈局規格 ===\n' +
+'Canvas: 2000 × 1600 px, horizontal / 畫幅：2000 × 1600 px（橫向）\n' +
+'Structure: EXACT 5 columns × 4 rows = 20 panels, each 400 × 400 px\n' +
+'結構：5欄 × 4列 = 20格，每格 400 × 400 px\n' +
+(count < 20 ? 'Active panels: ' + count + '. Remaining ' + (20-count) + ' panels: background color only.\n有效格數：' + count + '，其餘留白。\n' : 'Active panels: 20 / 有效格數：20格\n') +
+'One symbol per panel, centered, ≥20px safe margin\n' +
+'每格一個符號，置中，四周留 ≥20px 安全邊距\n' +
+'No grid lines, no borders / 禁止格線、邊框\n' +
+'\n' +
+'=== PANEL LIST / 各格符號列表 ===\n' +
+symbols.map((sym, i) => {
+  const fileNum = String(b.start + i).padStart(3, '0');
+  const col = (i % 5) + 1;
+  const row = Math.floor(i / 5) + 1;
+  return fileNum + ' Panel ' + (i+1) + ' (Row ' + row + ' Col ' + col + '): Symbol「' + sym + '」';
+}).join('\n') +
+(count < 20 ? '\n' + Array.from({length: 20 - count}, (_, i) => 'Panel ' + (count+i+1) + ': blank, background only').join('\n') : '') +
+'\n\n' +
+'=== FORBIDDEN / 嚴格禁忌 ===\n' +
+'1. No labels, no grid lines, no borders, no numbers / 禁止說明文字、格線、框線、數字編號\n' +
+'2. Background must be 100% pure ' + state.symBg + ' / 背景必須純淨 ' + state.symBg + '\n' +
+'3. No system fonts / 禁止以標準字型呈現符號\n' +
+'4. No characters, animals, or people / 禁止出現角色、人物、動物\n' +
+'5. Consistent style across all panels / 各格設計風格必須完全一致\n' +
+'6. HARD BOUNDARY: Every symbol and decoration MUST stay strictly within its own 400×400 panel. Nothing may cross into adjacent panels under any circumstances.\n' +
+'   硬性邊界：每格的符號與裝飾元素必須嚴格限制在自己的 400×400 格子內，任何情況下絕對禁止跨格。\n' +
+'7. SYMBOL SHAPE LOCK: Each symbol must be immediately recognizable as the exact assigned character. No substitution, no distortion beyond recognition.\n' +
+'   符號形狀鎖死：每個符號必須讓人一眼認出就是指定字元，禁止替換或扭曲至無法辨識。\n' +
+'\n' +
+'=== OUTPUT / 輸出 ===\n' +
+'Return ONE single image: 2000 × 1600 px, 5×4 grid, background ' + state.symBg + ', no grid lines.\n' +
+'輸出一張圖：2000×1600 px，5欄×4列，背景 ' + state.symBg + '，無格線。';
+
+  document.getElementById('prompt-output').textContent = full;
+}
+
+function copyPrompt() {
+  const text = document.getElementById('prompt-output').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✅ 已複製！';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 複製 Prompt'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function copyAndOpen(target) {
+  copyPrompt();
+  const urls = { gpt: 'https://chat.openai.com', gemini: 'https://gemini.google.com' };
+  window.open(urls[target], '_blank');
+}
+
+function handleRefUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('upload-preview').innerHTML = '<img src=&quot;' + e.target.result + '&quot;>';
+    generatePrompt();
+  };
+  reader.readAsDataURL(file);
+}
+
+const uploadArea = document.getElementById('upload-area');
+if (uploadArea) {
+  uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag'));
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault(); uploadArea.classList.remove('drag');
+    const file = e.dataTransfer.files[0];
+    if (file) { document.getElementById('ref-input').files = e.dataTransfer.files; handleRefUpload(document.getElementById('ref-input')); }
+  });
+}
+
+const refCharEl = document.getElementById('ref-char-name');
+if (refCharEl) refCharEl.addEventListener('input', function() {
+  state.refCharName = this.value.trim();
+  generatePrompt();
+});
+
+init();
+</script>
+</body>
+</html>
+" style="width:100%;height:calc(100vh - 120px);min-height:800px;border:1px solid var(--border);border-radius:14px;background:#0d0d14;display:block;"></iframe>
+</div>
+
 
 <script>
   // ===== 角色資料庫（第二頁，使用者不可見） =====
@@ -2114,149 +3353,15 @@ ${themes}
   function switchStep(n) {
     document.querySelector('main').style.display = n === 1 ? 'grid' : 'none';
     document.querySelector('.hero-section').style.display = n === 1 ? 'flex' : 'none';
-    document.getElementById('page-step2').style.display = n === 2 ? 'block' : 'none';
-    document.getElementById('page-step3').style.display = n === 3 ? 'block' : 'none';
-    document.getElementById('page-step4').style.display = n === 4 ? 'block' : 'none';
-    [1,2,3,4].forEach(i => {
-      const nav = document.getElementById(`step-nav-${i}`);
+    const s4 = document.getElementById('page-step4');
+    const s5 = document.getElementById('page-step5');
+    if (s4) s4.style.display = n === 4 ? 'block' : 'none';
+    if (s5) s5.style.display = n === 5 ? 'block' : 'none';
+    [1, 4, 5].forEach(i => {
+      const nav = document.getElementById('step-nav-' + i);
       if (nav) nav.classList.toggle('active', i === n);
     });
-  }
-
-  // ===== Step 2: 上傳分割 =====
-  let step2ImageData = null;
-  let splitResults = [];
-
-  // 拖曳上傳
-  const uploadArea = document.getElementById('step2-upload-area');
-  uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.style.borderColor = 'var(--accent)'; });
-  uploadArea.addEventListener('dragleave', () => { uploadArea.style.borderColor = 'var(--border)'; });
-  uploadArea.addEventListener('drop', e => {
-    e.preventDefault();
-    uploadArea.style.borderColor = 'var(--border)';
-    const file = e.dataTransfer.files[0];
-    if (file) loadStep2Image(file);
-  });
-
-  function handleStep2Upload(e) {
-    const file = e.target.files[0];
-    if (file) loadStep2Image(file);
-  }
-
-  function loadStep2Image(file) {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = new Image();
-      img.onload = () => {
-        step2ImageData = img;
-        document.getElementById('step2-preview-area').innerHTML = `
-          <img src="${ev.target.result}" style="max-width:100%;max-height:250px;border-radius:8px;object-fit:contain;">
-          <p style="margin-top:8px;font-size:12px;color:var(--accent3);">✅ 已載入：${img.width} × ${img.height} px</p>
-          ${img.width !== 2560 || img.height !== 1664 ? '<p style="font-size:12px;color:#ff6b35;">⚠️ 尺寸不符2560×1664，分割可能偏移</p>' : ''}
-        `;
-        document.getElementById('step2-settings').style.display = 'block';
-        resetCrop();
-        updateCropPreview();
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function processImage() {
-    if (!step2ImageData) return;
-    const removeBG = document.getElementById('remove-bg').checked;
-    const startNum = parseInt(document.getElementById('start-num').value) || 1;
-    const cols = gridCols, rows = gridRows;
-
-    const canvas = getCroppedCanvas();
-    if (!canvas) return;
-
-    const cellW = Math.floor(canvas.width / cols);
-    const cellH = Math.floor(canvas.height / rows);
-
-    splitResults = [];
-    const grid = document.getElementById('step2-grid');
-    grid.innerHTML = '';
-
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const cell = document.createElement('canvas');
-        cell.width = 370;
-        cell.height = 320;
-        const cCtx = cell.getContext('2d');
-        cCtx.drawImage(canvas, c * cellW, r * cellH, cellW, cellH, 0, 0, 370, 320);
-
-        if (removeBG) removeGreenScreen(cCtx, 370, 320);
-
-        const idx = r * cols + c;
-        const num = startNum + idx;
-        splitResults.push({ canvas: cell, num });
-
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = 'position:relative;border:1px solid var(--border);border-radius:6px;overflow:hidden;';
-        // 建立帶棋盤格的預覽 canvas
-        const previewCanvas = document.createElement('canvas');
-        previewCanvas.width = 370; previewCanvas.height = 320;
-        previewCanvas.style.cssText = 'width:100%;display:block;image-rendering:auto;';
-        const pCtx = previewCanvas.getContext('2d');
-        // 棋盤格背景
-        const sq = 12;
-        for (let py = 0; py < 320; py += sq) {
-          for (let px = 0; px < 370; px += sq) {
-            pCtx.fillStyle = ((px/sq + py/sq) % 2 === 0) ? '#aaaaaa' : '#dddddd';
-            pCtx.fillRect(px, py, sq, sq);
-          }
-        }
-        pCtx.drawImage(cell, 0, 0);
-        const label = document.createElement('div');
-        label.style.cssText = 'text-align:center;font-size:10px;color:var(--text2);padding:2px;background:var(--bg3);';
-        label.textContent = `${num}（370×320）`;
-        wrapper.appendChild(previewCanvas);
-        wrapper.appendChild(label);
-        grid.appendChild(wrapper);
-      }
-    }
-
-    grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    document.getElementById('step2-result').style.display = 'block';
-    document.getElementById('step2-result').scrollIntoView({ behavior: 'smooth' });
-  }
-
-  function removeGreenScreen(ctx, w, h) {
-    const imageData = ctx.getImageData(0, 0, w, h);
-    const data = imageData.data;
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i], g = data[i+1], b = data[i+2];
-      // 偵測綠幕顏色範圍
-      if (g > 150 && r < 100 && b < 100) {
-        data[i+3] = 0; // 透明
-      }
-    }
-    ctx.putImageData(imageData, 0, 0);
-  }
-
-  async function downloadAll() {
-    if (splitResults.length === 0) return;
-    // 用JSZip打包
-    const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-    document.head.appendChild(script);
-    script.onload = async () => {
-      const zip = new JSZip();
-      splitResults.forEach(({ canvas, num }) => {
-        const dataURL = canvas.toDataURL('image/png');
-        const base64 = dataURL.split(',')[1];
-        zip.file(`${String(num).padStart(2,'0')}.png`, base64, { base64: true });
-      });
-      const blob = await zip.generateAsync({ type: 'blob' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = '貼圖分割包.zip';
-      a.click();
-      URL.revokeObjectURL(url);
-    };
+    if (n === 4 && typeof generateAnimPrompt === 'function') generateAnimPrompt();
   }
 
   // ===== Step 4: 動態幀指令產生器 =====
