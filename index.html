@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>去背工具V9.9 · 煩躁胖子</title>
+<title>05031205V10 · 去背工具 · 煩躁胖子</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <style>
@@ -537,6 +537,21 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
   .two-col { grid-template-columns: 1fr; }
 }
 
+/* ===== 05031205V10 Dual Background Preview ===== */
+.dual-preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dual-preview-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px;}
+.dual-preview-title{font-size:12px;font-weight:900;color:var(--accent2);text-align:center;margin-bottom:8px;}
+.dual-canvas-stage{position:relative;aspect-ratio:1.54;min-height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:10px;border:1px solid var(--border);background-image:linear-gradient(45deg,#334155 25%,transparent 25%),linear-gradient(-45deg,#334155 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#334155 75%),linear-gradient(-45deg,transparent 75%,#334155 75%);background-size:12px 12px;background-color:#1e293b;}
+.dual-canvas-stage canvas{max-width:100%;max-height:100%;display:block;}
+.wand-layer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;max-width:100%;max-height:100%;display:block;}
+.wand-pick-active{outline:2px solid var(--accent2);box-shadow:0 0 0 4px rgba(255,209,102,.16);cursor:crosshair;}
+.bg-mode-btn.active-none{border-color:#aaa;color:#eee;background:rgba(255,255,255,.08)}
+.bg-mode-btn.active-traditional{border-color:var(--accent3);color:var(--accent3);background:rgba(6,214,160,.08)}
+.bg-mode-btn.active-wand{border-color:var(--accent2);color:var(--accent2);background:rgba(255,209,102,.12)}
+.bg-param-panel{display:none}.bg-param-panel.active{display:block}
+@media(max-width:760px){.dual-preview-grid{grid-template-columns:1fr;}}
+
+
 
 /* ===== Product Landing / Promotion Add-on v9.1 ===== */
 .product-hero {
@@ -789,7 +804,7 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
 <body>
 
 <header>
-  <div class="logo">煩躁胖子<span>· 去背工具<span>V9.9</span></div>
+  <div class="logo">煩躁胖子<span>· 去背工具<span>05031205V10</span></div>
   <div class="version" id="ver-tag"></div>
 </header>
 
@@ -823,7 +838,8 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
 <div class="steps-nav">
   <div class="step-tab active" id="tab1" onclick="goStep(1)"><span class="step-num">1</span>上傳</div>
   <div class="step-tab" id="tab2" onclick="goStep(2)"><span class="step-num">2</span>去星星</div>
-  <div class="step-tab" id="tab3" onclick="goStep(3)"><span class="step-num">3</span>設定＋切割</div>
+  <div class="step-tab" id="tab3" onclick="goStep(3)"><span class="step-num">3</span>去背</div>
+  <div class="step-tab" id="tab4" onclick="goStep(4)"><span class="step-num">4</span>分割＋打包</div>
 </div>
 
 <main>
@@ -999,212 +1015,160 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
   </div>
 </div>
 
-<!-- STEP 3: 全合一頁 -->
+<!-- STEP 3: 去背頁｜05031245V13 整張魔術棒多選區版 -->
 <div class="page" id="page3">
-
   <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
-
-    <!-- 左側：設定面板 -->
-    <div style="width:260px;flex-shrink:0;">
-
+    <div style="width:300px;flex-shrink:0;">
       <div class="card">
-        <div class="card-title">🎨 快速預設</div>
-        <div class="preset-btns">
-          <div class="preset-btn active-green" id="preset-green" onclick="applyPreset('green')">🟩 綠幕</div>
-          <div class="preset-btn" id="preset-black" onclick="applyPreset('black')">⬛ 黑底</div>
-          <div class="preset-btn" id="preset-white" onclick="applyPreset('white')">⬜ 白幕</div>
-        </div>
-        <div class="card-title" style="margin-top:12px;">🔧 去背模式</div>
+        <div class="card-title">🎨 去背模式（三選一）</div>
         <div class="mode-btns">
-          <div class="mode-btn active" id="mode-complete" onclick="setMode('complete')">
-            完全去背<br><span style="font-size:10px;font-weight:400;opacity:0.7;">移除所有背景</span>
-          </div>
-          <div class="mode-btn" id="mode-preserve" onclick="setMode('preserve')">
-            保留文字<br><span style="font-size:10px;font-weight:400;opacity:0.7;">保留格紋文字</span>
-          </div>
-          <div class="mode-btn" id="mode-none" onclick="setMode('none')">
-            不去背<br><span style="font-size:10px;font-weight:400;opacity:0.7;">直接切割輸出</span>
-          </div>
+          <div class="mode-btn bg-mode-btn active-none" id="bg-mode-none" onclick="setBgMode('none')">A 不去背<br><span style="font-size:10px;font-weight:400;opacity:.7;">原圖輸出</span></div>
+          <div class="mode-btn bg-mode-btn" id="bg-mode-traditional" onclick="setBgMode('traditional')">B 傳統去背<br><span style="font-size:10px;font-weight:400;opacity:.7;">只跑傳統</span></div>
+          <div class="mode-btn bg-mode-btn" id="bg-mode-wand" onclick="setBgMode('wand')">C 魔術棒去背<br><span style="font-size:10px;font-weight:400;opacity:.7;">只跑魔術棒</span></div>
         </div>
-        <div class="adv-toggle" onclick="toggleAdv()">
-          <span>⚙️ 進階設定</span>
-          <span id="adv-arrow">▼</span>
+        <div class="info-box" style="font-size:11px;line-height:1.6;margin-bottom:12px;">模式互斥：選 A 就關 B/C；選 B 只套傳統；選 C 只套魔術棒。預覽與匯出使用同一個模式。</div>
+        <div class="bg-param-panel" id="panel-none">
+          <div class="card-title" style="margin-top:12px;">A｜不去背</div>
+          <div class="wand-status">不套任何去背效果，分割打包時直接輸出原圖。</div>
         </div>
-        <div class="adv-content" id="adv-content">
+        <div class="bg-param-panel active" id="panel-traditional">
+          <div class="card-title" style="margin-top:12px;">B｜傳統去背參數</div>
+          <div class="preset-btns">
+            <div class="preset-btn active-green" id="preset-green" onclick="applyPreset('green')">🟩 綠幕</div>
+            <div class="preset-btn" id="preset-black" onclick="applyPreset('black')">⬛ 黑底</div>
+            <div class="preset-btn" id="preset-white" onclick="applyPreset('white')">⬜ 白幕</div>
+          </div>
+          <div class="mode-btns">
+            <div class="mode-btn active" id="trad-mode-complete" onclick="setTraditionalEffect('complete')">完全去背</div>
+            <div class="mode-btn" id="trad-mode-preserve" onclick="setTraditionalEffect('preserve')">保留文字</div>
+          </div>
           <div class="color-pick-row">
-            <label>目標顏色</label>
+            <label>傳統目標顏色</label>
             <input type="color" id="target-color" value="#00FF00">
             <span id="color-hex" style="font-size:11px;font-family:'Share Tech Mono',monospace;color:var(--text2);">#00FF00</span>
           </div>
+          <div class="slider-group">
+            <div class="slider-label"><span>傳統容許度</span><span id="tol-val">30</span></div>
+            <input type="range" id="tolerance" min="1" max="100" value="30" oninput="document.getElementById('tol-val').textContent=this.value;runPreview()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label"><span>傳統邊緣柔化</span><span id="smooth-val">2</span></div>
+            <input type="range" id="smoothness" min="0" max="10" value="2" oninput="document.getElementById('smooth-val').textContent=this.value;runPreview()">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-bottom:12px;">
+            <input type="checkbox" id="despill" checked style="accent-color:var(--accent3);" onchange="runPreview()">
+            <label for="despill">傳統溢色去除 Despill</label>
+          </div>
+        </div>
+        <div class="bg-param-panel" id="panel-wand">
+          <div class="card-title" style="margin-top:12px;">C｜魔術棒去背參數</div>
+          <div class="slider-group">
+            <div class="slider-label"><span>魔術棒容許度</span><span id="wand-tol-val">30</span></div>
+            <input type="range" id="wand-tolerance" min="1" max="120" value="30" oninput="document.getElementById('wand-tol-val').textContent=this.value;runPreview()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label"><span>魔術棒邊緣柔化</span><span id="wand-smooth-val">2</span></div>
+            <input type="range" id="wand-smoothness" min="0" max="10" value="2" oninput="document.getElementById('wand-smooth-val').textContent=this.value;runPreview()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label"><span>魔術棒清邊吃入</span><span id="wand-erode-val">1px</span></div>
+            <input type="range" id="wand-erode" min="0" max="3" value="1" oninput="document.getElementById('wand-erode-val').textContent=this.value+'px';runPreview()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label"><span>魔術棒 Despill 強度</span><span id="wand-despill-strength-val">75%</span></div>
+            <input type="range" id="wand-despill-strength" min="0" max="100" value="75" oninput="document.getElementById('wand-despill-strength-val').textContent=this.value+'%';runPreview()">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-bottom:12px;">
+            <input type="checkbox" id="wand-despill" checked style="accent-color:var(--accent3);" onchange="runPreview()">
+            <label for="wand-despill">魔術棒溢色去除 Despill</label>
+          </div>
           <div class="wand-row">
-            <button type="button" class="wand-btn" id="magic-wand-btn" onclick="toggleMagicWandPicker()">🪄 魔術棒取色：點格線預覽背景</button>
-            <div class="wand-status" id="magic-wand-status">尚未啟用。啟用後到右側「格線預覽」點背景色，會自動更新目標顏色。</div>
+            <button type="button" class="wand-btn" id="magic-wand-btn" onclick="toggleMagicWandPicker()">🪄 魔術棒連續選取：點整張母圖</button>
+            <button type="button" class="wand-btn" onclick="undoMagicWandV13()">復原上一點</button>
+            <button type="button" class="wand-btn" onclick="clearMagicWandV10()">清除魔術棒選區</button>
+            <div class="wand-status" id="magic-wand-status">尚未選取。啟用後可在右側整張母圖連續點選多個背景區。</div>
           </div>
-          <div class="slider-group">
-            <div class="slider-label"><span>色彩容許度</span><span id="tol-val">30</span></div>
-            <input type="range" id="tolerance" min="1" max="100" value="30" oninput="document.getElementById('tol-val').textContent=this.value">
-          </div>
-          <div class="slider-group">
-            <div class="slider-label"><span>邊緣柔化</span><span id="smooth-val">2</span></div>
-            <input type="range" id="smoothness" min="0" max="10" value="2" oninput="document.getElementById('smooth-val').textContent=this.value">
-          </div>
-          <div class="slider-group">
-            <div class="slider-label"><span>裁切縮放（去黑邊）</span><span id="zoom-val">0%</span></div>
-            <input type="range" id="zoom" min="1.00" max="1.50" step="0.01" value="1.00" oninput="document.getElementById('zoom-val').textContent=Math.round((this.value-1)*100)+'%'">
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);">
-            <input type="checkbox" id="despill" checked style="accent-color:var(--accent3);">
-            <label for="despill">溢色去除 (Despill)</label>
-          </div>
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>裁切縮放（去黑邊）</span><span id="zoom-val">0%</span></div>
+          <input type="range" id="zoom" min="1.00" max="1.50" step="0.01" value="1.00" oninput="document.getElementById('zoom-val').textContent=Math.round((this.value-1)*100)+'%';runPreview()">
+        </div>
+        <div class="action-row" style="margin-top:14px;">
+          <button class="btn-main btn-accent" onclick="runPreview()">重新整理雙預覽</button>
+          <button class="btn-main btn-green" onclick="goStep(4)">匯入切割 →</button>
+          <button class="btn-main btn-outline" onclick="downloadCurrentWorkImage()">下載目前去背圖</button>
         </div>
       </div>
-
-      <div class="card">
-        <div class="card-title">📐 分割格數</div>
-        <div class="slider-group">
-          <div class="slider-label"><span>欄數 (Columns)</span><span id="cols-val">5</span></div>
-          <input type="range" id="cols" min="1" max="8" value="5" oninput="document.getElementById('cols-val').textContent=this.value;updateGridCanvas();updateSlicePreview()">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>列數 (Rows)</span><span id="rows-val">4</span></div>
-          <input type="range" id="rows" min="1" max="8" value="4" oninput="document.getElementById('rows-val').textContent=this.value;updateGridCanvas();updateSlicePreview()">
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📋 圖片位置</div>
-        <div class="slider-group">
-          <div class="slider-label"><span>水平偏移</span><span id="x-val">0px</span></div>
-          <input type="range" id="grid-x" min="-1280" max="1280" value="0" oninput="document.getElementById('x-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview()">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>垂直偏移</span><span id="y-val">0px</span></div>
-          <input type="range" id="grid-y" min="-832" max="832" value="0" oninput="document.getElementById('y-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview()">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>縮放</span><span id="scale-val">100%</span></div>
-          <input type="range" id="grid-scale" min="0.5" max="1.5" step="0.01" value="1.0" oninput="document.getElementById('scale-val').textContent=Math.round(this.value*100)+'%';updateGridCanvas();updateSlicePreview()">
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">✂️ 裁邊（去空白）</div>
-        <div class="slider-group">
-          <div class="slider-label"><span>裁左</span><span id="crop-l-val">0px</span></div>
-          <input type="range" id="crop-l" min="0" max="500" value="0" oninput="document.getElementById('crop-l-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview()">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>裁右</span><span id="crop-r-val">0px</span></div>
-          <input type="range" id="crop-r" min="0" max="500" value="0" oninput="document.getElementById('crop-r-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview()">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>裁上</span><span id="crop-t-val">0px</span></div>
-          <input type="range" id="crop-t" min="0" max="400" value="0" oninput="document.getElementById('crop-t-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview()">
-        </div>
-        <div class="slider-group">
-          <div class="slider-label"><span>裁下</span><span id="crop-b-val">0px</span></div>
-          <input type="range" id="crop-b" min="0" max="400" value="0" oninput="document.getElementById('crop-b-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview()">
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">📦 打包設定</div>
-        <div class="start-num-row" style="margin-bottom:12px;">
-          <label>完成尺寸：</label>
-          <div class="preset-btns" style="margin-bottom:0;flex-wrap:wrap;">
-            <div class="preset-btn active-size" id="size-btn-370" onclick="selectOutputSize(370,320,this)" style="min-width:70px;">貼圖<br><span style="font-size:10px;">370×320</span></div>
-            <div class="preset-btn" id="size-btn-320" onclick="selectOutputSize(320,270,this)" style="min-width:70px;">貼圖<br><span style="font-size:10px;">320×270</span></div>
-            <div class="preset-btn" id="size-btn-180" onclick="selectOutputSize(180,180,this)" style="min-width:70px;">表情貼<br><span style="font-size:10px;">180×180</span></div>
-          </div>
-        </div>
-        <div class="start-num-row" style="margin-bottom:12px;">
-          <label>檔名碼數：</label>
-          <div class="preset-btns" style="margin-bottom:0;">
-            <div class="preset-btn active-size" id="digits-btn-2" onclick="selectDigits(2,this)">2碼<br><span style="font-size:10px;font-weight:400">01 02 03</span></div>
-            <div class="preset-btn" id="digits-btn-3" onclick="selectDigits(3,this)">3碼<br><span style="font-size:10px;font-weight:400">001 002 003</span></div>
-          </div>
-        </div>
-        <div class="start-num-row">
-          <label>起始編號：</label>
-          <input type="number" id="start-num" value="1" min="1">
-        </div>
-      </div>
-
-      <div class="action-row" style="flex-direction:column;gap:8px;margin-top:0;">
-        <button class="btn-main btn-green" style="width:100%;justify-content:center;" onclick="startProcess()">✂️ 開始去背＋切割</button>
-        <button class="btn-main btn-green" style="width:100%;justify-content:center;" id="btn-download" onclick="downloadZip()" disabled>⬇️ 下載 ZIP</button>
-        <button class="btn-main btn-outline" style="width:100%;justify-content:center;" onclick="resetToUpload()">🔄 重新上傳</button>
-      </div>
-
     </div>
-
-    <!-- 右側：大圖預覽 + 切割預覽 -->
-    <div style="flex:1;min-width:300px;">
-
-      <!-- 大圖格線預覽 -->
+    <div style="flex:1;min-width:320px;">
       <div class="card" style="padding:12px;">
-        <div class="card-title" style="margin-bottom:8px;">🗺️ 格線預覽</div>
-        <div style="position:relative;display:inline-block;width:100%;line-height:0;">
-          <canvas id="grid-canvas" style="width:100%;border-radius:8px;display:block;cursor:crosshair;"></canvas>
-        </div>
-        <div style="font-size:11px;color:var(--text2);text-align:center;margin-top:8px;font-family:'Share Tech Mono',monospace;">
-          共 <span id="total-cells" style="color:var(--accent);font-weight:700;">20</span> 格
-          · 每格約 <span id="cell-size" style="color:var(--accent2);">512×416</span> px
-          · 魔術棒取色請點這張預覽圖
-        </div>
-      </div>
-
-      <!-- 切割預覽 + 去背預覽（合併） -->
-      <div class="card" style="padding:12px;">
-        <div class="card-title" style="margin-bottom:8px;">✂️ 切割預覽（即時）
-          <span style="font-size:10px;font-weight:400;color:var(--text2);margin-left:6px;">調整設定後自動更新</span>
-        </div>
-        <div class="sticker-grid" id="slice-preview-grid"></div>
-
-        <!-- 去背預覽區：按鈕 + 第一格對比 -->
-        <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-            <span style="font-size:13px;font-weight:700;color:var(--accent2);">🔍 去背效果預覽（第 1 格）</span>
-            <button class="btn-main btn-outline" style="padding:7px 18px;font-size:12px;" onclick="runPreview()">預覽去背</button>
+        <div class="card-title" style="margin-bottom:8px;">🔍 去背雙預覽（整張母圖）</div>
+        <div id="preview-status" style="font-size:11px;color:var(--text2);margin-bottom:10px;">左邊是整張傳統去背，右邊是整張魔術棒去背。魔術棒可多次點選，分割打包會吃同一張去背後工作圖。</div>
+        <div class="dual-preview-grid">
+          <div class="dual-preview-box">
+            <div class="dual-preview-title">A｜傳統去背</div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-align:center;">原始整張母圖</div>
+            <div class="dual-canvas-stage" style="margin-bottom:8px;"><canvas id="preview-before"></canvas></div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-align:center;">傳統結果</div>
+            <div class="dual-canvas-stage"><canvas id="preview-after"></canvas></div>
           </div>
-          <div style="font-size:11px;color:var(--text2);margin-bottom:10px;" id="preview-status">點「預覽去背」，確認去背設定正確後再批次處理。</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-            <div>
-              <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-align:center;">去背前</div>
-              <div style="background:var(--bg3);border-radius:8px;border:1px solid var(--border);aspect-ratio:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                <canvas id="preview-before" style="max-width:100%;max-height:100%;display:block;"></canvas>
-              </div>
-            </div>
-            <div>
-              <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-align:center;">去背後</div>
-              <div style="background-image:linear-gradient(45deg,#334155 25%,transparent 25%),linear-gradient(-45deg,#334155 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#334155 75%),linear-gradient(-45deg,transparent 75%,#334155 75%);background-size:12px 12px;background-color:#1e293b;border-radius:8px;border:1px solid var(--border);aspect-ratio:1;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                <canvas id="preview-after" style="max-width:100%;max-height:100%;display:block;"></canvas>
-              </div>
-            </div>
+          <div class="dual-preview-box">
+            <div class="dual-preview-title">B｜魔術棒去背</div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-align:center;">點這張整張母圖選背景</div>
+            <div class="dual-canvas-stage" style="margin-bottom:8px;"><canvas id="wand-source"></canvas><canvas id="wand-mask-overlay" class="wand-layer"></canvas></div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-align:center;">魔術棒結果</div>
+            <div class="dual-canvas-stage"><canvas id="wand-after"></canvas></div>
           </div>
         </div>
       </div>
-
-      <!-- 去背結果 -->
-      <div class="card" style="padding:12px;display:none;" id="result-card">
-        <div class="card-title" style="margin-bottom:8px;">✅ 去背結果</div>
-        <div id="progress-area" style="display:none;">
-          <div class="status-text" id="status-text">處理中...</div>
-          <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-        </div>
-        <div class="info-box" style="margin-bottom:12px;">
-          · 點擊每張貼圖下方的 <strong>Main</strong> 設定封面圖
-          · 點擊 <strong>Tab</strong> 設定標籤圖
-        </div>
-        <div class="sticker-grid" id="sticker-grid"></div>
-      </div>
-
     </div>
   </div>
 </div>
 
-<!-- 空殼保留供舊參照不報錯 -->
-<div class="page" id="page4" style="display:none;"></div>
+<!-- STEP 4: 分割＋打包 -->
+<div class="page" id="page4">
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="width:260px;flex-shrink:0;">
+      <div class="card">
+        <div class="card-title">📐 分割格數</div>
+        <div class="slider-group"><div class="slider-label"><span>欄數 (Columns)</span><span id="cols-val">5</span></div><input type="range" id="cols" min="1" max="8" value="5" oninput="document.getElementById('cols-val').textContent=this.value;updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>列數 (Rows)</span><span id="rows-val">4</span></div><input type="range" id="rows" min="1" max="8" value="4" oninput="document.getElementById('rows-val').textContent=this.value;updateGridCanvas();updateSlicePreview();runPreview()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 圖片位置</div>
+        <div class="slider-group"><div class="slider-label"><span>水平偏移</span><span id="x-val">0px</span></div><input type="range" id="grid-x" min="-1280" max="1280" value="0" oninput="document.getElementById('x-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>垂直偏移</span><span id="y-val">0px</span></div><input type="range" id="grid-y" min="-832" max="832" value="0" oninput="document.getElementById('y-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>縮放</span><span id="scale-val">100%</span></div><input type="range" id="grid-scale" min="0.5" max="1.5" step="0.01" value="1.0" oninput="document.getElementById('scale-val').textContent=Math.round(this.value*100)+'%';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">✂️ 裁邊（去空白）</div>
+        <div class="slider-group"><div class="slider-label"><span>裁左</span><span id="crop-l-val">0px</span></div><input type="range" id="crop-l" min="0" max="500" value="0" oninput="document.getElementById('crop-l-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>裁右</span><span id="crop-r-val">0px</span></div><input type="range" id="crop-r" min="0" max="500" value="0" oninput="document.getElementById('crop-r-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>裁上</span><span id="crop-t-val">0px</span></div><input type="range" id="crop-t" min="0" max="400" value="0" oninput="document.getElementById('crop-t-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>裁下</span><span id="crop-b-val">0px</span></div><input type="range" id="crop-b" min="0" max="400" value="0" oninput="document.getElementById('crop-b-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📦 打包設定</div>
+        <div class="start-num-row" style="margin-bottom:12px;"><label>完成尺寸：</label><div class="preset-btns" style="margin-bottom:0;flex-wrap:wrap;"><div class="preset-btn active-size" id="size-btn-370" onclick="selectOutputSize(370,320,this)" style="min-width:70px;">貼圖<br><span style="font-size:10px;">370×320</span></div><div class="preset-btn" id="size-btn-320" onclick="selectOutputSize(320,270,this)" style="min-width:70px;">貼圖<br><span style="font-size:10px;">320×270</span></div><div class="preset-btn" id="size-btn-180" onclick="selectOutputSize(180,180,this)" style="min-width:70px;">表情貼<br><span style="font-size:10px;">180×180</span></div></div></div>
+        <div class="start-num-row" style="margin-bottom:12px;"><label>檔名碼數：</label><div class="preset-btns" style="margin-bottom:0;"><div class="preset-btn active-size" id="digits-btn-2" onclick="selectDigits(2,this)">2碼<br><span style="font-size:10px;font-weight:400">01 02 03</span></div><div class="preset-btn" id="digits-btn-3" onclick="selectDigits(3,this)">3碼<br><span style="font-size:10px;font-weight:400">001 002 003</span></div></div></div>
+        <div class="start-num-row"><label>起始編號：</label><input type="number" id="start-num" value="1" min="1"></div>
+      </div>
+      <div class="action-row" style="flex-direction:column;gap:8px;margin-top:0;">
+        <button class="btn-main btn-green" style="width:100%;justify-content:center;" onclick="startProcess()">✂️ 開始切割＋打包</button>
+        <button class="btn-main btn-green" style="width:100%;justify-content:center;" id="btn-download" onclick="downloadZip()" disabled>⬇️ 下載 ZIP</button>
+        <button class="btn-main btn-outline" style="width:100%;justify-content:center;" onclick="goStep(3)">← 回去背預覽</button>
+        <button class="btn-main btn-outline" style="width:100%;justify-content:center;" onclick="resetToUpload()">🔄 重新上傳</button>
+      </div>
+    </div>
+    <div style="flex:1;min-width:300px;">
+      <div class="card" style="padding:12px;"><div class="card-title" style="margin-bottom:8px;">🗺️ 格線預覽</div><div style="position:relative;display:inline-block;width:100%;line-height:0;"><canvas id="grid-canvas" style="width:100%;border-radius:8px;display:block;cursor:crosshair;"></canvas></div><div style="font-size:11px;color:var(--text2);text-align:center;margin-top:8px;font-family:'Share Tech Mono',monospace;">共 <span id="total-cells" style="color:var(--accent);font-weight:700;">20</span> 格 · 每格約 <span id="cell-size" style="color:var(--accent2);">512×416</span> px</div></div>
+      <div class="card" style="padding:12px;"><div class="card-title" style="margin-bottom:8px;">✂️ 切割預覽（目前去背結果）<span style="font-size:10px;font-weight:400;color:var(--text2);margin-left:6px;">調整設定後自動更新</span></div><div class="sticker-grid" id="slice-preview-grid"></div></div>
+      <div class="card" style="padding:12px;display:none;" id="result-card"><div class="card-title" style="margin-bottom:8px;">✅ 去背結果</div><div id="progress-area" style="display:none;"><div class="status-text" id="status-text">處理中...</div><div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div></div><div class="info-box" style="margin-bottom:12px;">· 點擊每張貼圖下方的 <strong>Main</strong> 設定封面圖<br>· 點擊 <strong>Tab</strong> 設定標籤圖</div><div class="sticker-grid" id="sticker-grid"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Page 4 已改為分割＋打包頁 -->
 
 </main>
 
@@ -1215,6 +1179,36 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
   <h2>隱藏頁｜工程日誌</h2>
   <button onclick="closeDevLogV91()">關閉</button>
   <pre>
+05031347V16｜2026-05-03｜魔術棒預覽回正＋多點保留版
+- 回修 V13 起的魔術棒預覽污染：未點選前，魔術棒原圖與魔術棒結果一律從乾淨母圖重畫，不能預先套用任何去背。
+- 保留整張母圖多點魔術棒；多次點選後才累積遮罩，並維持可復原上一點、清除選區。
+- 新增上傳／去星星匯入時自動清除舊魔術棒點，避免上一張圖的選區污染新圖。
+- 僅修改魔術棒預覽初始化與狀態清理，不更動去星星、切割、ZIP、Main/Tab、作品資料庫。
+
+05031314V15｜2026-05-03｜魔術棒清邊補強版
+- 魔術棒參數新增「清邊吃入」0～3px，解決綠幕邊緣殘留、抗鋸齒清不乾淨問題。
+- 魔術棒 Despill 新增強度滑桿，避免只有開關造成修邊過強或不足。
+- 僅修改魔術棒遮罩後處理與工程日誌，不更動去星星、切割、ZIP、Main/Tab、作品資料庫。
+
+05031305V14｜2026-05-03｜命名 UI 修正版
+- 移除使用者畫面中的「手動版本」欄位，避免把內部工程命名規則放到外部操作。
+- ZIP 下載檔名恢復 stickers.zip；ZIP 內圖片仍依使用者選擇輸出 01/02 或 001/002。
+- 僅修改命名 UI 與下載 ZIP 檔名，不更動去背、魔術棒、切割、Main/Tab、去星星、作品資料庫核心流程。
+
+05031205V10｜2026-05-03｜去背／分割分頁＋雙預覽測試版
+- 以 V9.9 公開版為基底。
+- 將流程調整為：上傳 → 去星星 → 去背 → 分割＋打包。
+- 去背頁新增雙預覽：左為傳統去背，右為魔術棒去背。
+- 魔術棒支援容許度、邊緣柔化、Despill，且每次從乾淨原始整張母圖重算，避免傳統去背＋魔術棒去背疊加。
+- 分割、ZIP、Main/Tab、去星星核心流程未修改。
+
+
+05031245V13｜2026-05-03｜整張母圖魔術棒多選區版
+- 魔術棒去背預覽從「第1格」改為「整張母圖」，避免匯入切割後只有局部處理。
+- 魔術棒改為可連續多次點選，多個選區會累積套用，並新增「復原上一點」。
+- 分割與ZIP改為先吃整張目前工作圖，再切割；不再於單格階段重跑傳統/魔術棒，避免預覽與匯出不一致。
+- 存檔規則維持：日期自動＋時間自動＋版本手動。
+
 v9.9｜2026-05-02｜輪播展示區＋去背預覽整合版
 v9.7｜2026-05-02｜分類關鍵字補強版
 - 新增分類「神明」，關鍵字：財神、保平安。
@@ -1562,6 +1556,7 @@ function starImportCurrentToBg() {
   const img = new Image();
   img.onload = () => {
     originalImg = img;
+    resetMagicWandStateForNewImage();
     document.getElementById('preview-img').src = starImportedPreviewUrl;
     document.getElementById('upload-preview').style.display = 'block';
     document.getElementById('img-info').textContent = `${img.width} × ${img.height} px ｜ 來源：去星星結果`;
@@ -1724,7 +1719,7 @@ function selectOutputSize(w, h, btn) {
 // ===== Web Worker =====
 const workerScript = `
 self.onmessage = function(e) {
-  const { imageBitmap, id, targetColor, tolerance, smoothness, despill, mode, outW, outH } = e.data;
+  const { imageBitmap, id, targetColor, tolerance, smoothness, despill, mode, outW, outH, wandX, wandY, wandTolerance, wandSmoothness, wandDespill } = e.data;
   const w = imageBitmap.width, h = imageBitmap.height;
   const canvas = new OffscreenCanvas(w, h);
   const ctx = canvas.getContext('2d');
@@ -1737,6 +1732,45 @@ self.onmessage = function(e) {
     const finalCanvas=new OffscreenCanvas(outW,outH),finalCtx=finalCanvas.getContext('2d');
     const scale=Math.min(outW/w,outH/h);
     finalCtx.drawImage(imageBitmap,0,0,w,h,(outW-w*scale)/2,(outH-h*scale)/2,w*scale,h*scale);
+    finalCanvas.convertToBlob({type:'image/png'}).then(blob=>{const reader=new FileReader();reader.readAsDataURL(blob);reader.onloadend=()=>self.postMessage({id,dataUrl:reader.result});});
+    return;
+  }
+  // 魔術棒模式：只跑魔術棒，不疊加傳統色鍵
+  if (mode === 'wand') {
+    const sx = Math.max(0, Math.min(w-1, Math.floor((Number(wandX)||0) * w)));
+    const sy = Math.max(0, Math.min(h-1, Math.floor((Number(wandY)||0) * h)));
+    const start = (sy*w + sx) * 4;
+    const sr=data[start], sg=data[start+1], sb=data[start+2];
+    const tol = Math.max(0, Number(wandTolerance)||30);
+    const soft = Math.max(1, (Number(wandSmoothness)||0) * 10);
+    const visited = new Uint8Array(w*h);
+    const stackX = new Int32Array(w*h), stackY = new Int32Array(w*h);
+    let top=0; stackX[top]=sx; stackY[top]=sy; top++;
+    const maskAlpha = new Uint8Array(w*h);
+    while(top>0){
+      top--; const x=stackX[top], y=stackY[top];
+      if(x<0||x>=w||y<0||y>=h) continue;
+      const p=y*w+x; if(visited[p]) continue; visited[p]=1;
+      const idx=p*4; const dr=data[idx]-sr, dg=data[idx+1]-sg, db=data[idx+2]-sb;
+      const dist=Math.sqrt(dr*dr+dg*dg+db*db);
+      if(dist<=tol+soft){
+        maskAlpha[p]=dist<=tol?255:Math.max(0,Math.round(255*(1-(dist-tol)/soft)));
+        if(top+4<stackX.length){stackX[top]=x+1;stackY[top]=y;top++;stackX[top]=x-1;stackY[top]=y;top++;stackX[top]=x;stackY[top]=y+1;top++;stackX[top]=x;stackY[top]=y-1;top++;}
+      }
+    }
+    const doDespill = !!wandDespill;
+    const isGreenSample = sg > Math.max(sr,sb)*1.15 && sg > 80;
+    for(let p=0;p<maskAlpha.length;p++){
+      const a=maskAlpha[p]; if(!a) continue;
+      const idx=p*4;
+      data[idx+3]=Math.max(0,data[idx+3]-a);
+      if(doDespill && isGreenSample && data[idx+3]>0 && data[idx+1]>data[idx] && data[idx+1]>data[idx+2]) data[idx+1]=Math.min(data[idx],data[idx+2]);
+      if(data[idx+3]===0){data[idx]=0;data[idx+1]=0;data[idx+2]=0;}
+    }
+    ctx.putImageData(imgData,0,0);
+    const finalCanvas=new OffscreenCanvas(outW,outH),finalCtx=finalCanvas.getContext('2d');
+    const scale=Math.min(outW/w,outH/h);
+    finalCtx.drawImage(canvas,0,0,w,h,(outW-w*scale)/2,(outH-h*scale)/2,w*scale,h*scale);
     finalCanvas.convertToBlob({type:'image/png'}).then(blob=>{const reader=new FileReader();reader.readAsDataURL(blob);reader.onloadend=()=>self.postMessage({id,dataUrl:reader.result});});
     return;
   }
@@ -1811,8 +1845,20 @@ let processedCount = 0;
 let totalCells = 0;
 let mainId = null;
 let tabId = null;
-let removalMode = 'complete';
+let bgMode = 'none';
+let traditionalEffect = 'complete';
 let advOpen = false;
+
+function resetMagicWandStateForNewImage() {
+  if (typeof wandPickPointsV10 !== 'undefined') wandPickPointsV10 = [];
+  if (typeof wandHistoryV13 !== 'undefined') wandHistoryV13 = [];
+  if (typeof wandPickingV10 !== 'undefined') wandPickingV10 = false;
+  const btn = document.getElementById('magic-wand-btn');
+  const src = document.getElementById('wand-source');
+  if (btn) btn.classList.remove('active');
+  if (src) src.classList.remove('wand-pick-active');
+  setMagicWandStatus?.('尚未選取魔術棒位置。');
+}
 
 // ===== Init =====
 function initWorker() {
@@ -1839,6 +1885,7 @@ function handleUpload(e) {
     const img = new Image();
     img.onload = () => {
       originalImg = img;
+      resetMagicWandStateForNewImage();
       document.getElementById('preview-img').src = ev.target.result;
       document.getElementById('upload-preview').style.display = 'block';
       document.getElementById('img-info').textContent = `${img.width} × ${img.height} px`;
@@ -1853,7 +1900,7 @@ function handleUpload(e) {
 
 // ===== Step nav =====
 function goStep(n) {
-  [1,2,3].forEach(i => {
+  [1,2,3,4].forEach(i => {
     document.getElementById('page'+i)?.classList.toggle('active', i===n);
     const tab = document.getElementById('tab'+i);
     if (!tab) return;
@@ -1866,6 +1913,9 @@ function goStep(n) {
     starUpdateCurrent();
   }
   if (n === 3) {
+    runPreview();
+  }
+  if (n === 4) {
     updateGridCanvas();
     updateSlicePreview();
   }
@@ -1889,30 +1939,153 @@ function resetToUpload() {
   goStep(1);
 }
 
-// ===== 即時切割預覽（不去背，純切格子）=====
-function updateSlicePreview() {
-  if (!originalImg) return;
-  const cols = parseInt(document.getElementById('cols').value);
-  const rows = parseInt(document.getElementById('rows').value);
-  const gridX = parseInt(document.getElementById('grid-x').value);
-  const gridY = parseInt(document.getElementById('grid-y').value);
-  const gridScale = parseFloat(document.getElementById('grid-scale').value);
+// ===== 目前工作圖：去背結果正式匯入切割 =====
+function copyCanvas(srcCanvas) {
+  const c = document.createElement('canvas');
+  c.width = srcCanvas.width;
+  c.height = srcCanvas.height;
+  c.getContext('2d').drawImage(srcCanvas, 0, 0);
+  return c;
+}
 
-  const cropL = parseInt(document.getElementById('crop-l').value) || 0;
-  const cropR = parseInt(document.getElementById('crop-r').value) || 0;
-  const cropT = parseInt(document.getElementById('crop-t').value) || 0;
-  const cropB = parseInt(document.getElementById('crop-b').value) || 0;
-
+function buildBaseSheetCanvas() {
+  if (!originalImg) return null;
+  const gridX = parseInt(document.getElementById('grid-x')?.value || '0');
+  const gridY = parseInt(document.getElementById('grid-y')?.value || '0');
+  const gridScale = parseFloat(document.getElementById('grid-scale')?.value || '1');
   const workW = originalImg.width, workH = originalImg.height;
   const canvas = document.createElement('canvas');
-  canvas.width = workW; canvas.height = workH;
-  const ctx = canvas.getContext('2d');
+  canvas.width = workW;
+  canvas.height = workH;
+  const ctx = canvas.getContext('2d', { willReadFrequently:true });
+  ctx.clearRect(0, 0, workW, workH);
   const drawW = workW * gridScale;
   const drawH = workH * gridScale;
   const dx = (workW - drawW) / 2 + gridX;
   const dy = (workH - drawH) / 2 + gridY;
   ctx.drawImage(originalImg, dx, dy, drawW, drawH);
+  return canvas;
+}
 
+function processTraditionalCanvasSync(srcCanvas) {
+  const opt = getTraditionalOptions();
+  const out = copyCanvas(srcCanvas);
+  if ((traditionalEffect || 'complete') === 'none') return out;
+  const ctx = out.getContext('2d', { willReadFrequently:true });
+  const w = out.width, h = out.height;
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const data = imgData.data;
+  const targetColor = opt.targetColor || '#00FF00';
+  const tr = parseInt(targetColor.slice(1,3),16), tg = parseInt(targetColor.slice(3,5),16), tb = parseInt(targetColor.slice(5,7),16);
+  const distThreshold = (Number(opt.tolerance)||30) * 4.42;
+  const ramp = Math.max(1, (Number(opt.smoothness)||0) * 5);
+  const isGreenTarget = targetColor.toLowerCase() === '#00ff00';
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+    let hit = false;
+    const dist = Math.sqrt((r-tr)**2+(g-tg)**2+(b-tb)**2);
+    if (dist < distThreshold) hit = true;
+    else if (isGreenTarget && g > Math.max(r,b)*1.15 && g > 80) hit = true;
+    if (hit) {
+      data[i+3] = 0;
+      data[i] = 0; data[i+1] = 0; data[i+2] = 0;
+    } else if (dist < distThreshold + ramp) {
+      data[i+3] = Math.min(data[i+3], Math.round(255 * ((dist - distThreshold) / ramp)));
+    } else if (opt.despill && isGreenTarget && g > r && g > b) {
+      data[i+1] = Math.min(r, b);
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+  return out;
+}
+
+function applySingleWandPointToImageData(srcCanvas, data, point, opt, overlayImg) {
+  if (!point) return 0;
+  const rx = point.x / Math.max(1, point.w || srcCanvas.width);
+  const ry = point.y / Math.max(1, point.h || srcCanvas.height);
+  const sx = Math.max(0, Math.min(srcCanvas.width - 1, Math.floor(rx * srcCanvas.width)));
+  const sy = Math.max(0, Math.min(srcCanvas.height - 1, Math.floor(ry * srcCanvas.height)));
+  let { maskAlpha, sample } = computeWandMaskV10(srcCanvas, sx, sy, opt.tolerance, opt.smoothness);
+  maskAlpha = expandWandMaskAlphaV15(maskAlpha, srcCanvas.width, srcCanvas.height, opt.erode || 0);
+  const [sr, sg, sb] = sample;
+  const isGreenSample = sg > Math.max(sr, sb) * 1.15 && sg > 80;
+  let count = 0;
+  for (let p = 0; p < maskAlpha.length; p++) {
+    const a = maskAlpha[p];
+    if (!a) continue;
+    count++;
+    const idx = p * 4;
+    if (overlayImg) {
+      overlayImg.data[idx] = 255;
+      overlayImg.data[idx+1] = 0;
+      overlayImg.data[idx+2] = 0;
+      overlayImg.data[idx+3] = Math.max(overlayImg.data[idx+3], Math.min(150, Math.max(55, a * 0.55)));
+    }
+    data[idx+3] = Math.max(0, data[idx+3] - a);
+    if (opt.despill && isGreenSample && data[idx+3] > 0 && data[idx+1] > data[idx] && data[idx+1] > data[idx+2]) {
+      const strength = Math.max(0, Math.min(1, (Number(opt.despillStrength) || 0) / 100));
+      const targetG = Math.min(data[idx], data[idx+2]);
+      data[idx+1] = Math.round(data[idx+1] + (targetG - data[idx+1]) * strength);
+    }
+    if (data[idx+3] === 0) { data[idx] = 0; data[idx+1] = 0; data[idx+2] = 0; }
+  }
+  return count;
+}
+
+function processWandCanvasSync(srcCanvas) {
+  const out = copyCanvas(srcCanvas);
+  const points = Array.isArray(wandPickPointsV10) ? wandPickPointsV10 : [];
+  if (!points.length) return out;
+  const opt = getWandOptions();
+  const ctx = out.getContext('2d', { willReadFrequently:true });
+  const imgData = ctx.getImageData(0, 0, out.width, out.height);
+  const data = imgData.data;
+  points.forEach(pt => applySingleWandPointToImageData(srcCanvas, data, pt, opt, null));
+  ctx.putImageData(imgData, 0, 0);
+  return out;
+}
+
+
+function processPieceForCurrentModeSync(pieceCanvas) {
+  if (bgMode === 'traditional') return processTraditionalCanvasSync(pieceCanvas);
+  if (bgMode === 'wand') return processWandCanvasSync(pieceCanvas);
+  return copyCanvas(pieceCanvas);
+}
+
+function buildCurrentWorkSheetCanvas() {
+  if (!originalImg) return null;
+  const base = buildBaseSheetCanvas();
+  if (!base || bgMode === 'none') return base;
+  if (bgMode === 'traditional') return processTraditionalCanvasSync(base);
+  if (bgMode === 'wand') return processWandCanvasSync(base);
+  return base;
+}
+
+
+function getCurrentBgModeLabel() {
+  if (bgMode === 'traditional') return '傳統去背';
+  if (bgMode === 'wand') return '魔術棒去背';
+  return '不去背';
+}
+
+function downloadCurrentWorkImage() {
+  const work = buildCurrentWorkSheetCanvas();
+  if (!work) return;
+  work.toBlob(blob => saveAs(blob, 'bg_removed.png'), 'image/png');
+}
+
+// ===== 即時切割預覽（吃目前工作圖）=====
+function updateSlicePreview() {
+  if (!originalImg) return;
+  const cols = parseInt(document.getElementById('cols').value);
+  const rows = parseInt(document.getElementById('rows').value);
+  const cropL = parseInt(document.getElementById('crop-l').value) || 0;
+  const cropR = parseInt(document.getElementById('crop-r').value) || 0;
+  const cropT = parseInt(document.getElementById('crop-t').value) || 0;
+  const cropB = parseInt(document.getElementById('crop-b').value) || 0;
+  const canvas = buildCurrentWorkSheetCanvas();
+  if (!canvas) return;
+  const workW = canvas.width, workH = canvas.height;
   const effW = workW - cropL - cropR;
   const effH = workH - cropT - cropB;
   const pieceW = effW / cols, pieceH = effH / rows;
@@ -1923,87 +2096,198 @@ function updateSlicePreview() {
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       const pc = document.createElement('canvas');
-      pc.width = pieceW; pc.height = pieceH;
-      pc.getContext('2d').drawImage(canvas, cropL + c*pieceW, cropT + r*pieceH, pieceW, pieceH, 0, 0, pieceW, pieceH);
+      pc.width = Math.max(1, Math.round(pieceW));
+      pc.height = Math.max(1, Math.round(pieceH));
+      pc.getContext('2d').drawImage(canvas, cropL + c*pieceW, cropT + r*pieceH, pieceW, pieceH, 0, 0, pc.width, pc.height);
       const cell = document.createElement('div');
       cell.className = 'sticker-cell';
       const num = r * cols + c + 1;
-      cell.innerHTML = `<div class="checker"><img src="${pc.toDataURL('image/png')}"></div><div class="num">格${num}</div>`;
+      cell.innerHTML = `<div class="checker"><img src="${pc.toDataURL('image/png')}"></div><div class="num">格${num}｜${getCurrentBgModeLabel()}</div>`;
       grid.appendChild(cell);
     }
   }
 }
 
-// ===== 去背預覽（第一格）=====
-let previewWorker = null;
-
-function runPreview() {
-  if (!originalImg) { alert('請先上傳圖片'); return; }
-  document.getElementById('preview-status').textContent = '處理中...';
-
-  const cols = parseInt(document.getElementById('cols').value);
-  const rows = parseInt(document.getElementById('rows').value);
-  const gridX = parseInt(document.getElementById('grid-x').value);
-  const gridY = parseInt(document.getElementById('grid-y').value);
-  const gridScale = parseFloat(document.getElementById('grid-scale').value);
-  const cropL = parseInt(document.getElementById('crop-l').value) || 0;
-  const cropT = parseInt(document.getElementById('crop-t').value) || 0;
-  const cropR = parseInt(document.getElementById('crop-r').value) || 0;
-  const cropB = parseInt(document.getElementById('crop-b').value) || 0;
-  const zoomLevel = parseFloat(document.getElementById('zoom').value);
-  const targetColor = document.getElementById('target-color').value;
-  const tolerance = parseInt(document.getElementById('tolerance').value);
-  const smoothness = parseInt(document.getElementById('smoothness').value);
-  const despill = document.getElementById('despill').checked;
-
-  const workW = originalImg.width, workH = originalImg.height;
-  const canvas = document.createElement('canvas');
-  canvas.width = workW; canvas.height = workH;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = targetColor;
-  ctx.fillRect(0, 0, workW, workH);
-  const drawW = workW * gridScale;
-  const drawH = workH * gridScale;
-  const dx = (workW - drawW) / 2 + gridX;
-  const dy = (workH - drawH) / 2 + gridY;
-  ctx.drawImage(originalImg, dx, dy, drawW, drawH);
-
-  // 考慮裁邊後的第一格尺寸
-  const effW = workW - cropL - cropR;
-  const effH = workH - cropT - cropB;
-  const pieceW = effW / cols, pieceH = effH / rows;
-
-  const pCanvas = document.createElement('canvas');
-  pCanvas.width = pieceW; pCanvas.height = pieceH;
-  pCanvas.getContext('2d').drawImage(canvas, cropL, cropT, pieceW, pieceH, 0, 0, pieceW, pieceH);
-
-  const beforeCanvas = document.getElementById('preview-before');
-  beforeCanvas.width = pieceW; beforeCanvas.height = pieceH;
-  beforeCanvas.getContext('2d').drawImage(pCanvas, 0, 0);
-
-  const tempC = document.createElement('canvas');
-  tempC.width = pieceW; tempC.height = pieceH;
-  const sW = pieceW / zoomLevel, sH = pieceH / zoomLevel;
-  const sX = (pieceW - sW) / 2, sY = (pieceH - sH) / 2;
-  tempC.getContext('2d').drawImage(pCanvas, sX, sY, sW, sH, 0, 0, pieceW, pieceH);
-
-  if (previewWorker) previewWorker.terminate();
-  previewWorker = new Worker(workerUrl);
-  previewWorker.onmessage = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      const afterCanvas = document.getElementById('preview-after');
-      afterCanvas.width = img.width; afterCanvas.height = img.height;
-      afterCanvas.getContext('2d').drawImage(img, 0, 0);
-      document.getElementById('preview-status').textContent = '✅ 預覽完成，確認效果後點「開始去背＋切割」';
-    };
-    img.src = e.data.dataUrl;
-  };
-  createImageBitmap(tempC).then(bitmap => {
-    previewWorker.postMessage({ imageBitmap: bitmap, id: 1, targetColor, tolerance, smoothness, despill, mode: removalMode, outW: outputW, outH: outputH }, [bitmap]);
-  });
+// ===== 去背預覽（整張母圖）=====
+function buildPreviewSheetCanvas() {
+  return buildBaseSheetCanvas();
 }
 
+function buildPreviewPieceCanvas() {
+  // 保留舊函式名稱供舊呼叫不報錯；現在預覽改為整張母圖。
+  return buildPreviewSheetCanvas();
+}
+
+
+// ===== 去背雙預覽（整張母圖）=====
+let previewWorker = null;
+let wandPickPointsV10 = [];
+let wandHistoryV13 = [];
+let wandPickingV10 = false;
+
+function drawCanvasTo(targetId, srcCanvas) {
+  const c = document.getElementById(targetId);
+  if (!c || !srcCanvas) return;
+  c.width = srcCanvas.width;
+  c.height = srcCanvas.height;
+  c.getContext('2d').clearRect(0, 0, c.width, c.height);
+  c.getContext('2d').drawImage(srcCanvas, 0, 0);
+}
+
+function colorDistanceAt(data, idx, tr, tg, tb) {
+  const dr = data[idx] - tr, dg = data[idx+1] - tg, db = data[idx+2] - tb;
+  return Math.sqrt(dr*dr + dg*dg + db*db);
+}
+
+function computeWandMaskV10(srcCanvas, sx, sy, tolerance, smoothness) {
+  const w = srcCanvas.width, h = srcCanvas.height;
+  const ctx = srcCanvas.getContext('2d', { willReadFrequently:true });
+  const img = ctx.getImageData(0, 0, w, h);
+  const data = img.data;
+  sx = Math.max(0, Math.min(w - 1, Math.floor(sx)));
+  sy = Math.max(0, Math.min(h - 1, Math.floor(sy)));
+  const start = (sy * w + sx) * 4;
+  const tr = data[start], tg = data[start+1], tb = data[start+2];
+  const visited = new Uint8Array(w*h);
+  const maskAlpha = new Uint8Array(w*h);
+  const stackX = new Int32Array(w*h);
+  const stackY = new Int32Array(w*h);
+  let top = 0;
+  stackX[top] = sx; stackY[top] = sy; top++;
+  const tol = Math.max(0, Number(tolerance) || 0);
+  const soft = Math.max(1, (Number(smoothness)||0) * 10);
+  while (top > 0) {
+    top--;
+    const x = stackX[top], y = stackY[top];
+    if (x < 0 || x >= w || y < 0 || y >= h) continue;
+    const p = y*w + x;
+    if (visited[p]) continue;
+    visited[p] = 1;
+    const idx = p*4;
+    const dist = colorDistanceAt(data, idx, tr, tg, tb);
+    if (dist <= tol + soft) {
+      maskAlpha[p] = dist <= tol ? 255 : Math.max(0, Math.round(255 * (1 - (dist - tol) / soft)));
+      if (top + 4 < stackX.length) {
+        stackX[top] = x+1; stackY[top] = y; top++;
+        stackX[top] = x-1; stackY[top] = y; top++;
+        stackX[top] = x; stackY[top] = y+1; top++;
+        stackX[top] = x; stackY[top] = y-1; top++;
+      }
+    }
+  }
+  return { maskAlpha, sample:[tr,tg,tb] };
+}
+
+function expandWandMaskAlphaV15(maskAlpha, w, h, iterations) {
+  iterations = Math.max(0, Math.min(3, Math.round(Number(iterations) || 0)));
+  if (!iterations) return maskAlpha;
+  let cur = maskAlpha;
+  for (let n = 0; n < iterations; n++) {
+    const next = new Uint8Array(cur);
+    for (let y = 0; y < h; y++) {
+      const row = y * w;
+      for (let x = 0; x < w; x++) {
+        const p = row + x;
+        if (cur[p]) continue;
+        let maxA = 0;
+        if (x > 0) maxA = Math.max(maxA, cur[p - 1]);
+        if (x < w - 1) maxA = Math.max(maxA, cur[p + 1]);
+        if (y > 0) maxA = Math.max(maxA, cur[p - w]);
+        if (y < h - 1) maxA = Math.max(maxA, cur[p + w]);
+        if (maxA) next[p] = Math.max(next[p], Math.round(maxA * 0.85));
+      }
+    }
+    cur = next;
+  }
+  return cur;
+}
+
+function renderWandPreviewV10(srcCanvas) {
+  if (!srcCanvas) return;
+  drawCanvasTo('wand-source', srcCanvas);
+  const overlay = document.getElementById('wand-mask-overlay');
+  const after = document.getElementById('wand-after');
+  if (!overlay || !after) return;
+  overlay.width = srcCanvas.width; overlay.height = srcCanvas.height;
+  after.width = srcCanvas.width; after.height = srcCanvas.height;
+  overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);
+  const actx = after.getContext('2d', { willReadFrequently:true });
+  actx.clearRect(0,0,after.width,after.height);
+  actx.drawImage(srcCanvas, 0, 0);
+  const points = Array.isArray(wandPickPointsV10) ? wandPickPointsV10 : [];
+  if (!points.length) return;
+  const wandOpt = getWandOptions();
+  const w = srcCanvas.width, h = srcCanvas.height;
+  const octx = overlay.getContext('2d');
+  const overlayImg = octx.createImageData(w,h);
+  const out = actx.getImageData(0,0,w,h);
+  const data = out.data;
+  let total = 0;
+  points.forEach(pt => { total += applySingleWandPointToImageData(srcCanvas, data, pt, wandOpt, overlayImg); });
+  octx.putImageData(overlayImg, 0, 0);
+  actx.putImageData(out, 0, 0);
+  const status = document.getElementById('magic-wand-status');
+  if (status) status.textContent = `已累積 ${points.length} 個魔術棒點，選取約 ${total} px。清邊 ${wandOpt.erode}px，Despill ${wandOpt.despill ? wandOpt.despillStrength + '%' : '關'}。`;
+}
+
+
+function getWandOptions() {
+  return {
+    tolerance: parseInt(document.getElementById('wand-tolerance')?.value || '30'),
+    smoothness: parseInt(document.getElementById('wand-smoothness')?.value || '2'),
+    erode: parseInt(document.getElementById('wand-erode')?.value || '1'),
+    despill: !!document.getElementById('wand-despill')?.checked,
+    despillStrength: parseInt(document.getElementById('wand-despill-strength')?.value || '75')
+  };
+}
+function getTraditionalOptions() {
+  return {
+    targetColor: document.getElementById('target-color')?.value || '#00FF00',
+    tolerance: parseInt(document.getElementById('tolerance')?.value || '30'),
+    smoothness: parseInt(document.getElementById('smoothness')?.value || '2'),
+    despill: !!document.getElementById('despill')?.checked,
+    effect: traditionalEffect || 'complete'
+  };
+}
+
+function runPreview() {
+  if (!originalImg) return;
+  const status = document.getElementById('preview-status');
+  const pCanvas = buildPreviewSheetCanvas();
+  if (!pCanvas) return;
+
+  // 兩邊的「原圖預覽」永遠都從乾淨母圖重畫，不能吃 workImage / processedImage。
+  drawCanvasTo('preview-before', pCanvas);
+  drawCanvasTo('wand-source', pCanvas);
+
+  // 傳統結果只跑傳統，不影響魔術棒。
+  const tradCanvas = processTraditionalCanvasSync(pCanvas);
+  drawCanvasTo('preview-after', tradCanvas);
+
+  // 魔術棒結果：未點選前必須與原圖完全一致；多次點選後才累積套用。
+  const points = Array.isArray(wandPickPointsV10) ? wandPickPointsV10 : [];
+  const overlay = document.getElementById('wand-mask-overlay');
+  if (overlay) {
+    overlay.width = pCanvas.width;
+    overlay.height = pCanvas.height;
+    overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
+  }
+
+  if (!points.length) {
+    drawCanvasTo('wand-after', pCanvas);
+    if (status) {
+      const label = bgMode === 'none' ? '目前模式：不去背' : (bgMode === 'traditional' ? '目前模式：傳統去背' : '目前模式：魔術棒去背');
+      status.textContent = `✅ 預覽完成。${label}。魔術棒尚未選取，右側原圖與結果會保持原圖，不會預先去背。`;
+    }
+    return;
+  }
+
+  renderWandPreviewV10(pCanvas);
+  if (status) {
+    const label = bgMode === 'none' ? '目前模式：不去背' : (bgMode === 'traditional' ? '目前模式：傳統去背' : '目前模式：魔術棒去背');
+    status.textContent = `✅ 預覽完成。${label}。魔術棒已累積 ${points.length} 點；預覽與匯出同一模式，不會 1+2 疊加。`;
+  }
+}
 // ===== Settings =====
 function applyPreset(type) {
   document.getElementById('preset-green').className = 'preset-btn' + (type==='green'?' active-green':'');
@@ -2019,7 +2303,8 @@ function applyPreset(type) {
     document.getElementById('zoom').value = 1.00;
     document.getElementById('zoom-val').textContent = '0%';
     document.getElementById('despill').checked = true;
-    removalMode = 'complete';
+    traditionalEffect = 'complete';
+    setBgMode('traditional', false);
   } else if (type === 'white') {
     document.getElementById('target-color').value = '#FFFFFF';
     document.getElementById('color-hex').textContent = '#FFFFFF';
@@ -2030,7 +2315,8 @@ function applyPreset(type) {
     document.getElementById('zoom').value = 1.00;
     document.getElementById('zoom-val').textContent = '0%';
     document.getElementById('despill').checked = false;
-    removalMode = 'complete';
+    traditionalEffect = 'complete';
+    setBgMode('traditional', false);
   } else {
     document.getElementById('target-color').value = '#000000';
     document.getElementById('color-hex').textContent = '#000000';
@@ -2041,7 +2327,8 @@ function applyPreset(type) {
     document.getElementById('zoom').value = 1.00;
     document.getElementById('zoom-val').textContent = '0%';
     document.getElementById('despill').checked = false;
-    removalMode = 'complete';
+    traditionalEffect = 'complete';
+    setBgMode('traditional', false);
   }
 }
 
@@ -2067,18 +2354,61 @@ function setMagicWandButtonActive(active) {
 
 function toggleMagicWandPicker(force) {
   if (!originalImg) {
-    setMagicWandStatus('請先上傳或匯入圖片，再使用魔術棒取色。');
+    setMagicWandStatus('請先上傳或匯入圖片，再使用魔術棒。');
     return;
   }
-  magicWandPicking = typeof force === 'boolean' ? force : !magicWandPicking;
-  setMagicWandButtonActive(magicWandPicking);
-  if (magicWandPicking) {
-    if (!advOpen) toggleAdv();
-    setMagicWandStatus('魔術棒已啟用：請到右側「格線預覽」點一下背景色。');
-  } else {
-    setMagicWandStatus('魔術棒已關閉。');
-  }
+  wandPickingV10 = typeof force === 'boolean' ? force : !wandPickingV10;
+  const btn = document.getElementById('magic-wand-btn');
+  const src = document.getElementById('wand-source');
+  if (btn) btn.classList.toggle('active', wandPickingV10);
+  if (src) src.classList.toggle('wand-pick-active', wandPickingV10);
+  setMagicWandStatus(wandPickingV10 ? '魔術棒已啟用：可在右側整張母圖連續點選多個背景區。' : '魔術棒已關閉。');
+  runPreview();
 }
+
+function clearMagicWandV10() {
+  wandPickPointsV10 = [];
+  wandHistoryV13 = [];
+  wandPickingV10 = false;
+  const btn = document.getElementById('magic-wand-btn');
+  const src = document.getElementById('wand-source');
+  if (btn) btn.classList.remove('active');
+  if (src) src.classList.remove('wand-pick-active');
+  setMagicWandStatus('已清除全部魔術棒選區。');
+  runPreview();
+}
+
+function undoMagicWandV13() {
+  if (!wandPickPointsV10.length) {
+    setMagicWandStatus('目前沒有可復原的魔術棒點。');
+    return;
+  }
+  const last = wandPickPointsV10.pop();
+  wandHistoryV13.push(last);
+  setMagicWandStatus(`已復原上一點，剩 ${wandPickPointsV10.length} 個魔術棒點。`);
+  runPreview();
+}
+
+
+function handleWandSourceClickV10(event) {
+  if (!wandPickingV10 || !originalImg) return;
+  const canvas = document.getElementById('wand-source');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const x = Math.max(0, Math.min(canvas.width - 1, Math.floor((event.clientX - rect.left) * canvas.width / rect.width)));
+  const y = Math.max(0, Math.min(canvas.height - 1, Math.floor((event.clientY - rect.top) * canvas.height / rect.height)));
+  wandPickPointsV10.push({ x, y, w: canvas.width, h: canvas.height });
+  wandHistoryV13 = [];
+  canvas.classList.add('wand-pick-active');
+  const btn = document.getElementById('magic-wand-btn');
+  if (btn) btn.classList.add('active');
+  setMagicWandStatus(`新增魔術棒點：x=${x}, y=${y}。目前共 ${wandPickPointsV10.length} 點，可繼續點選。`);
+  setBgMode('wand', false);
+  runPreview();
+}
+
+
 
 function getCleanGridSampleCanvas() {
   if (!originalImg) return null;
@@ -2157,28 +2487,51 @@ function handleMagicWandCanvasClick(event) {
 }
 
 window.addEventListener('load', () => {
+  traditionalEffect = 'complete';
+  document.getElementById('trad-mode-complete')?.classList.add('active');
+  document.getElementById('trad-mode-preserve')?.classList.remove('active');
+  setBgMode('none', false);
   const canvas = document.getElementById('grid-canvas');
   if (canvas) canvas.addEventListener('click', handleMagicWandCanvasClick);
+  const wandSource = document.getElementById('wand-source');
+  if (wandSource) wandSource.addEventListener('click', handleWandSourceClickV10);
 });
 
-document.getElementById('target-color').addEventListener('input', function() {
+document.getElementById('target-color')?.addEventListener('input', function() {
   document.getElementById('color-hex').textContent = this.value.toUpperCase();
+  runPreview();
 });
 
-function setMode(m) {
-  removalMode = m;
-  document.getElementById('mode-complete').classList.toggle('active', m==='complete');
-  document.getElementById('mode-preserve').classList.toggle('active', m==='preserve');
-  document.getElementById('mode-none').classList.toggle('active', m==='none');
-  // 不去背時隱藏去背相關進階設定
-  const advContent = document.getElementById('adv-content');
-  if (m === 'none') {
-    advContent.style.opacity = '0.3';
-    advContent.style.pointerEvents = 'none';
-  } else {
-    advContent.style.opacity = '';
-    advContent.style.pointerEvents = '';
-  }
+function setTraditionalEffect(m) {
+  traditionalEffect = m === 'preserve' ? 'preserve' : 'complete';
+  document.getElementById('trad-mode-complete')?.classList.toggle('active', traditionalEffect === 'complete');
+  document.getElementById('trad-mode-preserve')?.classList.toggle('active', traditionalEffect === 'preserve');
+  if (bgMode !== 'traditional') setBgMode('traditional', false);
+  runPreview();
+}
+
+function setBgMode(m, doPreview = true) {
+  bgMode = (m === 'wand' || m === 'traditional' || m === 'none') ? m : 'none';
+  const none = document.getElementById('bg-mode-none');
+  const trad = document.getElementById('bg-mode-traditional');
+  const wand = document.getElementById('bg-mode-wand');
+  [none, trad, wand].forEach(btn => { if (btn) btn.className = 'mode-btn bg-mode-btn'; });
+  if (bgMode === 'none' && none) none.classList.add('active-none');
+  if (bgMode === 'traditional' && trad) trad.classList.add('active-traditional');
+  if (bgMode === 'wand' && wand) wand.classList.add('active-wand');
+  document.getElementById('panel-none')?.classList.toggle('active', bgMode === 'none');
+  document.getElementById('panel-traditional')?.classList.toggle('active', bgMode === 'traditional');
+  document.getElementById('panel-wand')?.classList.toggle('active', bgMode === 'wand');
+  if (doPreview) runPreview();
+}
+
+function toggleAdv() {
+  const adv = document.getElementById('adv-content');
+  const arrow = document.getElementById('adv-arrow');
+  if (!adv) return;
+  advOpen = !advOpen;
+  adv.classList.toggle('open', advOpen);
+  if (arrow) arrow.textContent = advOpen ? '▲' : '▼';
 }
 
 function toggleAdv() {
@@ -2208,26 +2561,20 @@ function updateGridCanvas() {
   if (!originalImg) return;
   const cols = parseInt(document.getElementById('cols').value);
   const rows = parseInt(document.getElementById('rows').value);
-  const gridX = parseInt(document.getElementById('grid-x').value);
-  const gridY = parseInt(document.getElementById('grid-y').value);
-  const gridScale = parseFloat(document.getElementById('grid-scale').value);
   const cropL = parseInt(document.getElementById('crop-l').value) || 0;
   const cropR = parseInt(document.getElementById('crop-r').value) || 0;
   const cropT = parseInt(document.getElementById('crop-t').value) || 0;
   const cropB = parseInt(document.getElementById('crop-b').value) || 0;
-
-  const workW = originalImg.width, workH = originalImg.height;
+  const workCanvas = buildCurrentWorkSheetCanvas();
+  if (!workCanvas) return;
+  const workW = workCanvas.width, workH = workCanvas.height;
   const canvas = document.getElementById('grid-canvas');
-  canvas.width = workW; canvas.height = workH;
+  canvas.width = workW;
+  canvas.height = workH;
   const ctx = canvas.getContext('2d');
 
-  // Draw image
   ctx.clearRect(0, 0, workW, workH);
-  const drawW = workW * gridScale;
-  const drawH = workH * gridScale;
-  const dx = (workW - drawW) / 2 + gridX;
-  const dy = (workH - drawH) / 2 + gridY;
-  ctx.drawImage(originalImg, dx, dy, drawW, drawH);
+  ctx.drawImage(workCanvas, 0, 0);
 
   // 裁邊遮罩（半透明黑色）
   ctx.fillStyle = 'rgba(0,0,0,0.45)';
@@ -2236,13 +2583,11 @@ function updateGridCanvas() {
   if (cropT > 0) ctx.fillRect(0, 0, workW, cropT);
   if (cropB > 0) ctx.fillRect(0, workH - cropB, workW, cropB);
 
-  // 有效區域
   const effW = workW - cropL - cropR;
   const effH = workH - cropT - cropB;
-
-  // Draw grid lines（在有效區域內）
   const colW = effW / cols;
   const rowH = effH / rows;
+
   ctx.strokeStyle = 'rgba(255,107,53,0.85)';
   ctx.lineWidth = 6;
   ctx.setLineDash([24, 16]);
@@ -2255,12 +2600,10 @@ function updateGridCanvas() {
     ctx.beginPath(); ctx.moveTo(cropL, y); ctx.lineTo(workW - cropR, y); ctx.stroke();
   }
   ctx.setLineDash([]);
-  // 有效區域邊框
   ctx.strokeStyle = 'rgba(255,107,53,0.8)';
   ctx.lineWidth = 8;
   ctx.strokeRect(cropL + 4, cropT + 4, effW - 8, effH - 8);
 
-  // Cell numbers
   ctx.font = `bold ${Math.round(colW * 0.18)}px Share Tech Mono, monospace`;
   ctx.fillStyle = 'rgba(255,107,53,0.5)';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -2270,8 +2613,6 @@ function updateGridCanvas() {
       ctx.fillText(num, cropL + c * colW + colW / 2, cropT + r * rowH + rowH / 2);
     }
   }
-
-  // Update info
   updateCellInfo();
 }
 
@@ -2285,6 +2626,7 @@ document.getElementById('start-num').addEventListener('input', () => {
 // ===== Process =====
 function startProcess() {
   if (!originalImg) return;
+  if (bgMode === 'wand' && (!Array.isArray(wandPickPointsV10) || !wandPickPointsV10.length)) { alert('請先在魔術棒整張母圖預覽上點選至少一個背景區，再開始分割打包。'); goStep(3); return; }
   document.getElementById('result-card').style.display = 'block';
   document.getElementById('progress-area').style.display = 'block';
   document.getElementById('btn-download').disabled = true;
@@ -2298,42 +2640,20 @@ function startProcess() {
   const cols = parseInt(document.getElementById('cols').value);
   const rows = parseInt(document.getElementById('rows').value);
   totalCells = cols * rows;
-
-  const gridX = parseInt(document.getElementById('grid-x').value);
-  const gridY = parseInt(document.getElementById('grid-y').value);
-  const gridScale = parseFloat(document.getElementById('grid-scale').value);
   const zoomLevel = parseFloat(document.getElementById('zoom').value);
-  const targetColor = document.getElementById('target-color').value;
-  const tolerance = parseInt(document.getElementById('tolerance').value);
-  const smoothness = parseInt(document.getElementById('smoothness').value);
-  const despill = document.getElementById('despill').checked;
   const cropL = parseInt(document.getElementById('crop-l').value) || 0;
   const cropR = parseInt(document.getElementById('crop-r').value) || 0;
   const cropT = parseInt(document.getElementById('crop-t').value) || 0;
   const cropB = parseInt(document.getElementById('crop-b').value) || 0;
 
-  const workW = originalImg.width, workH = originalImg.height;
-  const canvas = document.createElement('canvas');
-  canvas.width = workW; canvas.height = workH;
-  const ctx = canvas.getContext('2d');
-
-  // 不去背模式不填底色，保持透明
-  if (removalMode !== 'none') {
-    ctx.fillStyle = targetColor;
-    ctx.fillRect(0, 0, workW, workH);
-  }
-
-  const drawW = workW * gridScale;
-  const drawH = workH * gridScale;
-  const dx = (workW - drawW) / 2 + gridX;
-  const dy = (workH - drawH) / 2 + gridY;
-  ctx.drawImage(originalImg, dx, dy, drawW, drawH);
-
+  // 先產生整張目前工作圖：不去背 / 傳統 / 魔術棒三模式互斥，分割只吃這張圖。
+  const canvas = buildCurrentWorkSheetCanvas();
+  if (!canvas) return;
+  const workW = canvas.width, workH = canvas.height;
   const effW = workW - cropL - cropR;
   const effH = workH - cropT - cropB;
   const pieceW = effW / cols, pieceH = effH / rows;
 
-  // Show progress
   document.getElementById('progress-area').style.display = 'block';
   document.getElementById('sticker-grid').innerHTML = '';
   updateProgress();
@@ -2346,7 +2666,6 @@ function startProcess() {
       const pCtx = pCanvas.getContext('2d');
       pCtx.drawImage(canvas, cropL + c*pieceW, cropT + r*pieceH, pieceW, pieceH, 0, 0, pieceW, pieceH);
 
-      // Apply zoom
       const tempC = document.createElement('canvas');
       tempC.width = pieceW; tempC.height = pieceH;
       const tCtx = tempC.getContext('2d');
@@ -2357,11 +2676,12 @@ function startProcess() {
       slicedPieces.push({ id, previewUrl: pCanvas.toDataURL('image/png') });
 
       createImageBitmap(tempC).then(bitmap => {
-        worker.postMessage({ imageBitmap: bitmap, id, targetColor, tolerance, smoothness, despill, mode: removalMode, outW: outputW, outH: outputH }, [bitmap]);
+        worker.postMessage({ imageBitmap: bitmap, id, targetColor:'#000000', tolerance:0, smoothness:0, despill:false, mode:'none', outW: outputW, outH: outputH, wandX:0, wandY:0, wandTolerance:0, wandSmoothness:0, wandDespill:false }, [bitmap]);
       });
     }
   }
 }
+
 
 function updateProgress() {
   const pct = totalCells > 0 ? Math.round(processedCount / totalCells * 100) : 0;
