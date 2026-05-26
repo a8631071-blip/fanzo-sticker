@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>免費公開版工具 · 煩躁胖子</title>
+<title>LINE 免費工具｜煩躁胖子</title>
+<meta name="description" content="免費公開版工具，支援去 Gemini 浮水印、圖片去背、切成 LINE 貼圖尺寸，並打包成 ZIP。">
+<meta property="og:title" content="LINE 免費工具｜煩躁胖子">
+<meta property="og:description" content="免費公開版工具，支援去 Gemini 浮水印、圖片去背、切成 LINE 貼圖尺寸，並打包成 ZIP。">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LINE 免費工具｜煩躁胖子">
+<meta name="twitter:description" content="免費公開版工具，支援去 Gemini 浮水印、圖片去背、切成 LINE 貼圖尺寸，並打包成 ZIP。">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <style>
@@ -1200,6 +1207,11 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
   <h2>隱藏頁｜工程日誌</h2>
   <button onclick="closeDevLogV91()">關閉</button>
   <pre>
+0526V19｜2026-05-26｜公開分享標題與 Meta 資訊修正
+- 將瀏覽器標題改為「LINE 免費工具｜煩躁胖子」，避免社群分享卡片顯示舊版號。
+- 新增 description / og:title / og:description / twitter:title / twitter:description，供 Threads、LINE、Facebook 等平台抓取公開分享資訊。
+- 存檔版本改為 0526V19；不修改首頁 UI、輪播、去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab 核心流程。
+
 0516V18｜2026-05-26｜公開版首頁 UI 清理與資料庫移除
 - Header 左側改為「煩躁胖子・免費公開版工具」，右側只顯示「更新日期 2026/05/26」，移除公開畫面中的工程版號與動態時間碼。
 - 首頁導流按鈕維持三顆：開始使用工具、看 LINE 主題、看 LINE 貼圖 + 表情貼。
