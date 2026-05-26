@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>0516V14 · 免費公開版工具 · 煩躁胖子</title>
+<title>免費公開版工具 · 煩躁胖子</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <style>
@@ -826,8 +826,8 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
 <body>
 
 <header>
-  <div class="logo">煩躁胖子<span>· 免費公開版工具<span>0516V14</span></div>
-  <div class="version" id="ver-tag"></div>
+  <div class="logo">煩躁胖子<span>・免費公開版工具</span></div>
+  <div class="version" id="ver-tag">更新日期 2026/05/26</div>
 </header>
 
 <section class="product-hero">
@@ -837,12 +837,14 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
       <h1>一鍵去 Gemini 浮水印、去背、切格、打包，可每頁獨立上傳、獨立打包</h1>
       <p style="color:var(--text2);font-size:12px;margin:6px 0 0;line-height:1.8;">
         免費公開版工具，可完整流程使用，也可單獨使用某一功能：<br>
-        支援 LINE 貼圖 / 表情貼 / 動態貼圖尺寸整理，可自由調整欄列、裁邊、縮放、起始編號，並輸出 PNG ZIP、Main、Tab。
+        支援 LINE 貼圖 / 表情貼 / 動態貼圖尺寸整理，可自由調整欄列、裁邊、縮放、起始編號，並輸出 PNG ZIP、Main、Tab。<br>
+        工具免費使用；如果覺得好用，也歡迎看看我的 LINE 主題與貼圖作品。
       </p>
     </div>
     <div class="product-hero-actions" style="margin-top:0;">
       <a class="product-link-btn primary" href="#page1">開始使用工具</a>
-      <a class="product-link-btn" href="https://store.line.me/stickershop/author/5965541/zh-Hant" target="_blank" rel="noopener">煩躁胖子 LINE 作品集</a>
+      <a class="product-link-btn" href="https://store.line.me/themeshop/author/11555829/zh-Hant" target="_blank" rel="noopener">看 LINE 主題</a>
+      <a class="product-link-btn" href="https://store.line.me/stickershop/author/5965541/zh-Hant" target="_blank" rel="noopener">看 LINE 貼圖 + 表情貼</a>
     </div>
   </div>
   <!-- 下段：精選作品輪播（全寬） -->
@@ -888,34 +890,6 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
 
 
   
-  <div class="card promo-products" id="product-db-card">
-    <div class="promo-head">
-      <div>
-        <h3>更多作品</h3>
-        <p>工具可免費使用；如果覺得好用，也歡迎看看我的 LINE 貼圖作品。</p>
-      </div>
-      <div class="product-db-actions">
-        <button class="product-db-toggle" id="product-db-toggle" onclick="toggleProductDB()">展開作品資料庫</button>
-        <a class="product-link-btn" href="https://store.line.me/stickershop/author/5965541/zh-Hant" target="_blank" rel="noopener">看全部作品</a>
-      </div>
-    </div>
-
-    <div class="product-db-body" id="product-db-body">
-    <div class="db-summary">
-      <div class="db-stat"><strong id="db-total-count">0</strong><span>全部商品</span></div>
-      <div class="db-stat"><strong id="db-sticker-count">0</strong><span>貼圖</span></div>
-      <div class="db-stat"><strong id="db-emoji-count">0</strong><span>表情貼</span></div>
-      <div class="db-stat"><strong id="db-visible-count">0</strong><span>目前顯示</span></div>
-    </div>
-
-    <div class="db-toolbar">
-      <input class="db-search" id="db-search" type="search" placeholder="搜尋名稱 / id / 分類" oninput="renderProductDB()">
-    </div>
-
-    <div class="db-filter-row" id="db-filters"></div>
-    <div class="db-products" id="db-products"></div>
-    </div>
-  </div>
 
   <div class="action-row">
     <button class="btn-main btn-accent" id="btn-to-step2" onclick="goStep(2)" disabled>下一步：去 Gemini 浮水印處理 →</button>
@@ -1226,6 +1200,29 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
   <h2>隱藏頁｜工程日誌</h2>
   <button onclick="closeDevLogV91()">關閉</button>
   <pre>
+0516V18｜2026-05-26｜公開版首頁 UI 清理與資料庫移除
+- Header 左側改為「煩躁胖子・免費公開版工具」，右側只顯示「更新日期 2026/05/26」，移除公開畫面中的工程版號與動態時間碼。
+- 首頁導流按鈕維持三顆：開始使用工具、看 LINE 主題、看 LINE 貼圖 + 表情貼。
+- 移除首頁底部「更多作品」作品資料庫整排 UI，並移除內建作品資料庫 JS 初始化與資料庫函式，公開版改以輪播與兩個作者頁按鈕導流。
+- 未修改去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab 與輪播資料內容。
+
+0516V17｜2026-05-26｜首頁導流與輸出前檢查
+- 首頁說明新增「工具免費使用，也歡迎查看 LINE 主題與貼圖作品」導流文案。
+- 首頁按鈕拆成「看 LINE 主題」與「看 LINE 貼圖」，保留「開始使用工具」。
+- 新增切割打包前檢查提示，顯示尺寸、格數、檔名範圍與目前去背模式；不自動修改檔名碼數。
+- 補充輪播排序註解：LINE 主題新品 → 最新貼圖 → 最新表情貼 → 長賣代表作。
+- 本版未新增 ZIP readme、未自動把 180×180 表情貼切成 3 碼；未修改去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab、作品資料庫核心流程。
+
+0516V16｜2026-05-26｜輪播補上 LINE 主題新品
+- 首頁精選作品輪播最前面新增「冷豔科技狐」與「義氣哥・衝出」兩組 LINE 主題。
+- 保留 V15 已新增的兩組懶教人貼圖，並維持母親節項目移除。
+- 僅修改 FEATURED_ITEMS、版本資訊與工程日誌；未修改去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab、作品資料庫核心流程。
+
+0516V15｜2026-05-26｜輪播移除母親節＋新增懶教人兩組
+- 首頁精選作品輪播移除「阿鵑姊與胖胖鬍渣：有妳在就好」母親節項目。
+- 新增「懶教人，就讓貼圖教之敷衍你剛好」與「懶教人，就讓貼圖教之真沒有敷衍」至輪播最前面。
+- 僅修改 FEATURED_ITEMS、版本資訊與工程日誌；未修改去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab、作品資料庫核心流程。
+
 0516V14｜2026-05-16｜流程頁籤置中修正
 - 將 steps-nav 新增 justify-content:center，使「上傳／去 Gemini 浮水印／去背／分割＋打包」流程頁籤在桌機版置中顯示。
 - 新增 700px 以下手機版 fallback：steps-nav 改回 flex-start，避免窄螢幕橫向捲動時切到左側項目。
@@ -2716,8 +2713,32 @@ document.getElementById('start-num').addEventListener('input', () => {
 });
 
 // ===== Process =====
+function confirmExportPrecheckV17() {
+  const cols = parseInt(document.getElementById('cols')?.value || '0');
+  const rows = parseInt(document.getElementById('rows')?.value || '0');
+  const startNum = parseInt(document.getElementById('start-num')?.value || '1') || 1;
+  const count = cols * rows;
+  const endNum = startNum + count - 1;
+  const sizeLabel = `${outputW}×${outputH}`;
+  const digitExample = `${String(startNum).padStart(outputDigits, '0')}.png ～ ${String(endNum).padStart(outputDigits, '0')}.png`;
+  const lines = [
+    '輸出前檢查：',
+    `尺寸：${sizeLabel}`,
+    `格數：${cols} × ${rows} = ${count} 張`,
+    `檔名：${digitExample}`,
+    `去背模式：${getCurrentBgModeLabel()}`,
+    '',
+    '請確認格數、起始編號、檔名碼數與 LINE 上傳需求一致。',
+    '若是表情貼或特殊編號素材，也請確認圖片內容與指定編號一致。',
+    '',
+    '是否繼續切割＋打包？'
+  ];
+  return window.confirm(lines.join('\n'));
+}
+
 function startProcess() {
   if (!originalImg) return;
+  if (!confirmExportPrecheckV17()) return;
   if (bgMode === 'wand' && (!Array.isArray(wandPickPointsV10) || !wandPickPointsV10.length)) { alert('請先在魔術棒整張母圖預覽上點選至少一個背景區，再開始分割打包。'); goStep(3); return; }
   document.getElementById('result-card').style.display = 'block';
   document.getElementById('progress-area').style.display = 'block';
@@ -2878,194 +2899,47 @@ async function downloadZip() {
 }
 
 
-// ===== Built-in Product Database v9.4 =====
-const BUILTIN_PRODUCTS_DB = [{"id":"69f45e199b8c7868c09cd95c","name":"會動的達摩小白飄","type":"emoji","url":"https://store.line.me/emojishop/product/69f45e199b8c7868c09cd95c/zh-Hant","motion":"animated"},{"id":"69f42210d6436b46ee674f91","name":"更多達摩小白飄在此","type":"emoji","url":"https://store.line.me/emojishop/product/69f42210d6436b46ee674f91/zh-Hant","motion":"static"},{"id":"69f2c8be69c93b016a23bf68","name":"柴柴手繪表情貼（呼吸動態版）","type":"emoji","url":"https://store.line.me/emojishop/product/69f2c8be69c93b016a23bf68/zh-Hant","motion":"animated"},{"id":"69f3016c69c93b016a23cd8c","name":"會呼吸的柴柴木紋表情貼（動態完整版）","type":"emoji","url":"https://store.line.me/emojishop/product/69f3016c69c93b016a23cd8c/zh-Hant","motion":"animated"},{"id":"69f31d4869c93b016a23d53c","name":"會呼吸的柴柴木紋表情貼","type":"emoji","url":"https://store.line.me/emojishop/product/69f31d4869c93b016a23d53c/zh-Hant","motion":"animated"},{"id":"33797580","name":"新肉肉胖熊","type":"sticker","url":"https://store.line.me/stickershop/product/33797580/zh-Hant","motion":"static"},{"id":"69f16a47d6436b46ee670d68","name":"我的可愛柴柴：手繪表情貼","type":"emoji","url":"https://store.line.me/emojishop/product/69f16a47d6436b46ee670d68/zh-Hant","motion":"static"},{"id":"69f1b24869c93b016a23a9c0","name":"柴柴木紋字母表情貼（完整版）","type":"emoji","url":"https://store.line.me/emojishop/product/69f1b24869c93b016a23a9c0/zh-Hant","motion":"static"},{"id":"69f16acad6436b46ee670d90","name":"柴柴木紋字母表情貼","type":"emoji","url":"https://store.line.me/emojishop/product/69f16acad6436b46ee670d90/zh-Hant","motion":"static"},{"id":"33786923","name":"不想理你，有事說","type":"sticker","url":"https://store.line.me/stickershop/product/33786923/zh-Hant","motion":"static"},{"id":"69f1b23ad6436b46ee671fe6","name":"脈動閃爍霓虹字母與符號","type":"emoji","url":"https://store.line.me/emojishop/product/69f1b23ad6436b46ee671fe6/zh-Hant","motion":"animated"},{"id":"33753788","name":"肥滋滋也想談戀愛","type":"sticker","url":"https://store.line.me/stickershop/product/33753788/zh-Hant","motion":"static"},{"id":"69eecda69b8c7868c09c67d2","name":"熊熊表情貼：字母、數字、符號","type":"emoji","url":"https://store.line.me/emojishop/product/69eecda69b8c7868c09c67d2/zh-Hant","motion":"static"},{"id":"69eecdae69c93b016a2368cb","name":"胖胖肉熊表情貼","type":"emoji","url":"https://store.line.me/emojishop/product/69eecdae69c93b016a2368cb/zh-Hant","motion":"static"},{"id":"69f0657cd6436b46ee67001b","name":"潦草字母動起來！","type":"emoji","url":"https://store.line.me/emojishop/product/69f0657cd6436b46ee67001b/zh-Hant","motion":"animated"},{"id":"33753718","name":"刀疤霆也會說英語","type":"sticker","url":"https://store.line.me/stickershop/product/33753718/zh-Hant","motion":"static"},{"id":"69eecd7969c93b016a2368ba","name":"靜態霓虹字母與符號","type":"emoji","url":"https://store.line.me/emojishop/product/69eecd7969c93b016a2368ba/zh-Hant","motion":"static"},{"id":"69edc61069c93b016a2362d6","name":"潦草字母","type":"emoji","url":"https://store.line.me/emojishop/product/69edc61069c93b016a2362d6/zh-Hant","motion":"static"},{"id":"33731648","name":"鄰家阿姨出沒中","type":"sticker","url":"https://store.line.me/stickershop/product/33731648/zh-Hant","motion":"static"},{"id":"33707418","name":"刀疤霆：我最暖","type":"sticker","url":"https://store.line.me/stickershop/product/33707418/zh-Hant","motion":"static"},{"id":"33707397","name":"刀疤霆你真夠真啊","type":"sticker","url":"https://store.line.me/stickershop/product/33707397/zh-Hant","motion":"static"},{"id":"33705639","name":"鄰家小姐姐來上班囉！","type":"sticker","url":"https://store.line.me/stickershop/product/33705639/zh-Hant","motion":"static"},{"id":"33678906","name":"飛龍在天・掌控全局","type":"sticker","url":"https://store.line.me/stickershop/product/33678906/zh-Hant","motion":"static"},{"id":"33661536","name":"媽～我真的愛你啦","type":"sticker","url":"https://store.line.me/stickershop/product/33661536/zh-Hant","motion":"static"},{"id":"33661827","name":"阿鵑姊與胖胖鬍渣：有妳在就好","type":"sticker","url":"https://store.line.me/stickershop/product/33661827/zh-Hant","motion":"static"},{"id":"33646543","name":"是義氣哥還是89仔!?","type":"sticker","url":"https://store.line.me/stickershop/product/33646543/zh-Hant","motion":"static"},{"id":"33650518","name":"小白飄動起來","type":"sticker","url":"https://store.line.me/stickershop/product/33650518/zh-Hant","motion":"animated"},{"id":"33621411","name":"大人的世界真的好累","type":"sticker","url":"https://store.line.me/stickershop/product/33621411/zh-Hant","motion":"static"},{"id":"33621187","name":"鄰家小姐姐跟你說HI","type":"sticker","url":"https://store.line.me/stickershop/product/33621187/zh-Hant","motion":"static"},{"id":"33615473","name":"胖胖鬍渣火柴男也想減肥","type":"sticker","url":"https://store.line.me/stickershop/product/33615473/zh-Hant","motion":"static"},{"id":"33611055","name":"小白飄也要上教會","type":"sticker","url":"https://store.line.me/stickershop/product/33611055/zh-Hant","motion":"static"},{"id":"33611097","name":"胖胖鬍渣火柴男與他的柴柴","type":"sticker","url":"https://store.line.me/stickershop/product/33611097/zh-Hant","motion":"static"},{"id":"33600398","name":"熱血艦長：全艦備便！","type":"sticker","url":"https://store.line.me/stickershop/product/33600398/zh-Hant","motion":"static"},{"id":"33594342","name":"刀疤霆的八點檔之路","type":"sticker","url":"https://store.line.me/stickershop/product/33594342/zh-Hant","motion":"static"},{"id":"33588989","name":"刀疤霆 3D公仔 3","type":"sticker","url":"https://store.line.me/stickershop/product/33588989/zh-Hant","motion":"static"},{"id":"33580495","name":"小白飄也真煩","type":"sticker","url":"https://store.line.me/stickershop/product/33580495/zh-Hant","motion":"static"},{"id":"33574504","name":"小白飄也跨足八點檔？！","type":"sticker","url":"https://store.line.me/stickershop/product/33574504/zh-Hant","motion":"static"},{"id":"33564182","name":"刀疤霆 3D公仔 2","type":"sticker","url":"https://store.line.me/stickershop/product/33564182/zh-Hant","motion":"static"},{"id":"33556578","name":"刀疤霆的流量密碼","type":"sticker","url":"https://store.line.me/stickershop/product/33556578/zh-Hant","motion":"static"},{"id":"33550860","name":"小白飄的童趣單字 2","type":"sticker","url":"https://store.line.me/stickershop/product/33550860/zh-Hant","motion":"static"},{"id":"69d70fc3029b0f74c3bddeae","name":"色盆內的小白飄，與你互動","type":"emoji","url":"https://store.line.me/emojishop/product/69d70fc3029b0f74c3bddeae/zh-Hant","motion":"static"},{"id":"69d70fa4302c410ddf716823","name":"濃眉達摩不倒翁","type":"emoji","url":"https://store.line.me/emojishop/product/69d70fa4302c410ddf716823/zh-Hant","motion":"static"},{"id":"69d70f94302c410ddf71681d","name":"達摩小白飄來囉","type":"emoji","url":"https://store.line.me/emojishop/product/69d70f94302c410ddf71681d/zh-Hant","motion":"static"},{"id":"69d70f840a830501fbd2396b","name":"小白飄的童趣單字 2","type":"emoji","url":"https://store.line.me/emojishop/product/69d70f840a830501fbd2396b/zh-Hant","motion":"static"},{"id":"69d70f810a830501fbd2396a","name":"小白飄的童趣單字","type":"emoji","url":"https://store.line.me/emojishop/product/69d70f810a830501fbd2396a/zh-Hant","motion":"static"},{"id":"33545034","name":"胖胖鬍渣火柴男(不意外)","type":"sticker","url":"https://store.line.me/stickershop/product/33545034/zh-Hant","motion":"static"},{"id":"33545017","name":"刀疤霆 3D公仔 1","type":"sticker","url":"https://store.line.me/stickershop/product/33545017/zh-Hant","motion":"static"},{"id":"33528447","name":"小白飄的童趣單字","type":"sticker","url":"https://store.line.me/stickershop/product/33528447/zh-Hant","motion":"static"},{"id":"33507700","name":"達摩小白飄來囉","type":"sticker","url":"https://store.line.me/stickershop/product/33507700/zh-Hant","motion":"static"},{"id":"33507467","name":"達摩小白飄，來補運","type":"sticker","url":"https://store.line.me/stickershop/product/33507467/zh-Hant","motion":"static"},{"id":"33499996","name":"濃眉達摩不倒翁","type":"sticker","url":"https://store.line.me/stickershop/product/33499996/zh-Hant","motion":"static"},{"id":"33499825","name":"色盆內的小白飄，與你互動","type":"sticker","url":"https://store.line.me/stickershop/product/33499825/zh-Hant","motion":"animated"},{"id":"33490176","name":"白盆內的小白飄","type":"sticker","url":"https://store.line.me/stickershop/product/33490176/zh-Hant","motion":"static"},{"id":"33490148","name":"胖胖鬍渣火柴男（別問）","type":"sticker","url":"https://store.line.me/stickershop/product/33490148/zh-Hant","motion":"static"},{"id":"33479034","name":"小白飄的童趣宇宙2-互動","type":"sticker","url":"https://store.line.me/stickershop/product/33479034/zh-Hant","motion":"animated"},{"id":"33479286","name":"公仔財神也不想上班","type":"sticker","url":"https://store.line.me/stickershop/product/33479286/zh-Hant","motion":"static"},{"id":"33479208","name":"連財神都不想上班(英文版)","type":"sticker","url":"https://store.line.me/stickershop/product/33479208/zh-Hant","motion":"static"},{"id":"33479201","name":"連財神都不想上班","type":"sticker","url":"https://store.line.me/stickershop/product/33479201/zh-Hant","motion":"static"},{"id":"33473495","name":"我的可愛柴柴：童趣篇","type":"sticker","url":"https://store.line.me/stickershop/product/33473495/zh-Hant","motion":"static"},{"id":"33462112","name":"煩躁胖子：又來亂","type":"sticker","url":"https://store.line.me/stickershop/product/33462112/zh-Hant","motion":"static"},{"id":"33462183","name":"有肉感的肥滋滋小肉團","type":"sticker","url":"https://store.line.me/stickershop/product/33462183/zh-Hant","motion":"static"},{"id":"33424378","name":"超崩潰厭世鮮肉(社畜日常)","type":"sticker","url":"https://store.line.me/stickershop/product/33424378/zh-Hant","motion":"static"},{"id":"33418102","name":"超頹廢的厭世鮮肉(聊天日常貼圖)","type":"sticker","url":"https://store.line.me/stickershop/product/33418102/zh-Hant","motion":"static"},{"id":"33417786","name":"白飄飄的暗黑世界：爛泥生存篇(更)","type":"sticker","url":"https://store.line.me/stickershop/product/33417786/zh-Hant","motion":"static"},{"id":"33409660","name":"生化肥滋滋小肉團（動圖）","type":"sticker","url":"https://store.line.me/stickershop/product/33409660/zh-Hant","motion":"animated"},{"id":"33409656","name":"生化肥滋滋小肉團：崩潰進化版","type":"sticker","url":"https://store.line.me/stickershop/product/33409656/zh-Hant","motion":"static"},{"id":"33409576","name":"草莓四超人：日常大爆發","type":"sticker","url":"https://store.line.me/stickershop/product/33409576/zh-Hant","motion":"static"},{"id":"33405309","name":"刀疤霆的吐槽小劇場","type":"sticker","url":"https://store.line.me/stickershop/product/33405309/zh-Hant","motion":"static"},{"id":"33400382","name":"生化肥滋滋小肉團(純表情)","type":"sticker","url":"https://store.line.me/stickershop/product/33400382/zh-Hant","motion":"static"},{"id":"33400369","name":"熱血艦長：火力全開！","type":"sticker","url":"https://store.line.me/stickershop/product/33400369/zh-Hant","motion":"static"},{"id":"33378361","name":"刀疤霆的日常小劇場(Q版)","type":"sticker","url":"https://store.line.me/stickershop/product/33378361/zh-Hant","motion":"static"},{"id":"33377161","name":"刀疤霆的日常小劇場","type":"sticker","url":"https://store.line.me/stickershop/product/33377161/zh-Hant","motion":"static"},{"id":"33366851","name":"白飄飄的暗黑世界：廢物模式篇(更)","type":"sticker","url":"https://store.line.me/stickershop/product/33366851/zh-Hant","motion":"static"},{"id":"33367015","name":"我的可愛柴柴：職場幹話(社畜)篇","type":"sticker","url":"https://store.line.me/stickershop/product/33367015/zh-Hant","motion":"static"},{"id":"33366838","name":"我的可愛柴柴：暖心陪伴篇","type":"sticker","url":"https://store.line.me/stickershop/product/33366838/zh-Hant","motion":"static"},{"id":"33366756","name":"白飄飄的暗黑世界：極度不屑篇","type":"sticker","url":"https://store.line.me/stickershop/product/33366756/zh-Hant","motion":"static"},{"id":"33361198","name":"我的可愛柴柴：黑白線稿篇","type":"sticker","url":"https://store.line.me/stickershop/product/33361198/zh-Hant","motion":"static"},{"id":"33340668","name":"白飄飄的暗黑世界：極度耗盡篇","type":"sticker","url":"https://store.line.me/stickershop/product/33340668/zh-Hant","motion":"static"},{"id":"33332504","name":"出車囉！靠北小車","type":"sticker","url":"https://store.line.me/stickershop/product/33332504/zh-Hant","motion":"static"},{"id":"33319931","name":"肥滋滋小肉團：慢慢變好中","type":"sticker","url":"https://store.line.me/stickershop/product/33319931/zh-Hant","motion":"static"},{"id":"33319965","name":"肥滋滋小肉團：就是廢","type":"sticker","url":"https://store.line.me/stickershop/product/33319965/zh-Hant","motion":"static"},{"id":"33308376","name":"專業運轉手的日常：遊覽車司機人生","type":"sticker","url":"https://store.line.me/stickershop/product/33308376/zh-Hant","motion":"static"},{"id":"33303404","name":"成語歪樓幹話集","type":"sticker","url":"https://store.line.me/stickershop/product/33303404/zh-Hant","motion":"static"},{"id":"33303709","name":"肥滋滋小肉團失戀了","type":"sticker","url":"https://store.line.me/stickershop/product/33303709/zh-Hant","motion":"static"},{"id":"33299910","name":"阿鵑姐的教會日常","type":"sticker","url":"https://store.line.me/stickershop/product/33299910/zh-Hant","motion":"static"},{"id":"33303548","name":"肥滋滋小肉團談戀愛啦！","type":"sticker","url":"https://store.line.me/stickershop/product/33303548/zh-Hant","motion":"static"},{"id":"69b90691ff4a66421d9b01cf","name":"鬍渣大叔 2","type":"emoji","url":"https://store.line.me/emojishop/product/69b90691ff4a66421d9b01cf/zh-Hant","motion":"static"},{"id":"33291785","name":"元慶旅遊出發囉！","type":"sticker","url":"https://store.line.me/stickershop/product/33291785/zh-Hant","motion":"static"},{"id":"33286270","name":"小火柴鬍渣大叔的教會日常2","type":"sticker","url":"https://store.line.me/stickershop/product/33286270/zh-Hant","motion":"static"},{"id":"33276708","name":"黑框鬍渣胖子的日常幹話","type":"sticker","url":"https://store.line.me/stickershop/product/33276708/zh-Hant","motion":"static"},{"id":"69b7703526782733e6b5eee6","name":"鬍渣大叔","type":"emoji","url":"https://store.line.me/emojishop/product/69b7703526782733e6b5eee6/zh-Hant","motion":"static"},{"id":"33263750","name":"黑框鬍渣胖子的日常嘴砲","type":"sticker","url":"https://store.line.me/stickershop/product/33263750/zh-Hant","motion":"static"},{"id":"33256582","name":"肥滋滋小肉團 2","type":"sticker","url":"https://store.line.me/stickershop/product/33256582/zh-Hant","motion":"static"},{"id":"33258911","name":"沐沐陪你聊天","type":"sticker","url":"https://store.line.me/stickershop/product/33258911/zh-Hant","motion":"static"},{"id":"33239244","name":"煩躁胖子的厭世人生","type":"sticker","url":"https://store.line.me/stickershop/product/33239244/zh-Hant","motion":"static"},{"id":"33239158","name":"煩躁胖子的工作日常","type":"sticker","url":"https://store.line.me/stickershop/product/33239158/zh-Hant","motion":"static"},{"id":"33239064","name":"愛搞笑的煩躁胖子2","type":"sticker","url":"https://store.line.me/stickershop/product/33239064/zh-Hant","motion":"static"},{"id":"33239031","name":"醜醜煩躁胖子的崩潰日常 2","type":"sticker","url":"https://store.line.me/stickershop/product/33239031/zh-Hant","motion":"static"},{"id":"33234486","name":"煩躁胖子的日常反應","type":"sticker","url":"https://store.line.me/stickershop/product/33234486/zh-Hant","motion":"static"},{"id":"33229957","name":"阿鵑姐的暖心問候","type":"sticker","url":"https://store.line.me/stickershop/product/33229957/zh-Hant","motion":"static"},{"id":"33222971","name":"平安祝福日常貼圖","type":"sticker","url":"https://store.line.me/stickershop/product/33222971/zh-Hant","motion":"static"},{"id":"33221055","name":"愛搞笑的煩躁胖子","type":"sticker","url":"https://store.line.me/stickershop/product/33221055/zh-Hant","motion":"static"},{"id":"33212238","name":"醜醜煩躁胖子的崩潰日常","type":"sticker","url":"https://store.line.me/stickershop/product/33212238/zh-Hant","motion":"static"},{"id":"33211897","name":"煩躁胖子的真實人生","type":"sticker","url":"https://store.line.me/stickershop/product/33211897/zh-Hant","motion":"static"},{"id":"33207825","name":"阿鵑姐的一日教會","type":"sticker","url":"https://store.line.me/stickershop/product/33207825/zh-Hant","motion":"static"},{"id":"33198567","name":"煩躁胖子的厭世社畜生存術","type":"sticker","url":"https://store.line.me/stickershop/product/33198567/zh-Hant","motion":"static"},{"id":"33194716","name":"沐沐的心情寫照","type":"sticker","url":"https://store.line.me/stickershop/product/33194716/zh-Hant","motion":"static"},{"id":"33190219","name":"沐沐的心情寫照 A","type":"sticker","url":"https://store.line.me/stickershop/product/33190219/zh-Hant","motion":"static"},{"id":"33190729","name":"建建的生活反應貼圖","type":"sticker","url":"https://store.line.me/stickershop/product/33190729/zh-Hant","motion":"static"},{"id":"33185225","name":"我是一條濕藍疲勞的抹布 2(new)","type":"sticker","url":"https://store.line.me/stickershop/product/33185225/zh-Hant","motion":"static"},{"id":"33185269","name":"肥滋滋小肉團","type":"sticker","url":"https://store.line.me/stickershop/product/33185269/zh-Hant","motion":"static"},{"id":"33176724","name":"冷面白轉灰：事情都壓我身上","type":"sticker","url":"https://store.line.me/stickershop/product/33176724/zh-Hant","motion":"static"},{"id":"33171479","name":"小火柴鬍渣大叔・生活表情-新","type":"sticker","url":"https://store.line.me/stickershop/product/33171479/zh-Hant","motion":"static"},{"id":"33172055","name":"小火柴鬍渣大叔・生活表情 新2","type":"sticker","url":"https://store.line.me/stickershop/product/33172055/zh-Hant","motion":"static"},{"id":"33165305","name":"咖啡色黑化老鳥布，爛事都我擦","type":"sticker","url":"https://store.line.me/stickershop/product/33165305/zh-Hant","motion":"static"},{"id":"33158398","name":"我是一條濕藍疲勞的抹布 2","type":"sticker","url":"https://store.line.me/stickershop/product/33158398/zh-Hant","motion":"static"},{"id":"33148102","name":"我是一條濕藍疲勞的抹布","type":"sticker","url":"https://store.line.me/stickershop/product/33148102/zh-Hant","motion":"static"},{"id":"33147676","name":"今天抹布還是很撐","type":"sticker","url":"https://store.line.me/stickershop/product/33147676/zh-Hant","motion":"static"},{"id":"33135478","name":"阿鵑嬤尬你做伙！台語日常貼圖","type":"sticker","url":"https://store.line.me/stickershop/product/33135478/zh-Hant","motion":"static"},{"id":"33135871","name":"小火柴鬍渣大叔・生活表情 2","type":"sticker","url":"https://store.line.me/stickershop/product/33135871/zh-Hant","motion":"static"},{"id":"33117809","name":"小火柴鬍渣大叔・生活表情 1","type":"sticker","url":"https://store.line.me/stickershop/product/33117809/zh-Hant","motion":"static"},{"id":"33109455","name":"今天抹布有點撐","type":"sticker","url":"https://store.line.me/stickershop/product/33109455/zh-Hant","motion":"static"},{"id":"33106234","name":"小火柴鬍渣大叔：百變職人","type":"sticker","url":"https://store.line.me/stickershop/product/33106234/zh-Hant","motion":"static"},{"id":"33106224","name":"小火柴鬍渣大叔","type":"sticker","url":"https://store.line.me/stickershop/product/33106224/zh-Hant","motion":"static"},{"id":"33097785","name":"小火柴鬍渣大叔的社畜幹話","type":"sticker","url":"https://store.line.me/stickershop/product/33097785/zh-Hant","motion":"static"},{"id":"33086339","name":"小火柴鬍渣大叔：日常聊天室","type":"sticker","url":"https://store.line.me/stickershop/product/33086339/zh-Hant","motion":"static"},{"id":"33086252","name":"小火柴鬍渣大叔：日常反應","type":"sticker","url":"https://store.line.me/stickershop/product/33086252/zh-Hant","motion":"static"},{"id":"33079960","name":"沐沐日常吐槽","type":"sticker","url":"https://store.line.me/stickershop/product/33079960/zh-Hant","motion":"static"},{"id":"33064848","name":"今天也很厭世的小男孩","type":"sticker","url":"https://store.line.me/stickershop/product/33064848/zh-Hant","motion":"static"},{"id":"33064860","name":"可愛厭世小巴","type":"sticker","url":"https://store.line.me/stickershop/product/33064860/zh-Hant","motion":"static"},{"id":"33064574","name":"煩躁胖子(更)","type":"sticker","url":"https://store.line.me/stickershop/product/33064574/zh-Hant","motion":"static"},{"id":"33047937","name":"煩躁胖子3","type":"sticker","url":"https://store.line.me/stickershop/product/33047937/zh-Hant","motion":"static"},{"id":"33047921","name":"煩躁胖子2","type":"sticker","url":"https://store.line.me/stickershop/product/33047921/zh-Hant","motion":"static"}];
-
-const PRODUCT_CATEGORY_MAP = [
-  { key: "神明", match: ["財神", "保平安"] },
-  { key: "小姐姐系列", match: ["鄰家", "媽～我真的愛你", "大人的世界"] },
-  { key: "抹布", match: ["抹布", "濕藍疲勞", "老鳥布"] },
-  { key: "車", match: ["車", "旅遊", "司機", "小巴"] },
-  { key: "鮮肉", match: ["鮮肉", "艦長", "小男孩"] },
-  { key: "89義氣", match: ["不想理你，有事說", "飛龍在天", "有事說重點", "江湖再見", "不解釋", "看結果就知道", "89", "義氣"] },
-  { key: "煩躁胖子", match: ["煩躁胖子", "鬍渣", "胖子"] },
-  { key: "刀疤霆", match: ["刀疤霆"] },
-  { key: "小白飄", match: ["小白飄"] },
-  { key: "白飄飄", match: ["白飄飄"] },
-  { key: "肥滋滋", match: ["肥滋滋"] },
-  { key: "阿鵑姊", match: ["阿鵑", "阿鵑姊", "阿鵑姐", "阿鵑嬤"] },
-  { key: "柴柴", match: ["柴柴"] },
-  { key: "沐沐", match: ["沐沐"] }
-];
-
-let productDBActiveFilter = "全部";
-
-function getProductType(item) {
-  return (item.url || "").includes("/emojishop/") ? "emoji" : "sticker";
-}
-
-function getStickerCategory(item) {
-  const name = item.name || "";
-  for (const cat of PRODUCT_CATEGORY_MAP) {
-    if (cat.match.some(m => name.includes(m))) return cat.key;
-  }
-  return "其他";
-}
-
-function getEmojiMotionV22(name) {
-  name = name || "";
-  if (name.includes("色盆內的小白飄，與你互動") || name.includes("色盆內的小白飄與你互動")) return "靜態";
-  return (
-    name.includes("動") ||
-    name.includes("會動") ||
-    name.includes("呼吸") ||
-    name.includes("閃爍") ||
-    name.includes("Animation")
-  ) ? "動態" : "靜態";
-}
-
-function getEmojiSubCategoryV22(name) {
-  name = name || "";
-  if (name.includes("完整")) return "完整_144";
-  if (name.includes("字母")) return "字母_104";
-  return "其他_40";
-}
-
-function normalizeBuiltinProductDB() {
-  BUILTIN_PRODUCTS_DB.forEach(item => {
-    item.type = getProductType(item);
-    if (item.type === "emoji") {
-      item.category = "表情貼";
-      item.motion = getEmojiMotionV22(item.name);
-      item.emoji_subcategory = getEmojiSubCategoryV22(item.name);
-    } else {
-      item.category = getStickerCategory(item);
-      item.motion = (item.name || "").includes("動圖") || (item.name || "").includes("動起來") ? "動態貼圖" : "靜態貼圖";
-      item.emoji_subcategory = "";
-    }
-  });
-}
-
-function getProductDBFilters() {
-  return [
-    "全部", "貼圖", "表情貼",
-    "表情貼｜動態", "表情貼｜靜態",
-    "完整_144", "字母_104", "其他_40",
-    "神明", "小姐姐系列", "抹布", "車", "鮮肉", "89義氣", "煩躁胖子",
-    "刀疤霆", "小白飄", "白飄飄", "肥滋滋", "阿鵑姊", "柴柴", "沐沐", "其他"
-  ];
-}
-
-function setProductDBFilter(filter) {
-  productDBActiveFilter = filter;
-  renderProductDB();
-}
-
-function productMatchesFilter(item, filter) {
-  if (filter === "全部") return true;
-  if (filter === "貼圖") return item.type === "sticker";
-  if (filter === "表情貼") return item.type === "emoji";
-  if (filter === "表情貼｜動態") return item.type === "emoji" && item.motion === "動態";
-  if (filter === "表情貼｜靜態") return item.type === "emoji" && item.motion === "靜態";
-  if (["完整_144", "字母_104", "其他_40"].includes(filter)) {
-    return item.type === "emoji" && item.emoji_subcategory === filter;
-  }
-  return item.category === filter;
-}
-
-function renderProductDBFilters() {
-  const wrap = document.getElementById("db-filters");
-  if (!wrap) return;
-  wrap.innerHTML = getProductDBFilters().map(f => `
-    <button type="button" class="db-filter ${f === productDBActiveFilter ? "active" : ""}" onclick="setProductDBFilter('${f}')">${f}</button>
-  `).join("");
-}
-
-function renderProductDB() {
-  const list = document.getElementById("db-products");
-  if (!list) return;
-
-  const keyword = (document.getElementById("db-search")?.value || "").trim().toLowerCase();
-  const data = BUILTIN_PRODUCTS_DB.filter(item => {
-    const pool = [
-      item.id, item.name, item.type, item.category, item.motion, item.emoji_subcategory, item.url
-    ].join(" ").toLowerCase();
-    return productMatchesFilter(item, productDBActiveFilter) && (!keyword || pool.includes(keyword));
-  });
-
-  const total = BUILTIN_PRODUCTS_DB.length;
-  const stickerCount = BUILTIN_PRODUCTS_DB.filter(x => x.type === "sticker").length;
-  const emojiCount = BUILTIN_PRODUCTS_DB.filter(x => x.type === "emoji").length;
-
-  const setText = (id, value) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-  };
-  setText("db-total-count", total);
-  setText("db-sticker-count", stickerCount);
-  setText("db-emoji-count", emojiCount);
-  setText("db-visible-count", data.length);
-
-  list.innerHTML = data.map(item => {
-    const typeLabel = item.type === "emoji" ? "表情貼" : "貼圖";
-    const typeClass = item.type === "emoji" ? "emoji" : "sticker";
-    const extra = item.type === "emoji"
-      ? `<span class="db-pill">${item.motion}</span><span class="db-pill">${item.emoji_subcategory}</span>`
-      : `<span class="db-pill">${item.motion}</span>`;
-    return `
-      <a class="db-card" href="${item.url}" target="_blank" rel="noopener">
-        <div class="db-name">${escapeHtmlDB(item.name || "(無名稱)")}</div>
-        <div class="db-meta">
-          <span class="db-pill ${typeClass}">${typeLabel}</span>
-          <span class="db-pill">${escapeHtmlDB(item.category || "")}</span>
-          ${extra}
-        </div>
-        <span class="db-id">${escapeHtmlDB(item.id || "")}</span>
-      </a>
-    `;
-  }).join("") || `<div class="info-box">沒有符合條件的商品。</div>`;
-
-  renderProductDBFilters();
-}
-
-function escapeHtmlDB(str) {
-  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-
-function initBuiltinProductDB() {
-  normalizeBuiltinProductDB();
-  renderProductDBFilters();
-  renderProductDB();
-}
-
-
-function toggleProductDB() {
-  const body = document.getElementById('product-db-body');
-  const btn = document.getElementById('product-db-toggle');
-  if (!body) return;
-  const open = body.classList.toggle('open');
-  if (btn) btn.textContent = open ? '收合作品資料庫' : '展開作品資料庫';
-}
-
 // Init
 applyPreset('green');
 updateCellInfo();
-initBuiltinProductDB();
-
-// ===== 版本號自動產生 =====
+// ===== 公開版更新日期顯示 =====
 (function(){
-  const VERSION = 'V14';
-  const now = new Date();
-  const mm = String(now.getMonth()+1).padStart(2,'0');
-  const dd = String(now.getDate()).padStart(2,'0');
-  const hh = String(now.getHours()).padStart(2,'0');
-  const mi = String(now.getMinutes()).padStart(2,'0');
   const tag = document.getElementById('ver-tag');
-  if (tag) tag.textContent = mm+dd+hh+mi+VERSION;
+  if (tag) tag.textContent = '更新日期 2026/05/26';
 })();
 
 // ===== 精選作品輪播 =====
+// 輪播排序原則：LINE 主題新品 → 最新貼圖 → 最新表情貼 → 長賣代表作。
+// 後續新增新品時，優先替換最前面 2～4 筆，不建議無限制增加輪播長度。
 const FEATURED_ITEMS = [
+  {
+    img: 'https://shop.line-scdn.net/themeshop/v1/products/b9/34/0d/b9340d91-49b0-4078-aad8-ed8047fffdaa/1/WEBSTORE/icon_198x278.png',
+    labels: ['LINE主題', '科技狐', '新品'],
+    title: '冷豔科技狐',
+    desc: '銀白狐身搭配霓虹藍光，冷靜又帶距離感，讓聊天室變成高級科幻空間。',
+    url: 'https://store.line.me/themeshop/product/b9340d91-49b0-4078-aad8-ed8047fffdaa/zh-Hant',
+  },
+  {
+    img: 'https://shop.line-scdn.net/themeshop/v1/products/c0/84/b9/c084b9d3-f547-4faa-8605-42a9d0f060b7/1/WEBSTORE/icon_198x278.png',
+    labels: ['LINE主題', '義氣哥', '衝出'],
+    title: '義氣哥・衝出',
+    desc: '義氣哥從破裂手機畫面中衝出，黑金爆裂光感，讓聊天介面更有氣勢。',
+    url: 'https://store.line.me/themeshop/product/c084b9d3-f547-4faa-8605-42a9d0f060b7/zh-Hant',
+  },
+  {
+    img: 'https://stickershop.line-scdn.net/stickershop/v1/product/34128364/LINEStorePC/main.png?v=1',
+    labels: ['貼圖', '懶教人', '新品'],
+    title: '懶教人，就讓貼圖教之敷衍你剛好',
+    desc: '懶教人系列，適合懶得解釋、只想快速回覆的日常對話。',
+    url: 'https://store.line.me/stickershop/product/34128364/zh-Hant',
+  },
+  {
+    img: 'https://stickershop.line-scdn.net/stickershop/v1/product/34128397/LINEStorePC/main.png?v=1',
+    labels: ['貼圖', '懶教人', '冷淡回覆'],
+    title: '懶教人，就讓貼圖教之真沒有敷衍',
+    desc: '真的不是敷衍，只是回得很省力。適合冷淡又實用的聊天回覆。',
+    url: 'https://store.line.me/stickershop/product/34128397/zh-Hant',
+  },
   {
     img: 'https://stickershop.line-scdn.net/sticonshop/v1/product/69edc61069c93b016a2362d6/iPhone/main.png?v=1',
     labels: ['表情貼', '字母', '手寫'],
@@ -3114,13 +2988,6 @@ const FEATURED_ITEMS = [
     title: '達摩小白飄，來補運',
     desc: '達摩造型小白飄，結合開運祝福與日常對話。',
     url: 'https://store.line.me/stickershop/product/33507467/zh-Hant',
-  },
-  {
-    img: 'https://stickershop.line-scdn.net/stickershop/v1/product/33661827/LINEStorePC/main.png?v=1',
-    labels: ['貼圖', '母親節', '親情'],
-    title: '阿鵑姊與胖胖鬍渣：有妳在就好',
-    desc: '溫暖親情貼圖，適合母親節、家人問候與日常感謝。',
-    url: 'https://store.line.me/stickershop/product/33661827/zh-Hant',
   },
   {
     img: 'https://stickershop.line-scdn.net/stickershop/v1/product/33611055/LINEStorePC/main.png?v=1',
