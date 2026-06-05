@@ -567,6 +567,45 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
 
 
 
+
+/* ===== 0605V21 Split Featured + Drag Grid Lines UI cleanup ===== */
+.featured-section {
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:rgba(255,255,255,.025);
+  padding:10px 12px 12px;
+}
+.featured-section + .featured-section { margin-top:10px; }
+.featured-section-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:6px;
+}
+.featured-section-title { font-size:13px; font-weight:900; color:var(--accent2); }
+.featured-section-sub { display:none; }
+.featured-img.theme-img { object-fit:contain; background:#0f172a; }
+.grid-canvas-wrap{position:relative;display:inline-block;width:100%;line-height:0;}
+.grid-canvas-wrap.drag-ready::after{
+  content:'可拖拉橘色切線微調分割位置';
+  position:absolute; left:10px; top:10px; z-index:2;
+  padding:5px 8px; border-radius:999px;
+  background:rgba(0,0,0,.55); color:#fff;
+  font-size:11px; line-height:1; pointer-events:none;
+}
+.grid-drag-status{
+  font-size:11px; color:var(--accent2); text-align:center; margin-top:6px;
+  font-family:'Share Tech Mono', monospace; line-height:1.6;
+}
+.grid-mini-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+.grid-mini-btn{
+  padding:6px 10px; border-radius:8px; border:1px solid var(--border);
+  background:var(--bg3); color:var(--text2); font-size:11px; font-weight:900;
+  cursor:pointer; font-family:'Noto Sans TC', sans-serif;
+}
+.grid-mini-btn:hover{border-color:var(--accent); color:var(--accent2);}
+
 /* ===== Product Landing / Promotion Add-on v9.1 ===== */
 .product-hero {
   max-width:1100px;
@@ -577,7 +616,7 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
   border-radius:18px;
   display:flex;
   flex-direction:column;
-  gap:18px;
+  gap:14px;
 }
 .product-hero-top {
   display:flex;
@@ -834,7 +873,7 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
 
 <header>
   <div class="logo">煩躁胖子<span>・免費公開版工具</span></div>
-  <div class="version" id="ver-tag">更新日期 2026/05/26</div>
+  <div class="version" id="ver-tag">更新日期 2026/06/05</div>
 </header>
 
 <section class="product-hero">
@@ -844,8 +883,8 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
       <h1>一鍵去 Gemini 浮水印、去背、切格、打包，可每頁獨立上傳、獨立打包</h1>
       <p style="color:var(--text2);font-size:12px;margin:6px 0 0;line-height:1.8;">
         免費公開版工具，可完整流程使用，也可單獨使用某一功能：<br>
-        支援 LINE 貼圖 / 表情貼 / 動態貼圖尺寸整理，可自由調整欄列、裁邊、縮放、起始編號，並輸出 PNG ZIP、Main、Tab。<br>
-        工具免費使用；如果覺得好用，也歡迎看看我的 LINE 主題與貼圖作品。
+        支援 LINE 貼圖 / 表情貼 / 動態貼圖尺寸整理，可自由調整欄列、手拉切割線、裁邊、縮放、起始編號，並輸出 PNG ZIP、Main、Tab。<br>
+        新增手拉切線微調，切割預覽與 ZIP 輸出會依照目前切線位置處理；如果覺得好用，也歡迎看看我的 LINE 主題與貼圖作品。
       </p>
     </div>
     <div class="product-hero-actions" style="margin-top:0;">
@@ -854,13 +893,35 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
       <a class="product-link-btn" href="https://store.line.me/stickershop/author/5965541/zh-Hant" target="_blank" rel="noopener">看 LINE 貼圖 + 表情貼</a>
     </div>
   </div>
-  <!-- 下段：精選作品輪播（全寬） -->
-  <div class="featured-carousel" id="featured-carousel"
-       onmouseenter="featuredPause()" onmouseleave="featuredResume()">
-    <div id="featured-slides"></div>
-    <div class="featured-arrows">
-      <button class="featured-arrow" onclick="featuredPrev()">&#8249;</button>
-      <button class="featured-arrow" onclick="featuredNext()">&#8250;</button>
+  <!-- 下段：指定作品輪播（主題 / 貼圖表情貼分區） -->
+  <div class="featured-section">
+    <div class="featured-section-head">
+      <div>
+        <div class="featured-section-title">LINE 主題精選</div>
+      </div>
+    </div>
+    <div class="featured-carousel" id="featured-carousel-theme"
+         onmouseenter="featuredPause('theme')" onmouseleave="featuredResume('theme')">
+      <div id="featured-slides-theme"></div>
+      <div class="featured-arrows">
+        <button class="featured-arrow" onclick="featuredPrev('theme')">&#8249;</button>
+        <button class="featured-arrow" onclick="featuredNext('theme')">&#8250;</button>
+      </div>
+    </div>
+  </div>
+  <div class="featured-section">
+    <div class="featured-section-head">
+      <div>
+        <div class="featured-section-title">貼圖 / 表情貼精選</div>
+      </div>
+    </div>
+    <div class="featured-carousel" id="featured-carousel-sticker"
+         onmouseenter="featuredPause('sticker')" onmouseleave="featuredResume('sticker')">
+      <div id="featured-slides-sticker"></div>
+      <div class="featured-arrows">
+        <button class="featured-arrow" onclick="featuredPrev('sticker')">&#8249;</button>
+        <button class="featured-arrow" onclick="featuredNext('sticker')">&#8250;</button>
+      </div>
     </div>
   </div>
 </section>
@@ -1189,7 +1250,7 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
       </div>
     </div>
     <div style="flex:1;min-width:300px;">
-      <div class="card" style="padding:12px;"><div class="card-title" style="margin-bottom:8px;">🗺️ 格線預覽</div><div style="position:relative;display:inline-block;width:100%;line-height:0;"><canvas id="grid-canvas" style="width:100%;border-radius:8px;display:block;cursor:crosshair;"></canvas></div><div style="font-size:11px;color:var(--text2);text-align:center;margin-top:8px;font-family:'Share Tech Mono',monospace;">共 <span id="total-cells" style="color:var(--accent);font-weight:700;">20</span> 格 · 每格約 <span id="cell-size" style="color:var(--accent2);">512×416</span> px</div></div>
+      <div class="card" style="padding:12px;"><div class="card-title" style="margin-bottom:8px;">🗺️ 格線預覽 <span style="font-size:10px;font-weight:400;color:var(--text2);margin-left:6px;">可直接拖拉橘色切線</span></div><div class="grid-canvas-wrap drag-ready"><canvas id="grid-canvas" style="width:100%;border-radius:8px;display:block;cursor:crosshair;touch-action:none;"></canvas></div><div style="font-size:11px;color:var(--text2);text-align:center;margin-top:8px;font-family:'Share Tech Mono',monospace;">共 <span id="total-cells" style="color:var(--accent);font-weight:700;">20</span> 格 · 每格約 <span id="cell-size" style="color:var(--accent2);">512×416</span> px</div><div class="grid-drag-status" id="grid-drag-status">提示：進入第4步後，可拖拉橘色切線微調每格範圍。</div><div class="grid-mini-actions"><button type="button" class="grid-mini-btn" onclick="resetGridLineAdjustments()">重置切線</button></div></div>
       <div class="card" style="padding:12px;"><div class="card-title" style="margin-bottom:8px;">✂️ 切割預覽（目前去背結果）<span style="font-size:10px;font-weight:400;color:var(--text2);margin-left:6px;">調整設定後自動更新</span></div><div class="sticker-grid" id="slice-preview-grid"></div></div>
       <div class="card" style="padding:12px;display:none;" id="result-card"><div class="card-title" style="margin-bottom:8px;">✅ 去背結果</div><div id="progress-area" style="display:none;"><div class="status-text" id="status-text">處理中...</div><div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div></div><div class="info-box" style="margin-bottom:12px;">· 點擊每張貼圖下方的 <strong>Main</strong> 設定封面圖<br>· 點擊 <strong>Tab</strong> 設定標籤圖</div><div class="sticker-grid" id="sticker-grid"></div></div>
     </div>
@@ -1207,13 +1268,28 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
   <h2>隱藏頁｜工程日誌</h2>
   <button onclick="closeDevLogV91()">關閉</button>
   <pre>
+0605V21｜2026-06-05｜首頁文案補新功能＋輪播說明清理
+- 首頁工具說明補上「手拉切割線」新功能，明確標示切割預覽與 ZIP 輸出會依目前切線位置處理。
+- 移除「LINE 主題精選」與「貼圖 / 表情貼精選」區塊下方的指定順序說明小字，版面往上收，避免作品輪播區出現多餘提示文字。
+- 將 20 組輪播卡片描述由通用句改為商品頁說明文字；不改 20 組商品順序。
+- 未修改去 Gemini 浮水印、傳統去背、魔術棒、手拉切線核心、ZIP、Main/Tab 流程。
+
+0605V20｜2026-06-05｜首頁輪播分區＋手拉切線移植
+- 以去背工具_0526V19.html 為基底，首頁精選輪播拆成「LINE 主題精選」與「貼圖 / 表情貼精選」兩個獨立區塊。
+- 主題區依使用者指定順序固定 10 組：T01、T02、T05、T06、T08、T03、T04、T09、T11、T13。
+- 貼圖 / 表情貼區依使用者指定順序固定 10 組：S002、S003、S009、S015、S037、S039、S007、S083、S034、S035。
+- Step 4 分割頁移植自用版既有手拉切割線資料流：gridLineState、getGridRangesFromCanvas、initGridLineDrag，並接到格線預覽、切割預覽與正式 ZIP 分割。
+- 新增「重置切線」與切線狀態提示；更換圖片時會重置自訂切線。
+- 修補 renderPackGrid 在公開版沒有 pack-grid 容器時的空值防護，避免切割完成後報錯。
+- 未修改去 Gemini 浮水印、傳統去背、魔術棒去背、Main/Tab 選取與 ZIP 命名核心流程。
+
 0526V19｜2026-05-26｜公開分享標題與 Meta 資訊修正
 - 將瀏覽器標題改為「LINE 免費工具｜煩躁胖子」，避免社群分享卡片顯示舊版號。
 - 新增 description / og:title / og:description / twitter:title / twitter:description，供 Threads、LINE、Facebook 等平台抓取公開分享資訊。
 - 存檔版本改為 0526V19；不修改首頁 UI、輪播、去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab 核心流程。
 
 0516V18｜2026-05-26｜公開版首頁 UI 清理與資料庫移除
-- Header 左側改為「煩躁胖子・免費公開版工具」，右側只顯示「更新日期 2026/05/26」，移除公開畫面中的工程版號與動態時間碼。
+- Header 左側改為「煩躁胖子・免費公開版工具」，右側只顯示「更新日期 2026/06/05」，移除公開畫面中的工程版號與動態時間碼。
 - 首頁導流按鈕維持三顆：開始使用工具、看 LINE 主題、看 LINE 貼圖 + 表情貼。
 - 移除首頁底部「更多作品」作品資料庫整排 UI，並移除內建作品資料庫 JS 初始化與資料庫函式，公開版改以輪播與兩個作者頁按鈕導流。
 - 未修改去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab 與輪播資料內容。
@@ -1926,6 +2002,123 @@ let tabId = null;
 let bgMode = 'none';
 let traditionalEffect = 'complete';
 let advOpen = false;
+let gridLineState = { v: [], h: [], cols: 5, rows: 4, active: false };
+let gridLineDrag = null;
+
+function invalidateFinalOutput(reason) {
+  if (finalImages.length || document.getElementById('btn-download')?.disabled === false) {
+    finalImages = [];
+    processedCount = 0;
+    mainId = null;
+    tabId = null;
+    const btn = document.getElementById('btn-download');
+    if (btn) btn.disabled = true;
+    const grid = document.getElementById('sticker-grid');
+    if (grid) grid.innerHTML = '';
+    const result = document.getElementById('result-card');
+    if (result) result.style.display = 'none';
+  }
+  if (reason) console.info(reason);
+}
+
+function resetGridLineAdjustments(skipRender = false) {
+  const cols = parseInt(document.getElementById('cols')?.value || '5');
+  const rows = parseInt(document.getElementById('rows')?.value || '4');
+  gridLineState = { v: [], h: [], cols, rows, active: false };
+  const status = document.getElementById('grid-drag-status');
+  if (status) status.textContent = '提示：進入第4步後，可拖拉橘色切線微調每格範圍。';
+  if (!skipRender) {
+    invalidateFinalOutput('切線已重置');
+    updateGridCanvas?.();
+    updateSlicePreview?.();
+  }
+}
+
+function getGridRangesFromCanvas(workW, workH) {
+  const cols = parseInt(document.getElementById('cols')?.value || '5');
+  const rows = parseInt(document.getElementById('rows')?.value || '4');
+  const cropL = parseInt(document.getElementById('crop-l')?.value || '0') || 0;
+  const cropR = parseInt(document.getElementById('crop-r')?.value || '0') || 0;
+  const cropT = parseInt(document.getElementById('crop-t')?.value || '0') || 0;
+  const cropB = parseInt(document.getElementById('crop-b')?.value || '0') || 0;
+  const left = Math.max(0, Math.min(workW - 1, cropL));
+  const right = Math.max(left + 1, Math.min(workW, workW - cropR));
+  const top = Math.max(0, Math.min(workH - 1, cropT));
+  const bottom = Math.max(top + 1, Math.min(workH, workH - cropB));
+  const minGapX = Math.max(12, (right - left) / Math.max(cols, 1) * 0.18);
+  const minGapY = Math.max(12, (bottom - top) / Math.max(rows, 1) * 0.18);
+  const hasCustom = gridLineState.active && gridLineState.cols === cols && gridLineState.rows === rows && gridLineState.v.length === cols - 1 && gridLineState.h.length === rows - 1;
+  let v = [];
+  let h = [];
+  if (hasCustom) {
+    v = gridLineState.v.slice().sort((a, b) => a - b).map(x => Math.max(left + minGapX, Math.min(right - minGapX, x)));
+    h = gridLineState.h.slice().sort((a, b) => a - b).map(y => Math.max(top + minGapY, Math.min(bottom - minGapY, y)));
+  } else {
+    for (let c = 1; c < cols; c++) v.push(left + (right - left) * c / cols);
+    for (let r = 1; r < rows; r++) h.push(top + (bottom - top) * r / rows);
+  }
+  return { cols, rows, xCuts: [left, ...v, right], yCuts: [top, ...h, bottom], cropL, cropR, cropT, cropB, custom: hasCustom };
+}
+
+function initGridLineDrag() {
+  const canvas = document.getElementById('grid-canvas');
+  if (!canvas || canvas.dataset.dragReady === '1') return;
+  canvas.dataset.dragReady = '1';
+  const getPoint = (ev) => {
+    const rect = canvas.getBoundingClientRect();
+    return { x: (ev.clientX - rect.left) * canvas.width / rect.width, y: (ev.clientY - rect.top) * canvas.height / rect.height, rect };
+  };
+  canvas.addEventListener('pointerdown', (ev) => {
+    if (!originalImg || !canvas.width || !canvas.height) return;
+    const ranges = getGridRangesFromCanvas(canvas.width, canvas.height);
+    const pt = getPoint(ev);
+    const threshold = Math.max(12, 14 * canvas.width / Math.max(pt.rect.width, 1));
+    let best = null;
+    ranges.xCuts.slice(1, -1).forEach((x, i) => { const d = Math.abs(pt.x - x); if (d < threshold && (!best || d < best.d)) best = { axis: 'v', index: i, d }; });
+    ranges.yCuts.slice(1, -1).forEach((y, i) => { const d = Math.abs(pt.y - y); if (d < threshold && (!best || d < best.d)) best = { axis: 'h', index: i, d }; });
+    if (!best) return;
+    ev.preventDefault();
+    if (!gridLineState.active || gridLineState.cols !== ranges.cols || gridLineState.rows !== ranges.rows) {
+      gridLineState = { v: ranges.xCuts.slice(1, -1), h: ranges.yCuts.slice(1, -1), cols: ranges.cols, rows: ranges.rows, active: true };
+    }
+    gridLineDrag = best;
+    canvas.setPointerCapture?.(ev.pointerId);
+    const status = document.getElementById('grid-drag-status');
+    if (status) status.textContent = best.axis === 'v' ? `拖拉第 ${best.index + 1} 條直切線中...` : `拖拉第 ${best.index + 1} 條橫切線中...`;
+  });
+  canvas.addEventListener('pointermove', (ev) => {
+    if (!gridLineDrag) return;
+    ev.preventDefault();
+    const pt = getPoint(ev);
+    const ranges = getGridRangesFromCanvas(canvas.width, canvas.height);
+    const gapX = Math.max(12, (ranges.xCuts.at(-1) - ranges.xCuts[0]) / Math.max(ranges.cols, 1) * 0.12);
+    const gapY = Math.max(12, (ranges.yCuts.at(-1) - ranges.yCuts[0]) / Math.max(ranges.rows, 1) * 0.12);
+    if (gridLineDrag.axis === 'v') {
+      const i = gridLineDrag.index;
+      const min = (i === 0 ? ranges.xCuts[0] : gridLineState.v[i - 1]) + gapX;
+      const max = (i === gridLineState.v.length - 1 ? ranges.xCuts.at(-1) : gridLineState.v[i + 1]) - gapX;
+      gridLineState.v[i] = Math.max(min, Math.min(max, pt.x));
+    } else {
+      const i = gridLineDrag.index;
+      const min = (i === 0 ? ranges.yCuts[0] : gridLineState.h[i - 1]) + gapY;
+      const max = (i === gridLineState.h.length - 1 ? ranges.yCuts.at(-1) : gridLineState.h[i + 1]) - gapY;
+      gridLineState.h[i] = Math.max(min, Math.min(max, pt.y));
+    }
+    updateGridCanvas();
+  });
+  const endDrag = () => {
+    if (!gridLineDrag) return;
+    gridLineDrag = null;
+    const status = document.getElementById('grid-drag-status');
+    if (status) status.textContent = '已套用自訂切線；切割預覽與 ZIP 會依照目前切線輸出。';
+    invalidateFinalOutput('切線位置已變更');
+    updateGridCanvas();
+    updateSlicePreview();
+  };
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+}
+
 
 function resetMagicWandStateForNewImage() {
   if (typeof wandPickPointsV10 !== 'undefined') wandPickPointsV10 = [];
@@ -1963,6 +2156,7 @@ function loadImageIntoMainFlow(file, sourceLabel, targetStep) {
     img.onload = () => {
       originalImg = img;
       resetMagicWandStateForNewImage();
+      resetGridLineAdjustments(true);
       finalImages = [];
       slicedPieces = [];
       processedCount = 0;
@@ -2019,6 +2213,7 @@ function goStep(n) {
   if (n === 4) {
     updateGridCanvas();
     updateSlicePreview();
+    initGridLineDrag();
   }
 }
 
@@ -2178,32 +2373,29 @@ function downloadCurrentWorkImage() {
 // ===== 即時切割預覽（吃目前工作圖）=====
 function updateSlicePreview() {
   if (!originalImg) return;
-  const cols = parseInt(document.getElementById('cols').value);
-  const rows = parseInt(document.getElementById('rows').value);
-  const cropL = parseInt(document.getElementById('crop-l').value) || 0;
-  const cropR = parseInt(document.getElementById('crop-r').value) || 0;
-  const cropT = parseInt(document.getElementById('crop-t').value) || 0;
-  const cropB = parseInt(document.getElementById('crop-b').value) || 0;
   const canvas = buildCurrentWorkSheetCanvas();
   if (!canvas) return;
   const workW = canvas.width, workH = canvas.height;
-  const effW = workW - cropL - cropR;
-  const effH = workH - cropT - cropB;
-  const pieceW = effW / cols, pieceH = effH / rows;
+  const ranges = getGridRangesFromCanvas(workW, workH);
   const grid = document.getElementById('slice-preview-grid');
-  grid.style.gridTemplateColumns = `repeat(${Math.min(cols, 5)}, 1fr)`;
+  grid.style.gridTemplateColumns = `repeat(${Math.min(ranges.cols, 5)}, 1fr)`;
   grid.innerHTML = '';
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
+  for (let r = 0; r < ranges.rows; r++) {
+    for (let c = 0; c < ranges.cols; c++) {
+      const sx = ranges.xCuts[c];
+      const sy = ranges.yCuts[r];
+      const pieceW = ranges.xCuts[c + 1] - ranges.xCuts[c];
+      const pieceH = ranges.yCuts[r + 1] - ranges.yCuts[r];
       const pc = document.createElement('canvas');
       pc.width = Math.max(1, Math.round(pieceW));
       pc.height = Math.max(1, Math.round(pieceH));
-      pc.getContext('2d').drawImage(canvas, cropL + c*pieceW, cropT + r*pieceH, pieceW, pieceH, 0, 0, pc.width, pc.height);
+      pc.getContext('2d').drawImage(canvas, sx, sy, pieceW, pieceH, 0, 0, pc.width, pc.height);
       const cell = document.createElement('div');
       cell.className = 'sticker-cell';
-      const num = r * cols + c + 1;
-      cell.innerHTML = `<div class="checker"><img src="${pc.toDataURL('image/png')}"></div><div class="num">格${num}｜${getCurrentBgModeLabel()}</div>`;
+      const num = r * ranges.cols + c + 1;
+      const cutLabel = ranges.custom ? '自訂切線' : '平均切線';
+      cell.innerHTML = `<div class="checker"><img src="${pc.toDataURL('image/png')}"></div><div class="num">格${num}｜${getCurrentBgModeLabel()}｜${cutLabel}</div>`;
       grid.appendChild(cell);
     }
   }
@@ -2660,15 +2852,10 @@ function updateCellInfo() {
 
 function updateGridCanvas() {
   if (!originalImg) return;
-  const cols = parseInt(document.getElementById('cols').value);
-  const rows = parseInt(document.getElementById('rows').value);
-  const cropL = parseInt(document.getElementById('crop-l').value) || 0;
-  const cropR = parseInt(document.getElementById('crop-r').value) || 0;
-  const cropT = parseInt(document.getElementById('crop-t').value) || 0;
-  const cropB = parseInt(document.getElementById('crop-b').value) || 0;
   const workCanvas = buildCurrentWorkSheetCanvas();
   if (!workCanvas) return;
   const workW = workCanvas.width, workH = workCanvas.height;
+  const ranges = getGridRangesFromCanvas(workW, workH);
   const canvas = document.getElementById('grid-canvas');
   canvas.width = workW;
   canvas.height = workH;
@@ -2677,43 +2864,49 @@ function updateGridCanvas() {
   ctx.clearRect(0, 0, workW, workH);
   ctx.drawImage(workCanvas, 0, 0);
 
-  // 裁邊遮罩（半透明黑色）
+  const cropL = ranges.xCuts[0];
+  const cropR = workW - ranges.xCuts.at(-1);
+  const cropT = ranges.yCuts[0];
+  const cropB = workH - ranges.yCuts.at(-1);
+  const effW = ranges.xCuts.at(-1) - ranges.xCuts[0];
+  const effH = ranges.yCuts.at(-1) - ranges.yCuts[0];
+
   ctx.fillStyle = 'rgba(0,0,0,0.45)';
   if (cropL > 0) ctx.fillRect(0, 0, cropL, workH);
   if (cropR > 0) ctx.fillRect(workW - cropR, 0, cropR, workH);
   if (cropT > 0) ctx.fillRect(0, 0, workW, cropT);
   if (cropB > 0) ctx.fillRect(0, workH - cropB, workW, cropB);
 
-  const effW = workW - cropL - cropR;
-  const effH = workH - cropT - cropB;
-  const colW = effW / cols;
-  const rowH = effH / rows;
-
-  ctx.strokeStyle = 'rgba(255,107,53,0.85)';
+  ctx.strokeStyle = ranges.custom ? 'rgba(255,209,102,0.95)' : 'rgba(255,107,53,0.85)';
   ctx.lineWidth = 6;
   ctx.setLineDash([24, 16]);
-  for (let c = 1; c < cols; c++) {
-    const x = cropL + c * colW;
-    ctx.beginPath(); ctx.moveTo(x, cropT); ctx.lineTo(x, workH - cropB); ctx.stroke();
+  for (let c = 1; c < ranges.xCuts.length - 1; c++) {
+    const x = ranges.xCuts[c];
+    ctx.beginPath(); ctx.moveTo(x, ranges.yCuts[0]); ctx.lineTo(x, ranges.yCuts.at(-1)); ctx.stroke();
   }
-  for (let r = 1; r < rows; r++) {
-    const y = cropT + r * rowH;
-    ctx.beginPath(); ctx.moveTo(cropL, y); ctx.lineTo(workW - cropR, y); ctx.stroke();
+  for (let r = 1; r < ranges.yCuts.length - 1; r++) {
+    const y = ranges.yCuts[r];
+    ctx.beginPath(); ctx.moveTo(ranges.xCuts[0], y); ctx.lineTo(ranges.xCuts.at(-1), y); ctx.stroke();
   }
   ctx.setLineDash([]);
   ctx.strokeStyle = 'rgba(255,107,53,0.8)';
   ctx.lineWidth = 8;
-  ctx.strokeRect(cropL + 4, cropT + 4, effW - 8, effH - 8);
+  ctx.strokeRect(ranges.xCuts[0] + 4, ranges.yCuts[0] + 4, effW - 8, effH - 8);
 
-  ctx.font = `bold ${Math.round(colW * 0.18)}px Share Tech Mono, monospace`;
+  const avgColW = effW / Math.max(ranges.cols, 1);
+  ctx.font = `bold ${Math.round(avgColW * 0.18)}px Share Tech Mono, monospace`;
   ctx.fillStyle = 'rgba(255,107,53,0.5)';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const num = r * cols + c + 1;
-      ctx.fillText(num, cropL + c * colW + colW / 2, cropT + r * rowH + rowH / 2);
+  for (let r = 0; r < ranges.rows; r++) {
+    for (let c = 0; c < ranges.cols; c++) {
+      const num = r * ranges.cols + c + 1;
+      const cx = (ranges.xCuts[c] + ranges.xCuts[c + 1]) / 2;
+      const cy = (ranges.yCuts[r] + ranges.yCuts[r + 1]) / 2;
+      ctx.fillText(num, cx, cy);
     }
   }
+  const status = document.getElementById('grid-drag-status');
+  if (status && !gridLineDrag) status.textContent = ranges.custom ? '目前使用自訂切線；切割預覽與 ZIP 會依照目前切線輸出。' : '提示：可拖拉橘色切線微調每格範圍。';
   updateCellInfo();
 }
 
@@ -2762,46 +2955,48 @@ function startProcess() {
   mainId = null;
   tabId = null;
 
-  const cols = parseInt(document.getElementById('cols').value);
-  const rows = parseInt(document.getElementById('rows').value);
-  totalCells = cols * rows;
+  totalCells = 0;
   const zoomLevel = parseFloat(document.getElementById('zoom').value);
-  const cropL = parseInt(document.getElementById('crop-l').value) || 0;
-  const cropR = parseInt(document.getElementById('crop-r').value) || 0;
-  const cropT = parseInt(document.getElementById('crop-t').value) || 0;
-  const cropB = parseInt(document.getElementById('crop-b').value) || 0;
 
-  // 先產生整張目前工作圖：不去背 / 傳統 / 魔術棒三模式互斥，分割只吃這張圖。
   const canvas = buildCurrentWorkSheetCanvas();
   if (!canvas) return;
   const workW = canvas.width, workH = canvas.height;
-  const effW = workW - cropL - cropR;
-  const effH = workH - cropT - cropB;
-  const pieceW = effW / cols, pieceH = effH / rows;
+  const ranges = getGridRangesFromCanvas(workW, workH);
+  totalCells = ranges.cols * ranges.rows;
 
   document.getElementById('progress-area').style.display = 'block';
   document.getElementById('sticker-grid').innerHTML = '';
   updateProgress();
 
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const id = r * cols + c + 1;
+  for (let r = 0; r < ranges.rows; r++) {
+    for (let c = 0; c < ranges.cols; c++) {
+      const id = r * ranges.cols + c + 1;
+      const sx = ranges.xCuts[c];
+      const sy = ranges.yCuts[r];
+      const pieceW = ranges.xCuts[c + 1] - ranges.xCuts[c];
+      const pieceH = ranges.yCuts[r + 1] - ranges.yCuts[r];
       const pCanvas = document.createElement('canvas');
-      pCanvas.width = pieceW; pCanvas.height = pieceH;
+      pCanvas.width = Math.max(1, Math.round(pieceW));
+      pCanvas.height = Math.max(1, Math.round(pieceH));
       const pCtx = pCanvas.getContext('2d');
-      pCtx.drawImage(canvas, cropL + c*pieceW, cropT + r*pieceH, pieceW, pieceH, 0, 0, pieceW, pieceH);
+      pCtx.drawImage(canvas, sx, sy, pieceW, pieceH, 0, 0, pCanvas.width, pCanvas.height);
 
       const tempC = document.createElement('canvas');
-      tempC.width = pieceW; tempC.height = pieceH;
+      tempC.width = pCanvas.width; tempC.height = pCanvas.height;
       const tCtx = tempC.getContext('2d');
-      const sW = pieceW / zoomLevel, sH = pieceH / zoomLevel;
-      const sX = (pieceW - sW) / 2, sY = (pieceH - sH) / 2;
-      tCtx.drawImage(pCanvas, sX, sY, sW, sH, 0, 0, pieceW, pieceH);
+      const sW = pCanvas.width / zoomLevel, sH = pCanvas.height / zoomLevel;
+      const sX = (pCanvas.width - sW) / 2, sY = (pCanvas.height - sH) / 2;
+      tCtx.drawImage(pCanvas, sX, sY, sW, sH, 0, 0, pCanvas.width, pCanvas.height);
 
       slicedPieces.push({ id, previewUrl: pCanvas.toDataURL('image/png') });
 
       createImageBitmap(tempC).then(bitmap => {
         worker.postMessage({ imageBitmap: bitmap, id, targetColor:'#000000', tolerance:0, smoothness:0, despill:false, mode:'none', outW: outputW, outH: outputH, wandX:0, wandY:0, wandTolerance:0, wandSmoothness:0, wandDespill:false }, [bitmap]);
+      }).catch(err => {
+        console.error('createImageBitmap failed on piece', id, err);
+        processedCount++;
+        updateProgress();
+        if (processedCount === totalCells) onProcessDone();
       });
     }
   }
@@ -2859,6 +3054,7 @@ function selTab(id) {
 function renderPackGrid() {
   const startNum = parseInt(document.getElementById('start-num').value) || 1;
   const grid = document.getElementById('pack-grid');
+  if (!grid) return;
   grid.innerHTML = '';
   finalImages.forEach((img, idx) => {
     const cell = document.createElement('div');
@@ -2917,121 +3113,255 @@ updateCellInfo();
 // ===== 公開版更新日期顯示 =====
 (function(){
   const tag = document.getElementById('ver-tag');
-  if (tag) tag.textContent = '更新日期 2026/05/26';
+  if (tag) tag.textContent = '更新日期 2026/06/05';
 })();
 
-// ===== 精選作品輪播 =====
-// 輪播排序原則：LINE 主題新品 → 最新貼圖 → 最新表情貼 → 長賣代表作。
-// 後續新增新品時，優先替換最前面 2～4 筆，不建議無限制增加輪播長度。
-const FEATURED_ITEMS = [
+// ===== 精選作品輪播｜0605V21 分區版 =====
+// 主題區與貼圖 / 表情貼區依使用者指定順序固定，禁止自行改成作者頁前10。
+const FEATURED_THEME_ITEMS = [
   {
-    img: 'https://shop.line-scdn.net/themeshop/v1/products/b9/34/0d/b9340d91-49b0-4078-aad8-ed8047fffdaa/1/WEBSTORE/icon_198x278.png',
-    labels: ['LINE主題', '科技狐', '新品'],
-    title: '冷豔科技狐',
-    desc: '銀白狐身搭配霓虹藍光，冷靜又帶距離感，讓聊天室變成高級科幻空間。',
-    url: 'https://store.line.me/themeshop/product/b9340d91-49b0-4078-aad8-ed8047fffdaa/zh-Hant',
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/fb/26/bf/fb26bf33-06ce-491a-aa95-96139af0bde6/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題",
+      "冷月幻想"
+    ],
+    "title": "冷月聖域",
+    "desc": "冷月照耀著沉睡的聖域，星光、冰晶與魔法陣交織出靜謐又神秘的幻想世界。",
+    "url": "https://store.line.me/themeshop/product/fb26bf33-06ce-491a-aa95-96139af0bde6/zh-Hant"
   },
   {
-    img: 'https://shop.line-scdn.net/themeshop/v1/products/c0/84/b9/c084b9d3-f547-4faa-8605-42a9d0f060b7/1/WEBSTORE/icon_198x278.png',
-    labels: ['LINE主題', '義氣哥', '衝出'],
-    title: '義氣哥・衝出',
-    desc: '義氣哥從破裂手機畫面中衝出，黑金爆裂光感，讓聊天介面更有氣勢。',
-    url: 'https://store.line.me/themeshop/product/c084b9d3-f547-4faa-8605-42a9d0f060b7/zh-Hant',
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/c7/b7/0d/c7b70d19-152f-4026-b7a2-ef16cd999b7b/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題",
+      "星儀聖域"
+    ],
+    "title": "月輪星儀",
+    "desc": "以月輪、水晶與星辰法陣打造的神秘主題，讓聊天室沉入冷藍色的幻想世界。",
+    "url": "https://store.line.me/themeshop/product/c7b70d19-152f-4026-b7a2-ef16cd999b7b/zh-Hant"
   },
   {
-    img: 'https://stickershop.line-scdn.net/stickershop/v1/product/34128364/LINEStorePC/main.png?v=1',
-    labels: ['貼圖', '懶教人', '新品'],
-    title: '懶教人，就讓貼圖教之敷衍你剛好',
-    desc: '懶教人系列，適合懶得解釋、只想快速回覆的日常對話。',
-    url: 'https://store.line.me/stickershop/product/34128364/zh-Hant',
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/5a/8a/0c/5a8a0c4b-727c-44b9-bb5f-026e6cb4c45a/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題",
+      "銀機狐"
+    ],
+    "title": "冷月・銀機狐",
+    "desc": "冷月之下，銀色機械狐世界展開，冰藍光感與未來機械美學交織。",
+    "url": "https://store.line.me/themeshop/product/5a8a0c4b-727c-44b9-bb5f-026e6cb4c45a/zh-Hant"
   },
   {
-    img: 'https://stickershop.line-scdn.net/stickershop/v1/product/34128397/LINEStorePC/main.png?v=1',
-    labels: ['貼圖', '懶教人', '冷淡回覆'],
-    title: '懶教人，就讓貼圖教之真沒有敷衍',
-    desc: '真的不是敷衍，只是回得很省力。適合冷淡又實用的聊天回覆。',
-    url: 'https://store.line.me/stickershop/product/34128397/zh-Hant',
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/ec/c0/46/ecc0468a-bcec-4286-8660-8156923d7449/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題",
+      "暗機狐"
+    ],
+    "title": "冷月・暗機狐",
+    "desc": "冷月之下，暗色機械狐世界展開，黑銀光感與暗黑機械美學交織。",
+    "url": "https://store.line.me/themeshop/product/ecc0468a-bcec-4286-8660-8156923d7449/zh-Hant"
   },
   {
-    img: 'https://stickershop.line-scdn.net/sticonshop/v1/product/69edc61069c93b016a2362d6/iPhone/main.png?v=1',
-    labels: ['表情貼', '字母', '手寫'],
-    title: '潦草字母',
-    desc: '粗黑手寫英文字母、數字與符號，適合拼字、標記與日常聊天。',
-    url: 'https://store.line.me/emojishop/product/69edc61069c93b016a2362d6/zh-Hant',
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/cf/92/66/cf926616-4254-499d-84c5-eb7e5c062174/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題",
+      "冰月瓶景"
+    ],
+    "title": "瓶中冰月緣",
+    "desc": "冰月微光封存在透明瓶中，藍白冰晶與月光交織出安靜浪漫的瓶中世界。",
+    "url": "https://store.line.me/themeshop/product/cf926616-4254-499d-84c5-eb7e5c062174/zh-Hant"
   },
   {
-    img: 'https://stickershop.line-scdn.net/sticonshop/v1/product/69d70fa4302c410ddf716823/iPhone/main.png?v=1',
-    labels: ['表情貼', '達摩', '祈福'],
-    title: '濃眉達摩不倒翁',
-    desc: '達摩造型表情貼，適合祝福、祈願、補運與可愛回覆。',
-    url: 'https://store.line.me/emojishop/product/69d70fa4302c410ddf716823/zh-Hant',
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/68/72/c6/6872c68d-41c8-4617-a094-db6b827eee95/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題",
+      "櫻花達摩"
+    ],
+    "title": "櫻花福福達摩",
+    "desc": "櫻花盛開，福福達摩帶著溫柔祝福，讓聊天室充滿春日與好運。",
+    "url": "https://store.line.me/themeshop/product/6872c68d-41c8-4617-a094-db6b827eee95/zh-Hant"
   },
   {
-    img: 'https://stickershop.line-scdn.net/sticonshop/v1/product/69f45e199b8c7868c09cd95c/iPhone/main.png?v=1',
-    labels: ['動態表情貼', '達摩', '小白飄'],
-    title: '會動的達摩小白飄',
-    desc: '達摩小白飄動態版，讓祝福感與聊天反應更明顯。',
-    url: 'https://store.line.me/emojishop/product/69f45e199b8c7868c09cd95c/zh-Hant',
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/01/a5/c6/01a5c66a-4e0c-4b54-a35c-b704c9929b06/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題",
+      "端午達摩"
+    ],
+    "title": "粽香福福達摩",
+    "desc": "端午粽香與福福達摩一起登場，把節慶祝福與可愛好運放進聊天室。",
+    "url": "https://store.line.me/themeshop/product/01a5c66a-4e0c-4b54-a35c-b704c9929b06/zh-Hant"
   },
   {
-    img: 'https://stickershop.line-scdn.net/sticonshop/v1/product/69f815e49b8c7868c09cde33/iPhone/main.png?v=1',
-    labels: ['表情貼', '字母', '毛筆'],
-    title: '毛筆手寫字母表情貼',
-    desc: '毛筆手寫風字母、數字與符號，清楚好讀又有手寫感。',
-    url: 'https://store.line.me/emojishop/product/69f815e49b8c7868c09cde33/zh-Hant',
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/e1/83/08/e1830805-1197-415f-8a13-6b8f29d655de/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題",
+      "夢幻黑貓"
+    ],
+    "title": "傲嬌的夢幻小黑貓",
+    "desc": "夢幻光影中的傲嬌小黑貓，帶點神秘、可愛與距離感，陪你換上柔亮聊天室。",
+    "url": "https://store.line.me/themeshop/product/e1830805-1197-415f-8a13-6b8f29d655de/zh-Hant"
   },
   {
-    img: 'https://stickershop.line-scdn.net/sticonshop/v1/product/69f1b24869c93b016a23a9c0/iPhone/main.png?v=1',
-    labels: ['表情貼', '柴柴', '字母'],
-    title: '柴柴木紋字母表情貼（完整版）',
-    desc: '柴柴搭配木紋字母、數字與符號，完整收藏版。',
-    url: 'https://store.line.me/emojishop/product/69f1b24869c93b016a23a9c0/zh-Hant',
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/bb/d8/0e/bbd80ef5-be88-4b14-867d-8ebef124daeb/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題",
+      "雨天青蛙"
+    ],
+    "title": "小青蛙也躲雨",
+    "desc": "雨天裡的小青蛙躲進清新綠意中，帶來柔和療癒的自然氣息。",
+    "url": "https://store.line.me/themeshop/product/bbd80ef5-be88-4b14-867d-8ebef124daeb/zh-Hant"
   },
   {
-    img: 'https://stickershop.line-scdn.net/sticonshop/v1/product/69f96934d6436b46ee675ecc/iPhone/main.png?v=1',
-    labels: ['表情貼', '字母', '白光'],
-    title: '白光毛筆手寫字母表情貼',
-    desc: '白光脈動毛筆字母、數字與符號，適合拼字與聊天裝飾。',
-    url: 'https://store.line.me/emojishop/product/69f96934d6436b46ee675ecc/zh-Hant',
-  },
-  {
-    img: 'https://stickershop.line-scdn.net/stickershop/v1/product/33507467/LINEStorePC/main.png?v=1',
-    labels: ['貼圖', '達摩', '祈福'],
-    title: '達摩小白飄，來補運',
-    desc: '達摩造型小白飄，結合開運祝福與日常對話。',
-    url: 'https://store.line.me/stickershop/product/33507467/zh-Hant',
-  },
-  {
-    img: 'https://stickershop.line-scdn.net/stickershop/v1/product/33611055/LINEStorePC/main.png?v=1',
-    labels: ['貼圖', '教會', '祝福'],
-    title: '小白飄也要上教會',
-    desc: '小白飄教會日常，適合平安、祝福、禱告與溫柔問候。',
-    url: 'https://store.line.me/stickershop/product/33611055/zh-Hant',
-  },
-  {
-    img: 'https://stickershop.line-scdn.net/stickershop/v1/product/33400369/LINEStorePC/main.png?v=1',
-    labels: ['貼圖', '熱血', '搞笑'],
-    title: '熱血艦長：火力全開！',
-    desc: '少年艦長火力全開，適合任務感、熱血回覆與搞笑對話。',
-    url: 'https://store.line.me/stickershop/product/33400369/zh-Hant',
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/f2/e6/1b/f2e61b33-1bdf-478e-a803-75a45b5573f4/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題",
+      "溫泉水豚"
+    ],
+    "title": "水豚奶呼呼・溫泉暖呼呼",
+    "desc": "奶呼呼水豚泡在暖呼呼溫泉裡，溫柔、放鬆又療癒的聊天主題。",
+    "url": "https://store.line.me/themeshop/product/f2e61b33-1bdf-478e-a803-75a45b5573f4/zh-Hant"
   }
 ];
 
-let featuredIndex = 0;
-let featuredTimer = null;
+const FEATURED_STICKER_ITEMS = [
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a17b4fd71f5f26c68e84be5/iPhone/main.png?v=1",
+    "imgClass": "",
+    "labels": [
+      "表情貼",
+      "AI銀字母"
+    ],
+    "title": "過時組裝AI銀字母表情貼",
+    "desc": "舊時代組裝AI化身為銀色字母表情貼，英文字母、數字與符號都能用，帶點機甲感與復古科技味，讓聊天更有辨識度。",
+    "url": "https://store.line.me/emojishop/product/6a17b4fd71f5f26c68e84be5/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a1a55b027f76405a1c6e09e/iPhone/main.png?v=1",
+    "imgClass": "",
+    "labels": [
+      "表情貼",
+      "冷金屬"
+    ],
+    "title": "冷金屬字母表情貼",
+    "desc": "一整套結合冷銀金屬質感與奇幻冰藍精靈的客製化圖形字母表情貼。",
+    "url": "https://store.line.me/emojishop/product/6a1a55b027f76405a1c6e09e/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a150e2aca472a3a9ec318b5/iPhone/main.png?v=1",
+    "imgClass": "",
+    "labels": [
+      "表情貼",
+      "小銀狐"
+    ],
+    "title": "科技小銀狐字母表情貼",
+    "desc": "科技小銀狐搭配英文字母、數字與常用符號，銀藍金屬感加上可愛互動，適合拼字、裝飾訊息與日常聊天使用。",
+    "url": "https://store.line.me/emojishop/product/6a150e2aca472a3a9ec318b5/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a1401aad387770800d86c50/iPhone/main.png?v=1",
+    "imgClass": "",
+    "labels": [
+      "表情貼",
+      "科技狐"
+    ],
+    "title": "人性化科技狐字母表情貼",
+    "desc": "人性化科技狐搭配英文字母、數字與常用符號，銀藍機械感加上可愛互動表情，適合聊天拼字、裝飾訊息與日常回覆使用。",
+    "url": "https://store.line.me/emojishop/product/6a1401aad387770800d86c50/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a0a7e35f014a8056ed8a9df/iPhone/main.png?v=1",
+    "imgClass": "",
+    "labels": [
+      "表情貼",
+      "金箔草寫"
+    ],
+    "title": "金箔草寫字母表情貼",
+    "desc": "金箔質感的草寫字母表情貼，適合拼字、裝飾聊天、做出華麗又有存在感的訊息。",
+    "url": "https://store.line.me/emojishop/product/6a0a7e35f014a8056ed8a9df/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a0a7e58f014a8056ed8a9e7/iPhone/main.png?v=1",
+    "imgClass": "",
+    "labels": [
+      "表情貼",
+      "描金流光"
+    ],
+    "title": "描金流光字母表情貼",
+    "desc": "描金外框搭配流光質感，華麗又清楚的英文字母表情貼，適合日常聊天、裝飾名字與可愛回覆。",
+    "url": "https://store.line.me/emojishop/product/6a0a7e58f014a8056ed8a9e7/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34206710/LINEStorePC/main.png?v=1",
+    "imgClass": "",
+    "labels": [
+      "貼圖",
+      "大哥"
+    ],
+    "title": "大哥的江湖傳說",
+    "desc": "傳說中的大哥登場，用生動對白回應日常聊天。兄弟招呼、霸氣吐槽、直接表態都能派上用場，讓每句話更有江湖味。 ※本組貼圖在聊天室中將會顯示為長型大貼圖",
+    "url": "https://store.line.me/stickershop/product/34206710/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/33786923/LINEStorePC/main.png?v=1",
+    "imgClass": "",
+    "labels": [
+      "貼圖",
+      "義氣"
+    ],
+    "title": "不想理你，有事說",
+    "desc": "少講話的日常回覆。沒有情緒，不多解釋，有事直接說。 適合各種聊天情境，簡單回應就好。",
+    "url": "https://store.line.me/stickershop/product/33786923/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34128364/LINEStorePC/main.png?v=1",
+    "imgClass": "",
+    "labels": [
+      "貼圖",
+      "懶教人"
+    ],
+    "title": "懶教人，就讓貼圖教之敷衍你剛好",
+    "desc": "懶得解釋、懶得認真回，就讓貼圖幫你敷衍剛好。冷淡、無奈、隨便、假裝有回應，日常社交省力用。",
+    "url": "https://store.line.me/stickershop/product/34128364/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34128397/LINEStorePC/main.png?v=1",
+    "imgClass": "",
+    "labels": [
+      "貼圖",
+      "冷淡回覆"
+    ],
+    "title": "懶教人，就讓貼圖教之真沒有敷衍",
+    "desc": "真的不是敷衍，也沒有敷衍，只是回得很省力。好、可以、知道了、沒問題，各種冷淡又實用的日常回覆，懶得解釋時剛好用。",
+    "url": "https://store.line.me/stickershop/product/34128397/zh-Hant"
+  }
+];
 
-// 兩格並排：每頁顯示2張，共 ceil(n/2) 頁
-function featuredRender() {
-  const wrap = document.getElementById('featured-slides');
-  if (!wrap || !FEATURED_ITEMS.length) return;
-  const totalPages = Math.ceil(FEATURED_ITEMS.length / 2);
-  const dotCount = totalPages;
+const featuredState = {
+  theme: { index: 0, timer: null, items: FEATURED_THEME_ITEMS, slidesId: 'featured-slides-theme' },
+  sticker: { index: 0, timer: null, items: FEATURED_STICKER_ITEMS, slidesId: 'featured-slides-sticker' }
+};
+
+function featuredRender(kind) {
+  const state = featuredState[kind];
+  if (!state) return;
+  const wrap = document.getElementById(state.slidesId);
+  if (!wrap || !state.items.length) return;
+  const totalPages = Math.ceil(state.items.length / 2);
   let html = '';
   for (let p = 0; p < totalPages; p++) {
-    const items = FEATURED_ITEMS.slice(p * 2, p * 2 + 2);
+    const items = state.items.slice(p * 2, p * 2 + 2);
     const cards = items.map(item => {
+      const extraClass = item.imgClass ? ` ${item.imgClass}` : '';
       const imgHtml = item.img
-        ? `<img class="featured-img" src="${item.img}" alt="${item.title}">`
+        ? `<img class="featured-img${extraClass}" src="${item.img}" alt="${item.title}" loading="lazy">`
         : `<div class="featured-img-placeholder">🎭</div>`;
       return `
         <a class="featured-card" href="${item.url}" target="_blank" rel="noopener">
@@ -3046,8 +3376,8 @@ function featuredRender() {
     html += `<div class="featured-slide${p === 0 ? ' active' : ''}" data-page="${p}">
       <div class="featured-page-inner">${cards}</div>
       <div class="featured-footer" style="padding:0 16px 12px;">
-        <div class="featured-dots">${Array.from({length: dotCount}, (_, j) =>
-          `<button class="featured-dot${j===0?' active':''}" onclick="featuredGo(${j})"></button>`
+        <div class="featured-dots">${Array.from({length: totalPages}, (_, j) =>
+          `<button class="featured-dot${j === 0 ? ' active' : ''}" onclick="featuredGo('${kind}', ${j})"></button>`
         ).join('')}</div>
       </div>
     </div>`;
@@ -3055,35 +3385,51 @@ function featuredRender() {
   wrap.innerHTML = html;
 }
 
-function featuredGo(idx) {
-  const slides = document.querySelectorAll('.featured-slide');
+function featuredGo(kind, idx) {
+  const state = featuredState[kind];
+  if (!state) return;
+  const wrap = document.getElementById(state.slidesId);
+  if (!wrap) return;
+  const slides = wrap.querySelectorAll('.featured-slide');
   if (!slides.length) return;
-  const totalPages = Math.ceil(FEATURED_ITEMS.length / 2);
+  const totalPages = Math.ceil(state.items.length / 2);
   slides.forEach(s => s.classList.remove('active'));
-  featuredIndex = (idx + totalPages) % totalPages;
-  slides[featuredIndex].classList.add('active');
-  document.querySelectorAll('.featured-dot').forEach((d, i) => {
-    d.classList.toggle('active', i === featuredIndex);
+  state.index = (idx + totalPages) % totalPages;
+  slides[state.index]?.classList.add('active');
+  wrap.querySelectorAll('.featured-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === state.index);
   });
 }
 
-function featuredNext() {
-  const totalPages = Math.ceil(FEATURED_ITEMS.length / 2);
-  featuredGo((featuredIndex + 1) % totalPages);
+function featuredNext(kind) {
+  const state = featuredState[kind];
+  if (!state) return;
+  const totalPages = Math.ceil(state.items.length / 2);
+  featuredGo(kind, (state.index + 1) % totalPages);
 }
-function featuredPrev() {
-  const totalPages = Math.ceil(FEATURED_ITEMS.length / 2);
-  featuredGo((featuredIndex - 1 + totalPages) % totalPages);
+function featuredPrev(kind) {
+  const state = featuredState[kind];
+  if (!state) return;
+  const totalPages = Math.ceil(state.items.length / 2);
+  featuredGo(kind, (state.index - 1 + totalPages) % totalPages);
 }
 
-function featuredStart() {
-  featuredTimer = setInterval(featuredNext, 4000);
+function featuredStart(kind) {
+  const state = featuredState[kind];
+  if (!state) return;
+  clearInterval(state.timer);
+  state.timer = setInterval(() => featuredNext(kind), 4000);
 }
-function featuredPause() { clearInterval(featuredTimer); }
-function featuredResume() { featuredStart(); }
+function featuredPause(kind) {
+  const state = featuredState[kind];
+  if (state) clearInterval(state.timer);
+}
+function featuredResume(kind) { featuredStart(kind); }
 
-featuredRender();
-featuredStart();
+featuredRender('theme');
+featuredRender('sticker');
+featuredStart('theme');
+featuredStart('sticker');
 </script>
 </body>
 </html>
