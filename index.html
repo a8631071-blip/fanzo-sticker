@@ -867,61 +867,53 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
   .db-products { grid-template-columns:repeat(2,1fr); }
 }
 
+
+/* ===== 0711V22｜分頁輪播＋成品排版 ===== */
+.page-featured { margin-bottom:16px; }
+.page-featured .featured-section { margin-top:0; }
+.output-layout-options { display:grid; gap:10px; }
+.output-layout-row { display:grid; grid-template-columns:58px 1fr; gap:8px; align-items:center; }
+.output-layout-label { font-size:11px; font-weight:900; color:var(--text2); }
+.output-layout-btns { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+.output-layout-btns.two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.output-layout-btn {
+  border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text2);
+  border-radius:8px; padding:9px 6px; cursor:pointer; font-size:11px; font-weight:800; text-align:center;
+}
+.output-layout-btn:hover { border-color:rgba(255,107,53,.7); color:var(--text); }
+.output-layout-btn.active { border-color:var(--accent); background:rgba(255,107,53,.18); color:#fff; }
+.output-layout-btn:disabled, .output-layout-btn.disabled { opacity:.35; cursor:not-allowed; border-color:rgba(255,255,255,.08); }
+.output-layout-note { font-size:10px; line-height:1.65; color:var(--text2); margin-top:8px; }
+@media (max-width:700px) {
+  .featured-page-inner { grid-template-columns:1fr; }
+  .product-hero-actions { width:100%; }
+  .product-link-btn { flex:1 1 calc(50% - 8px); text-align:center; }
+}
+
 </style>
 </head>
 <body>
 
 <header>
   <div class="logo">煩躁胖子<span>・免費公開版工具</span></div>
-  <div class="version" id="ver-tag">更新日期 2026/06/05</div>
+  <div class="version" id="ver-tag">更新日期 2026/07/11</div>
 </header>
 
 <section class="product-hero">
-  <!-- 上段：工具說明 -->
   <div class="product-hero-top">
     <div>
       <h1>一鍵去 Gemini 浮水印、去背、切格、打包，可每頁獨立上傳、獨立打包</h1>
       <p style="color:var(--text2);font-size:12px;margin:6px 0 0;line-height:1.8;">
         免費公開版工具，可完整流程使用，也可單獨使用某一功能：<br>
-        支援 LINE 貼圖 / 表情貼 / 動態貼圖尺寸整理，可自由調整欄列、手拉切割線、裁邊、縮放、起始編號，並輸出 PNG ZIP、Main、Tab。<br>
-        新增手拉切線微調，切割預覽與 ZIP 輸出會依照目前切線位置處理；如果覺得好用，也歡迎看看我的 LINE 主題與貼圖作品。
+        支援 LINE 貼圖 / 表情貼 / 動態貼圖尺寸整理，可自由調整欄列、手拉切割線、裁邊、母圖位置與成品排版，並輸出 PNG ZIP、Main、Tab。<br>
+        切割預覽與 ZIP 輸出會依照目前切線及成品排版設定處理；工具免費使用，也歡迎查看我的 LINE 作品。
       </p>
     </div>
     <div class="product-hero-actions" style="margin-top:0;">
       <a class="product-link-btn primary" href="#page1">開始使用工具</a>
-      <a class="product-link-btn" href="https://store.line.me/themeshop/author/11555829/zh-Hant" target="_blank" rel="noopener">看 LINE 主題</a>
-      <a class="product-link-btn" href="https://store.line.me/stickershop/author/5965541/zh-Hant" target="_blank" rel="noopener">看 LINE 貼圖 + 表情貼</a>
-    </div>
-  </div>
-  <!-- 下段：指定作品輪播（主題 / 貼圖表情貼分區） -->
-  <div class="featured-section">
-    <div class="featured-section-head">
-      <div>
-        <div class="featured-section-title">LINE 主題精選</div>
-      </div>
-    </div>
-    <div class="featured-carousel" id="featured-carousel-theme"
-         onmouseenter="featuredPause('theme')" onmouseleave="featuredResume('theme')">
-      <div id="featured-slides-theme"></div>
-      <div class="featured-arrows">
-        <button class="featured-arrow" onclick="featuredPrev('theme')">&#8249;</button>
-        <button class="featured-arrow" onclick="featuredNext('theme')">&#8250;</button>
-      </div>
-    </div>
-  </div>
-  <div class="featured-section">
-    <div class="featured-section-head">
-      <div>
-        <div class="featured-section-title">貼圖 / 表情貼精選</div>
-      </div>
-    </div>
-    <div class="featured-carousel" id="featured-carousel-sticker"
-         onmouseenter="featuredPause('sticker')" onmouseleave="featuredResume('sticker')">
-      <div id="featured-slides-sticker"></div>
-      <div class="featured-arrows">
-        <button class="featured-arrow" onclick="featuredPrev('sticker')">&#8249;</button>
-        <button class="featured-arrow" onclick="featuredNext('sticker')">&#8250;</button>
-      </div>
+      <a class="product-link-btn" href="https://store.line.me/search/sticker/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看 LINE 貼圖</a>
+      <a class="product-link-btn" href="https://store.line.me/search/emoji/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看 LINE 表情貼</a>
+      <a class="product-link-btn" href="https://store.line.me/search/theme/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看 LINE 主題</a>
     </div>
   </div>
 </section>
@@ -938,6 +930,19 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
 
 <!-- STEP 1: 上傳 -->
 <div class="page active" id="page1">
+  <div class="page-featured">
+    <div class="featured-section">
+      <div class="featured-section-head"><div><div class="featured-section-title">LINE 貼圖精選</div></div></div>
+      <div class="featured-carousel" id="featured-carousel-sticker" onmouseenter="featuredPause('sticker')" onmouseleave="featuredResume('sticker')">
+        <div id="featured-slides-sticker"></div>
+        <div class="featured-arrows">
+          <button class="featured-arrow" type="button" aria-label="上一組" onclick="featuredPrev('sticker')">&#8249;</button>
+          <button class="featured-arrow" type="button" aria-label="下一組" onclick="featuredNext('sticker')">&#8250;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title">📂 上傳母圖</div>
     <div class="upload-zone" id="upload-zone">
@@ -1086,6 +1091,19 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
 
 <!-- STEP 3: 去背頁｜05031245V13 整張魔術棒多選區版 -->
 <div class="page" id="page3">
+  <div class="page-featured">
+    <div class="featured-section">
+      <div class="featured-section-head"><div><div class="featured-section-title">LINE 表情貼精選</div></div></div>
+      <div class="featured-carousel" id="featured-carousel-emoji" onmouseenter="featuredPause('emoji')" onmouseleave="featuredResume('emoji')">
+        <div id="featured-slides-emoji"></div>
+        <div class="featured-arrows">
+          <button class="featured-arrow" type="button" aria-label="上一組" onclick="featuredPrev('emoji')">&#8249;</button>
+          <button class="featured-arrow" type="button" aria-label="下一組" onclick="featuredNext('emoji')">&#8250;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
     <div style="width:300px;flex-shrink:0;">
       <div class="card">
@@ -1170,7 +1188,7 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
         </div>
         <div class="slider-group">
           <div class="slider-label"><span>裁切縮放（去黑邊）</span><span id="zoom-val">0%</span></div>
-          <input type="range" id="zoom" min="1.00" max="1.50" step="0.01" value="1.00" oninput="document.getElementById('zoom-val').textContent=Math.round((this.value-1)*100)+'%';runPreview()">
+          <input type="range" id="zoom" min="1.00" max="1.50" step="0.01" value="1.00" oninput="document.getElementById('zoom-val').textContent=Math.round((this.value-1)*100)+'%';invalidateFinalOutput('裁切縮放已變更');runPreview();updateSlicePreview()">
         </div>
         <div class="action-row" style="margin-top:14px;">
           <button class="btn-main btn-accent" onclick="runPreview()">重新整理雙預覽</button>
@@ -1206,6 +1224,19 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
 
 <!-- STEP 4: 分割＋打包 -->
 <div class="page" id="page4">
+  <div class="page-featured">
+    <div class="featured-section">
+      <div class="featured-section-head"><div><div class="featured-section-title">LINE 主題精選</div></div></div>
+      <div class="featured-carousel" id="featured-carousel-theme" onmouseenter="featuredPause('theme')" onmouseleave="featuredResume('theme')">
+        <div id="featured-slides-theme"></div>
+        <div class="featured-arrows">
+          <button class="featured-arrow" type="button" aria-label="上一組" onclick="featuredPrev('theme')">&#8249;</button>
+          <button class="featured-arrow" type="button" aria-label="下一組" onclick="featuredNext('theme')">&#8250;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
     <div style="width:260px;flex-shrink:0;">
       <div class="card">
@@ -1220,21 +1251,42 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
       </div>
       <div class="card">
         <div class="card-title">📐 分割格數</div>
-        <div class="slider-group"><div class="slider-label"><span>欄數 (Columns)</span><span id="cols-val">5</span></div><input type="range" id="cols" min="1" max="8" value="5" oninput="document.getElementById('cols-val').textContent=this.value;updateGridCanvas();updateSlicePreview();runPreview()"></div>
-        <div class="slider-group"><div class="slider-label"><span>列數 (Rows)</span><span id="rows-val">4</span></div><input type="range" id="rows" min="1" max="8" value="4" oninput="document.getElementById('rows-val').textContent=this.value;updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>欄數 (Columns)</span><span id="cols-val">5</span></div><input type="range" id="cols" min="1" max="8" value="5" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('cols-val').textContent=this.value;updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>列數 (Rows)</span><span id="rows-val">4</span></div><input type="range" id="rows" min="1" max="8" value="4" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('rows-val').textContent=this.value;updateGridCanvas();updateSlicePreview();runPreview()"></div>
       </div>
       <div class="card">
-        <div class="card-title">📋 圖片位置</div>
-        <div class="slider-group"><div class="slider-label"><span>水平偏移</span><span id="x-val">0px</span></div><input type="range" id="grid-x" min="-1280" max="1280" value="0" oninput="document.getElementById('x-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
-        <div class="slider-group"><div class="slider-label"><span>垂直偏移</span><span id="y-val">0px</span></div><input type="range" id="grid-y" min="-832" max="832" value="0" oninput="document.getElementById('y-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
-        <div class="slider-group"><div class="slider-label"><span>縮放</span><span id="scale-val">100%</span></div><input type="range" id="grid-scale" min="0.5" max="1.5" step="0.01" value="1.0" oninput="document.getElementById('scale-val').textContent=Math.round(this.value*100)+'%';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="card-title">📋 母圖調整</div>
+        <div class="slider-group"><div class="slider-label"><span>水平偏移</span><span id="x-val">0px</span></div><input type="range" id="grid-x" min="-1280" max="1280" value="0" oninput="document.getElementById('x-val').textContent=this.value+'px';onSourceLayoutChange()"></div>
+        <div class="slider-group"><div class="slider-label"><span>垂直偏移</span><span id="y-val">0px</span></div><input type="range" id="grid-y" min="-832" max="832" value="0" oninput="document.getElementById('y-val').textContent=this.value+'px';onSourceLayoutChange()"></div>
+        <div class="slider-group"><div class="slider-label"><span>縮放</span><span id="scale-val">100%</span></div><input type="range" id="grid-scale" min="0.5" max="1.5" step="0.01" value="1.0" oninput="document.getElementById('scale-val').textContent=Math.round(this.value*100)+'%';onSourceLayoutChange()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🧭 成品排版</div>
+        <div class="output-layout-options">
+          <div class="output-layout-row">
+            <div class="output-layout-label">位置</div>
+            <div class="output-layout-btns two">
+              <button type="button" class="output-layout-btn active" id="out-pos-center" onclick="setOutputPosition('center')">置中</button>
+              <button type="button" class="output-layout-btn" id="out-pos-original" onclick="setOutputPosition('original')">原位</button>
+            </div>
+          </div>
+          <div class="output-layout-row">
+            <div class="output-layout-label">比例</div>
+            <div class="output-layout-btns">
+              <button type="button" class="output-layout-btn active" id="out-scale-full" onclick="setOutputScale('full')">滿版</button>
+              <button type="button" class="output-layout-btn" id="out-scale-90" onclick="setOutputScale('90')">90%</button>
+              <button type="button" class="output-layout-btn" id="out-scale-original" onclick="setOutputScale('original')">原尺寸</button>
+            </div>
+          </div>
+        </div>
+        <div class="output-layout-note" id="output-layout-note">置中可搭配滿版、90% 或原尺寸；滿版依可見內容等比例放大，不變形、不裁切。</div>
       </div>
       <div class="card">
         <div class="card-title">✂️ 裁邊（去空白）</div>
-        <div class="slider-group"><div class="slider-label"><span>裁左</span><span id="crop-l-val">0px</span></div><input type="range" id="crop-l" min="0" max="500" value="0" oninput="document.getElementById('crop-l-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
-        <div class="slider-group"><div class="slider-label"><span>裁右</span><span id="crop-r-val">0px</span></div><input type="range" id="crop-r" min="0" max="500" value="0" oninput="document.getElementById('crop-r-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
-        <div class="slider-group"><div class="slider-label"><span>裁上</span><span id="crop-t-val">0px</span></div><input type="range" id="crop-t" min="0" max="400" value="0" oninput="document.getElementById('crop-t-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
-        <div class="slider-group"><div class="slider-label"><span>裁下</span><span id="crop-b-val">0px</span></div><input type="range" id="crop-b" min="0" max="400" value="0" oninput="document.getElementById('crop-b-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>裁左</span><span id="crop-l-val">0px</span></div><input type="range" id="crop-l" min="0" max="500" value="0" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('crop-l-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>裁右</span><span id="crop-r-val">0px</span></div><input type="range" id="crop-r" min="0" max="500" value="0" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('crop-r-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>裁上</span><span id="crop-t-val">0px</span></div><input type="range" id="crop-t" min="0" max="400" value="0" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('crop-t-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>裁下</span><span id="crop-b-val">0px</span></div><input type="range" id="crop-b" min="0" max="400" value="0" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('crop-b-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
       </div>
       <div class="card">
         <div class="card-title">📦 打包設定</div>
@@ -1268,6 +1320,14 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
   <h2>隱藏頁｜工程日誌</h2>
   <button onclick="closeDevLogV91()">關閉</button>
   <pre>
+0711V22｜2026-07-11｜三頁獨立輪播＋成品排版
+- 上方導流拆成貼圖、表情貼、主題三個搜尋按鈕。
+- 貼圖、表情貼、主題輪播分別放在第1、第3、第4頁最上方，採正常頁面排列，不浮動、不吸頂、不覆蓋操作區。
+- 輪播更新為貼圖14款、表情貼10款、主題10款；卡片主圖、正式標題、說明與商品頁一對一綁定。
+- 第4頁「圖片位置」改名「母圖調整」；新增成品位置「置中／原位」與比例「滿版／90%／原尺寸」。
+- 原位模式固定原尺寸，不重新放大、不置中；預覽、正式輸出與ZIP共用同一排版函式。
+- 保留去 Gemini 浮水印、傳統去背、魔術棒、手拉切線、Main/Tab與ZIP核心流程。
+
 0605V21｜2026-06-05｜首頁文案補新功能＋輪播說明清理
 - 首頁工具說明補上「手拉切割線」新功能，明確標示切割預覽與 ZIP 輸出會依目前切線位置處理。
 - 移除「LINE 主題精選」與「貼圖 / 表情貼精選」區塊下方的指定順序說明小字，版面往上收，避免作品輪播區出現多餘提示文字。
@@ -1869,6 +1929,111 @@ function selectOutputSize(w, h, btn) {
   outputW = w; outputH = h;
   document.querySelectorAll('#size-btn-370,#size-btn-320,#size-btn-180').forEach(b => b.className = 'preset-btn');
   btn.classList.add('active-size');
+  invalidateFinalOutput('完成尺寸已變更');
+  updateSlicePreview();
+}
+
+// ===== 0711V22｜成品排版 =====
+let outputPositionMode = 'center';
+let outputScaleMode = 'full';
+
+function onSourceLayoutChange() {
+  invalidateFinalOutput('母圖調整已變更');
+  updateGridCanvas();
+  updateSlicePreview();
+  runPreview();
+}
+
+function updateOutputLayoutUI() {
+  document.getElementById('out-pos-center')?.classList.toggle('active', outputPositionMode === 'center');
+  document.getElementById('out-pos-original')?.classList.toggle('active', outputPositionMode === 'original');
+  const scaleMap = { full:'out-scale-full', '90':'out-scale-90', original:'out-scale-original' };
+  Object.entries(scaleMap).forEach(([mode,id]) => document.getElementById(id)?.classList.toggle('active', outputScaleMode === mode));
+  const locked = outputPositionMode === 'original';
+  ['out-scale-full','out-scale-90'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) { btn.disabled = locked; btn.classList.toggle('disabled', locked); }
+  });
+  const note = document.getElementById('output-layout-note');
+  if (note) note.textContent = locked
+    ? '原位模式僅保留切割格內原始位置與原始尺寸，不重新放大、不置中；超過輸出尺寸時只會等比例縮小以避免裁切。'
+    : '置中可搭配滿版、90% 或原尺寸；滿版依可見內容等比例放大，不變形、不裁切。';
+}
+
+function setOutputPosition(mode) {
+  outputPositionMode = mode === 'original' ? 'original' : 'center';
+  if (outputPositionMode === 'original') outputScaleMode = 'original';
+  updateOutputLayoutUI();
+  invalidateFinalOutput('成品位置已變更');
+  updateSlicePreview();
+}
+
+function setOutputScale(mode) {
+  if (outputPositionMode === 'original' && mode !== 'original') return;
+  outputScaleMode = ['full','90','original'].includes(mode) ? mode : 'full';
+  updateOutputLayoutUI();
+  invalidateFinalOutput('成品比例已變更');
+  updateSlicePreview();
+}
+
+function getOutputLayoutLabel() {
+  const pos = outputPositionMode === 'original' ? '原位' : '置中';
+  const scale = outputScaleMode === 'full' ? '滿版' : (outputScaleMode === '90' ? '90%' : '原尺寸');
+  return `${pos}＋${scale}`;
+}
+
+function getVisibleAlphaBounds(canvas, threshold = 8) {
+  const w = canvas.width, h = canvas.height;
+  if (!w || !h) return { x:0, y:0, width:1, height:1, empty:true };
+  const data = canvas.getContext('2d', { willReadFrequently:true }).getImageData(0,0,w,h).data;
+  let minX=w, minY=h, maxX=-1, maxY=-1;
+  for (let y=0; y<h; y++) {
+    for (let x=0; x<w; x++) {
+      if (data[(y*w+x)*4+3] > threshold) {
+        if (x<minX) minX=x; if (x>maxX) maxX=x;
+        if (y<minY) minY=y; if (y>maxY) maxY=y;
+      }
+    }
+  }
+  if (maxX < minX || maxY < minY) return { x:0, y:0, width:w, height:h, empty:true };
+  return { x:minX, y:minY, width:maxX-minX+1, height:maxY-minY+1, empty:false };
+}
+
+function makeZoomedPieceCanvas(pieceCanvas, zoomLevel = 1) {
+  const out = document.createElement('canvas');
+  out.width = pieceCanvas.width; out.height = pieceCanvas.height;
+  const ctx = out.getContext('2d');
+  const z = Math.max(1, Number(zoomLevel) || 1);
+  const sW = pieceCanvas.width / z, sH = pieceCanvas.height / z;
+  const sX = (pieceCanvas.width - sW) / 2, sY = (pieceCanvas.height - sH) / 2;
+  ctx.drawImage(pieceCanvas, sX, sY, sW, sH, 0, 0, out.width, out.height);
+  return out;
+}
+
+function renderOutputCanvas(pieceCanvas, outW = outputW, outH = outputH) {
+  const out = document.createElement('canvas');
+  out.width = Math.max(1, Math.round(outW));
+  out.height = Math.max(1, Math.round(outH));
+  const ctx = out.getContext('2d');
+  ctx.clearRect(0,0,out.width,out.height);
+
+  if (outputPositionMode === 'original') {
+    const scale = Math.min(1, out.width / pieceCanvas.width, out.height / pieceCanvas.height);
+    ctx.drawImage(pieceCanvas, 0, 0, pieceCanvas.width, pieceCanvas.height, 0, 0, pieceCanvas.width*scale, pieceCanvas.height*scale);
+    return out;
+  }
+
+  const bounds = getVisibleAlphaBounds(pieceCanvas);
+  const fit = Math.min(out.width / Math.max(1,bounds.width), out.height / Math.max(1,bounds.height));
+  let scale = fit;
+  if (outputScaleMode === '90') scale = fit * 0.9;
+  if (outputScaleMode === 'original') scale = Math.min(1, fit);
+  const cx = bounds.x + bounds.width/2;
+  const cy = bounds.y + bounds.height/2;
+  const dx = out.width/2 - cx*scale;
+  const dy = out.height/2 - cy*scale;
+  ctx.drawImage(pieceCanvas, dx, dy, pieceCanvas.width*scale, pieceCanvas.height*scale);
+  return out;
 }
 // ===== Web Worker =====
 const workerScript = `
@@ -2215,6 +2380,7 @@ function goStep(n) {
     updateSlicePreview();
     initGridLineDrag();
   }
+  featuredActivateForStep?.(n);
 }
 
 function resetToUpload() {
@@ -2380,6 +2546,7 @@ function updateSlicePreview() {
   const grid = document.getElementById('slice-preview-grid');
   grid.style.gridTemplateColumns = `repeat(${Math.min(ranges.cols, 5)}, 1fr)`;
   grid.innerHTML = '';
+  const zoomLevel = parseFloat(document.getElementById('zoom')?.value || '1');
 
   for (let r = 0; r < ranges.rows; r++) {
     for (let c = 0; c < ranges.cols; c++) {
@@ -2391,11 +2558,13 @@ function updateSlicePreview() {
       pc.width = Math.max(1, Math.round(pieceW));
       pc.height = Math.max(1, Math.round(pieceH));
       pc.getContext('2d').drawImage(canvas, sx, sy, pieceW, pieceH, 0, 0, pc.width, pc.height);
+      const zoomed = makeZoomedPieceCanvas(pc, zoomLevel);
+      const rendered = renderOutputCanvas(zoomed, outputW, outputH);
       const cell = document.createElement('div');
       cell.className = 'sticker-cell';
       const num = r * ranges.cols + c + 1;
       const cutLabel = ranges.custom ? '自訂切線' : '平均切線';
-      cell.innerHTML = `<div class="checker"><img src="${pc.toDataURL('image/png')}"></div><div class="num">格${num}｜${getCurrentBgModeLabel()}｜${cutLabel}</div>`;
+      cell.innerHTML = `<div class="checker"><img src="${rendered.toDataURL('image/png')}"></div><div class="num">格${num}｜${getOutputLayoutLabel()}｜${cutLabel}</div>`;
       grid.appendChild(cell);
     }
   }
@@ -2932,6 +3101,7 @@ function confirmExportPrecheckV17() {
     `格數：${cols} × ${rows} = ${count} 張`,
     `檔名：${digitExample}`,
     `去背模式：${getCurrentBgModeLabel()}`,
+    `成品排版：${getOutputLayoutLabel()}`,
     '',
     '請確認格數、起始編號、檔名碼數與 LINE 上傳需求一致。',
     '若是表情貼或特殊編號素材，也請確認圖片內容與指定編號一致。',
@@ -2941,65 +3111,58 @@ function confirmExportPrecheckV17() {
   return window.confirm(lines.join('\n'));
 }
 
-function startProcess() {
+async function startProcess() {
   if (!originalImg) return;
   if (!confirmExportPrecheckV17()) return;
-  if (bgMode === 'wand' && (!Array.isArray(wandPickPointsV10) || !wandPickPointsV10.length)) { alert('請先在魔術棒整張母圖預覽上點選至少一個背景區，再開始分割打包。'); goStep(3); return; }
+  if (bgMode === 'wand' && (!Array.isArray(wandPickPointsV10) || !wandPickPointsV10.length)) {
+    alert('請先在魔術棒整張母圖預覽上點選至少一個背景區，再開始分割打包。');
+    goStep(3);
+    return;
+  }
   document.getElementById('result-card').style.display = 'block';
   document.getElementById('progress-area').style.display = 'block';
   document.getElementById('btn-download').disabled = true;
-  initWorker();
   slicedPieces = [];
   finalImages = [];
   processedCount = 0;
   mainId = null;
   tabId = null;
-
-  totalCells = 0;
+  const failedIds = [];
   const zoomLevel = parseFloat(document.getElementById('zoom').value);
-
   const canvas = buildCurrentWorkSheetCanvas();
   if (!canvas) return;
-  const workW = canvas.width, workH = canvas.height;
-  const ranges = getGridRangesFromCanvas(workW, workH);
+  const ranges = getGridRangesFromCanvas(canvas.width, canvas.height);
   totalCells = ranges.cols * ranges.rows;
-
-  document.getElementById('progress-area').style.display = 'block';
   document.getElementById('sticker-grid').innerHTML = '';
   updateProgress();
 
   for (let r = 0; r < ranges.rows; r++) {
     for (let c = 0; c < ranges.cols; c++) {
       const id = r * ranges.cols + c + 1;
-      const sx = ranges.xCuts[c];
-      const sy = ranges.yCuts[r];
-      const pieceW = ranges.xCuts[c + 1] - ranges.xCuts[c];
-      const pieceH = ranges.yCuts[r + 1] - ranges.yCuts[r];
-      const pCanvas = document.createElement('canvas');
-      pCanvas.width = Math.max(1, Math.round(pieceW));
-      pCanvas.height = Math.max(1, Math.round(pieceH));
-      const pCtx = pCanvas.getContext('2d');
-      pCtx.drawImage(canvas, sx, sy, pieceW, pieceH, 0, 0, pCanvas.width, pCanvas.height);
-
-      const tempC = document.createElement('canvas');
-      tempC.width = pCanvas.width; tempC.height = pCanvas.height;
-      const tCtx = tempC.getContext('2d');
-      const sW = pCanvas.width / zoomLevel, sH = pCanvas.height / zoomLevel;
-      const sX = (pCanvas.width - sW) / 2, sY = (pCanvas.height - sH) / 2;
-      tCtx.drawImage(pCanvas, sX, sY, sW, sH, 0, 0, pCanvas.width, pCanvas.height);
-
-      slicedPieces.push({ id, previewUrl: pCanvas.toDataURL('image/png') });
-
-      createImageBitmap(tempC).then(bitmap => {
-        worker.postMessage({ imageBitmap: bitmap, id, targetColor:'#000000', tolerance:0, smoothness:0, despill:false, mode:'none', outW: outputW, outH: outputH, wandX:0, wandY:0, wandTolerance:0, wandSmoothness:0, wandDespill:false }, [bitmap]);
-      }).catch(err => {
-        console.error('createImageBitmap failed on piece', id, err);
-        processedCount++;
-        updateProgress();
-        if (processedCount === totalCells) onProcessDone();
-      });
+      try {
+        const sx = ranges.xCuts[c], sy = ranges.yCuts[r];
+        const pieceW = ranges.xCuts[c + 1] - ranges.xCuts[c];
+        const pieceH = ranges.yCuts[r + 1] - ranges.yCuts[r];
+        const piece = document.createElement('canvas');
+        piece.width = Math.max(1, Math.round(pieceW));
+        piece.height = Math.max(1, Math.round(pieceH));
+        piece.getContext('2d').drawImage(canvas, sx, sy, pieceW, pieceH, 0, 0, piece.width, piece.height);
+        const zoomed = makeZoomedPieceCanvas(piece, zoomLevel);
+        const rendered = renderOutputCanvas(zoomed, outputW, outputH);
+        slicedPieces.push({ id, previewUrl: rendered.toDataURL('image/png') });
+        finalImages.push({ id, dataUrl: rendered.toDataURL('image/png') });
+      } catch (err) {
+        failedIds.push(id);
+        console.error('切割失敗', id, err);
+      }
+      processedCount++;
+      updateProgress();
+      if (processedCount % 4 === 0) await new Promise(resolve => requestAnimationFrame(resolve));
     }
   }
+  finalImages.sort((a,b) => a.id - b.id);
+  onProcessDone();
+  if (failedIds.length) alert(`完成，但格 ${failedIds.join('、')} 處理失敗；其餘圖片已保留。`);
 }
 
 
@@ -3019,7 +3182,7 @@ function onProcessDone() {
   grid.innerHTML = '';
 
   finalImages.forEach((img, idx) => {
-    const fileNum = (startNum + idx).toString().padStart(outputDigits, '0');
+    const fileNum = (startNum + img.id - 1).toString().padStart(outputDigits, '0');
     const cell = document.createElement('div');
     cell.className = 'sticker-cell';
     cell.innerHTML = `
@@ -3061,7 +3224,7 @@ function renderPackGrid() {
     cell.className = 'sticker-cell';
     cell.innerHTML = `
       <div class="checker"><img src="${img.dataUrl}"></div>
-      <div class="num">${(startNum+idx).toString().padStart(outputDigits,'0')}.png</div>
+      <div class="num">${(startNum+img.id-1).toString().padStart(outputDigits,'0')}.png</div>
       <div class="cell-btns">
         <div class="cell-btn ${mainId===img.id?'sel-main':''}" onclick="selMain(${img.id})">Main</div>
         <div class="cell-btn ${tabId===img.id?'sel-tab':''}" onclick="selTab(${img.id})">Tab</div>
@@ -3091,10 +3254,10 @@ async function resizeImg(dataUrl, w, h) {
 async function downloadZip() {
   const startNum = parseInt(document.getElementById('start-num').value) || 1;
   const zip = new JSZip();
-  await Promise.all(finalImages.map(async (img, idx) => {
-    const resized = await resizeImg(img.dataUrl, outputW, outputH);
-    zip.file(`${(startNum+idx).toString().padStart(outputDigits,'0')}.png`, resized, { base64: true });
-  }));
+  finalImages.forEach((img, idx) => {
+    const base64 = img.dataUrl.split(',')[1];
+    zip.file(`${(startNum+img.id-1).toString().padStart(outputDigits,'0')}.png`, base64, { base64: true });
+  });
   if (mainId) {
     const m = finalImages.find(i => i.id === mainId);
     if (m) zip.file('main.png', await resizeImg(m.dataUrl, 240, 240), { base64: true });
@@ -3110,326 +3273,413 @@ async function downloadZip() {
 // Init
 applyPreset('green');
 updateCellInfo();
+updateOutputLayoutUI();
 // ===== 公開版更新日期顯示 =====
 (function(){
   const tag = document.getElementById('ver-tag');
-  if (tag) tag.textContent = '更新日期 2026/06/05';
+  if (tag) tag.textContent = '更新日期 2026/07/11';
 })();
 
-// ===== 精選作品輪播｜0605V21 分區版 =====
-// 主題區與貼圖 / 表情貼區依使用者指定順序固定，禁止自行改成作者頁前10。
+// ===== 精選作品輪播｜0711V22 三頁獨立版 =====
+const FEATURED_STICKER_ITEMS = [
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/35100805/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "煩躁胖子・又見嘴砲",
+    "desc": "煩躁胖子又回來嘴砲了，日常吐槽、崩潰、敷衍、裝沒事都能用，讓生活增加不少樂趣",
+    "url": "https://store.line.me/stickershop/product/35100805/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/35085299/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "柴柴就是吐你沒保留",
+    "desc": "柴柴就是要吐槽你，沒保留、沒客氣。日常聊天、傻眼、回嘴、嘴一下都能用。",
+    "url": "https://store.line.me/stickershop/product/35085299/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34959948/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "煩躁黑青犬・臭臉上線",
+    "desc": "黑青眼、方胖身、臭臉又煩躁的醜萌犬無字登場！適合日常敷衍、厭世反應、無聲吐槽與各種不想說話的時刻。",
+    "url": "https://store.line.me/stickershop/product/34959948/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/35058060/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "奶呼呼小象",
+    "desc": "可愛的奶呼呼小象無字貼圖，用柔軟表情傳達心情，不用文字也能自然回覆聊天。",
+    "url": "https://store.line.me/stickershop/product/35058060/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34982060/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "懶教人，就讓貼圖教之可以先停了",
+    "desc": "不是不聽，也不是沒禮貌，只是覺得可以先停了。冷淡、禮貌、句點式日常回覆，適合不想繼續解釋的時候使用。",
+    "url": "https://store.line.me/stickershop/product/34982060/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34959941/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "百變粉紅小豬・就想愛你",
+    "desc": "粉紅小豬的甜甜戀愛貼圖，想你、抱抱、撒嬌、吃醋、等回覆都能用，適合情侶聊天與日常可愛互動。",
+    "url": "https://store.line.me/stickershop/product/34959941/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34642879/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "歹命抹布・台語碎念",
+    "desc": "一塊被生活用到快乾掉的抹布，厭世又歹命，用台語碎念回覆日常、加班、被催、被凹和各種有夠煩的時刻。",
+    "url": "https://store.line.me/stickershop/product/34642879/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34863173/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "軟萌小刺蝟來撒嬌",
+    "desc": "軟萌小刺蝟帶著可愛表情來撒嬌，適合聊天、問候、加油與日常回覆。",
+    "url": "https://store.line.me/stickershop/product/34863173/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34405642/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "招福達摩來賜福（福氣滿滿）",
+    "desc": "繽紛福福達摩搭配各種吉祥小元素，帶來祝福、守護、好運與滿滿福氣，讓聊天更有喜氣與心意。",
+    "url": "https://store.line.me/stickershop/product/34405642/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34434855/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "福福達摩祝福徽章",
+    "desc": "把招財、平安、好運都收錄。送祝福、討吉利、日常打氣都剛好。一切都在福福達摩祝福徽章。",
+    "url": "https://store.line.me/stickershop/product/34434855/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34958267/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "被突破的手機，爆裂衝出",
+    "desc": "手機畫面被強烈文字突破，爆裂感從螢幕中心衝出來。適合震驚、吐槽、爆氣、不耐煩、拒絕廢話與強烈回覆，讓每一句訊息都像從手機裡炸出來一樣有存在感。",
+    "url": "https://store.line.me/stickershop/product/34958267/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34937666/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "阿醜的白爛雞屁梯",
+    "desc": "黑框胖胖阿醜化身白爛雞屁梯，專門用欠揍表情亂回朋友。裝懂、胡扯、傻眼、崩潰、賤嘴反應都有。",
+    "url": "https://store.line.me/stickershop/product/34937666/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34955913/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "柴柴的問候・溫暖你心",
+    "desc": "柴柴用溫暖的問候陪著你。早安、晚安、謝謝、辛苦了，讓聊天多一點貼心與溫度。",
+    "url": "https://store.line.me/stickershop/product/34955913/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34897609/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "奶橘小毛球・暖心問候",
+    "desc": "奶橘小毛球帶著早安、想你了、謝謝你、晚安囉等暖心短句，適合聊天開場、即時回覆、店家接待與親友互動。橘白毛茸茸的小身影配上呆萌表情，讓每一句話都更親切可愛。",
+    "url": "https://store.line.me/stickershop/product/34897609/zh-Hant"
+  }
+];
+const FEATURED_EMOJI_ITEMS = [
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4f52f6a9ee5b3be23631ac/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "常用單詞印章2",
+    "desc": "常用聊天單詞表情貼，收錄動作、狀態、日常回應與對話常見用字，適合快速貼出。",
+    "url": "https://store.line.me/emojishop/product/6a4f52f6a9ee5b3be23631ac/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4f52babfc6ef757e559b42/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "常用單詞印章1",
+    "desc": "常用聊天單詞印章，收錄情緒、反應、吐槽與簡短回覆，適合日常對話快速使用。",
+    "url": "https://store.line.me/emojishop/product/6a4f52babfc6ef757e559b42/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4f14c8bfc6ef757e5599aa/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "滑金影字母貼",
+    "desc": "滑金影風格的字母、數字與符號表情貼，帶有順滑筆畫與金色點綴感，適合日常聊天與文字拼貼。",
+    "url": "https://store.line.me/emojishop/product/6a4f14c8bfc6ef757e5599aa/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4e0763bfc6ef757e55965a/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "金靛滑筆字母假名貼",
+    "desc": "金靛滑筆風格的字母、假名與符號表情貼，帶有順滑筆畫與金砂點點感，適合日常聊天與文字拼貼。",
+    "url": "https://store.line.me/emojishop/product/6a4e0763bfc6ef757e55965a/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4e075c37efe94940a2a30c/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "緋霞礦晶字母假名貼",
+    "desc": "緋霞礦晶質感的字母、假名與符號表情貼，適合日常聊天、裝飾訊息與文字拼貼。",
+    "url": "https://store.line.me/emojishop/product/6a4e075c37efe94940a2a30c/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4e074bbfc6ef757e559656/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "赤影礦晶字母假名貼",
+    "desc": "赤影礦晶質感的字母、假名與符號表情貼，適合日常聊天、裝飾訊息與文字拼貼。",
+    "url": "https://store.line.me/emojishop/product/6a4e074bbfc6ef757e559656/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4cb5eaa9ee5b3be23628ec/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "孤菇紅白貼",
+    "desc": "紅白傘帽的小菇表情貼，害羞、開心、驚訝、搞笑與日常反應都能用，讓聊天多一點孤菇感。",
+    "url": "https://store.line.me/emojishop/product/6a4cb5eaa9ee5b3be23628ec/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4b61a837efe94940a29add/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "熔金晶紋字母假名貼",
+    "desc": "熔金晶紋質感的字母、假名與符號表情貼，適合日常聊天、裝飾訊息與文字拼貼。",
+    "url": "https://store.line.me/emojishop/product/6a4b61a837efe94940a29add/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a10056acb1c2e53ef8365bf/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "公文印章表情貼",
+    "desc": "收到、確認、核准、通過、退回、待辦等公文章風格表情貼。適合工作回覆、日常確認、聊天敷衍與正式感回應。",
+    "url": "https://store.line.me/emojishop/product/6a10056acb1c2e53ef8365bf/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a111507ca472a3a9ec3067f/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "嗆聲印章表情貼",
+    "desc": "把閉嘴、少來、免談、別吵、閃開、退下、不准、你敢等嗆聲短句做成紅色印章表情貼，適合朋友互嗆、吐槽、玩笑回覆與日常聊天使用。",
+    "url": "https://store.line.me/emojishop/product/6a111507ca472a3a9ec3067f/zh-Hant"
+  }
+];
 const FEATURED_THEME_ITEMS = [
-  {
-    "img": "https://shop.line-scdn.net/themeshop/v1/products/fb/26/bf/fb26bf33-06ce-491a-aa95-96139af0bde6/1/WEBSTORE/icon_198x278.png",
-    "imgClass": "theme-img",
-    "labels": [
-      "LINE主題",
-      "冷月幻想"
-    ],
-    "title": "冷月聖域",
-    "desc": "冷月照耀著沉睡的聖域，星光、冰晶與魔法陣交織出靜謐又神秘的幻想世界。",
-    "url": "https://store.line.me/themeshop/product/fb26bf33-06ce-491a-aa95-96139af0bde6/zh-Hant"
-  },
-  {
-    "img": "https://shop.line-scdn.net/themeshop/v1/products/c7/b7/0d/c7b70d19-152f-4026-b7a2-ef16cd999b7b/1/WEBSTORE/icon_198x278.png",
-    "imgClass": "theme-img",
-    "labels": [
-      "LINE主題",
-      "星儀聖域"
-    ],
-    "title": "月輪星儀",
-    "desc": "以月輪、水晶與星辰法陣打造的神秘主題，讓聊天室沉入冷藍色的幻想世界。",
-    "url": "https://store.line.me/themeshop/product/c7b70d19-152f-4026-b7a2-ef16cd999b7b/zh-Hant"
-  },
-  {
-    "img": "https://shop.line-scdn.net/themeshop/v1/products/5a/8a/0c/5a8a0c4b-727c-44b9-bb5f-026e6cb4c45a/1/WEBSTORE/icon_198x278.png",
-    "imgClass": "theme-img",
-    "labels": [
-      "LINE主題",
-      "銀機狐"
-    ],
-    "title": "冷月・銀機狐",
-    "desc": "冷月之下，銀色機械狐世界展開，冰藍光感與未來機械美學交織。",
-    "url": "https://store.line.me/themeshop/product/5a8a0c4b-727c-44b9-bb5f-026e6cb4c45a/zh-Hant"
-  },
-  {
-    "img": "https://shop.line-scdn.net/themeshop/v1/products/ec/c0/46/ecc0468a-bcec-4286-8660-8156923d7449/1/WEBSTORE/icon_198x278.png",
-    "imgClass": "theme-img",
-    "labels": [
-      "LINE主題",
-      "暗機狐"
-    ],
-    "title": "冷月・暗機狐",
-    "desc": "冷月之下，暗色機械狐世界展開，黑銀光感與暗黑機械美學交織。",
-    "url": "https://store.line.me/themeshop/product/ecc0468a-bcec-4286-8660-8156923d7449/zh-Hant"
-  },
-  {
-    "img": "https://shop.line-scdn.net/themeshop/v1/products/cf/92/66/cf926616-4254-499d-84c5-eb7e5c062174/1/WEBSTORE/icon_198x278.png",
-    "imgClass": "theme-img",
-    "labels": [
-      "LINE主題",
-      "冰月瓶景"
-    ],
-    "title": "瓶中冰月緣",
-    "desc": "冰月微光封存在透明瓶中，藍白冰晶與月光交織出安靜浪漫的瓶中世界。",
-    "url": "https://store.line.me/themeshop/product/cf926616-4254-499d-84c5-eb7e5c062174/zh-Hant"
-  },
-  {
-    "img": "https://shop.line-scdn.net/themeshop/v1/products/68/72/c6/6872c68d-41c8-4617-a094-db6b827eee95/1/WEBSTORE/icon_198x278.png",
-    "imgClass": "theme-img",
-    "labels": [
-      "LINE主題",
-      "櫻花達摩"
-    ],
-    "title": "櫻花福福達摩",
-    "desc": "櫻花盛開，福福達摩帶著溫柔祝福，讓聊天室充滿春日與好運。",
-    "url": "https://store.line.me/themeshop/product/6872c68d-41c8-4617-a094-db6b827eee95/zh-Hant"
-  },
-  {
-    "img": "https://shop.line-scdn.net/themeshop/v1/products/01/a5/c6/01a5c66a-4e0c-4b54-a35c-b704c9929b06/1/WEBSTORE/icon_198x278.png",
-    "imgClass": "theme-img",
-    "labels": [
-      "LINE主題",
-      "端午達摩"
-    ],
-    "title": "粽香福福達摩",
-    "desc": "端午粽香與福福達摩一起登場，把節慶祝福與可愛好運放進聊天室。",
-    "url": "https://store.line.me/themeshop/product/01a5c66a-4e0c-4b54-a35c-b704c9929b06/zh-Hant"
-  },
-  {
-    "img": "https://shop.line-scdn.net/themeshop/v1/products/e1/83/08/e1830805-1197-415f-8a13-6b8f29d655de/1/WEBSTORE/icon_198x278.png",
-    "imgClass": "theme-img",
-    "labels": [
-      "LINE主題",
-      "夢幻黑貓"
-    ],
-    "title": "傲嬌的夢幻小黑貓",
-    "desc": "夢幻光影中的傲嬌小黑貓，帶點神秘、可愛與距離感，陪你換上柔亮聊天室。",
-    "url": "https://store.line.me/themeshop/product/e1830805-1197-415f-8a13-6b8f29d655de/zh-Hant"
-  },
   {
     "img": "https://shop.line-scdn.net/themeshop/v1/products/bb/d8/0e/bbd80ef5-be88-4b14-867d-8ebef124daeb/1/WEBSTORE/icon_198x278.png",
     "imgClass": "theme-img",
     "labels": [
-      "LINE主題",
-      "雨天青蛙"
+      "LINE主題"
     ],
     "title": "小青蛙也躲雨",
-    "desc": "雨天裡的小青蛙躲進清新綠意中，帶來柔和療癒的自然氣息。",
+    "desc": "小青蛙也會躲雨。荷葉、水滴、小花與柔和彩虹，組成清新可愛的雨後森林主題，讓你的 LINE 聊天畫面變得明亮又舒服。",
     "url": "https://store.line.me/themeshop/product/bbd80ef5-be88-4b14-867d-8ebef124daeb/zh-Hant"
   },
   {
     "img": "https://shop.line-scdn.net/themeshop/v1/products/f2/e6/1b/f2e61b33-1bdf-478e-a803-75a45b5573f4/1/WEBSTORE/icon_198x278.png",
     "imgClass": "theme-img",
     "labels": [
-      "LINE主題",
-      "溫泉水豚"
+      "LINE主題"
     ],
     "title": "水豚奶呼呼・溫泉暖呼呼",
-    "desc": "奶呼呼水豚泡在暖呼呼溫泉裡，溫柔、放鬆又療癒的聊天主題。",
+    "desc": "水豚奶呼呼在秋日溫泉裡放鬆泡湯，柚子、楓葉與暖光陪你一起慢慢休息，讓 LINE 變得柔軟又暖呼呼。",
     "url": "https://store.line.me/themeshop/product/f2e61b33-1bdf-478e-a803-75a45b5573f4/zh-Hant"
-  }
-];
-
-const FEATURED_STICKER_ITEMS = [
-  {
-    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a17b4fd71f5f26c68e84be5/iPhone/main.png?v=1",
-    "imgClass": "",
-    "labels": [
-      "表情貼",
-      "AI銀字母"
-    ],
-    "title": "過時組裝AI銀字母表情貼",
-    "desc": "舊時代組裝AI化身為銀色字母表情貼，英文字母、數字與符號都能用，帶點機甲感與復古科技味，讓聊天更有辨識度。",
-    "url": "https://store.line.me/emojishop/product/6a17b4fd71f5f26c68e84be5/zh-Hant"
   },
   {
-    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a1a55b027f76405a1c6e09e/iPhone/main.png?v=1",
-    "imgClass": "",
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/c6/2c/58/c62c58dd-712d-4109-9ddd-5a5a81127e18/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
     "labels": [
-      "表情貼",
-      "冷金屬"
+      "LINE主題"
     ],
-    "title": "冷金屬字母表情貼",
-    "desc": "一整套結合冷銀金屬質感與奇幻冰藍精靈的客製化圖形字母表情貼。",
-    "url": "https://store.line.me/emojishop/product/6a1a55b027f76405a1c6e09e/zh-Hant"
+    "title": "懶教人，就讓主題教之童戰神",
+    "desc": "懶教人主題登場。童戰神造型、手繪小戰盔，氣勢有了，熱血沒有。懶懶的 LINE 介面，陪你每天一起被迫營業。",
+    "url": "https://store.line.me/themeshop/product/c62c58dd-712d-4109-9ddd-5a5a81127e18/zh-Hant"
   },
   {
-    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a150e2aca472a3a9ec318b5/iPhone/main.png?v=1",
-    "imgClass": "",
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/1e/ce/12/1ece1286-b8ca-4492-97a3-d1021acd2319/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
     "labels": [
-      "表情貼",
-      "小銀狐"
+      "LINE主題"
     ],
-    "title": "科技小銀狐字母表情貼",
-    "desc": "科技小銀狐搭配英文字母、數字與常用符號，銀藍金屬感加上可愛互動，適合拼字、裝飾訊息與日常聊天使用。",
-    "url": "https://store.line.me/emojishop/product/6a150e2aca472a3a9ec318b5/zh-Hant"
+    "title": "暖心柴柴・笑臉迎你",
+    "desc": "暖心柴柴帶著笑臉迎接每一天。柔和色調、可愛腳印與溫暖陪伴感，讓聊天畫面變得輕鬆又療癒。",
+    "url": "https://store.line.me/themeshop/product/1ece1286-b8ca-4492-97a3-d1021acd2319/zh-Hant"
   },
   {
-    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a1401aad387770800d86c50/iPhone/main.png?v=1",
-    "imgClass": "",
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/fe/1b/1e/fe1b1e89-dffe-46c6-a755-9e9cc05ee94f/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
     "labels": [
-      "表情貼",
-      "科技狐"
+      "LINE主題"
     ],
-    "title": "人性化科技狐字母表情貼",
-    "desc": "人性化科技狐搭配英文字母、數字與常用符號，銀藍機械感加上可愛互動表情，適合聊天拼字、裝飾訊息與日常回覆使用。",
-    "url": "https://store.line.me/emojishop/product/6a1401aad387770800d86c50/zh-Hant"
+    "title": "雨後森林-小青蛙",
+    "desc": "小青蛙們在雨後森林裡躲雨、玩水與發呆。荷葉、水滴、小花與柔和光線，陪你的 LINE 聊天畫面變得清新可愛。",
+    "url": "https://store.line.me/themeshop/product/fe1b1e89-dffe-46c6-a755-9e9cc05ee94f/zh-Hant"
   },
   {
-    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a0a7e35f014a8056ed8a9df/iPhone/main.png?v=1",
-    "imgClass": "",
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/c0/84/b9/c084b9d3-f547-4faa-8605-42a9d0f060b7/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
     "labels": [
-      "表情貼",
-      "金箔草寫"
+      "LINE主題"
     ],
-    "title": "金箔草寫字母表情貼",
-    "desc": "金箔質感的草寫字母表情貼，適合拼字、裝飾聊天、做出華麗又有存在感的訊息。",
-    "url": "https://store.line.me/emojishop/product/6a0a7e35f014a8056ed8a9df/zh-Hant"
+    "title": "義氣哥・衝出",
+    "desc": "義氣哥從破裂的手機畫面中衝出，黑金色系搭配碎玻璃與爆裂光感，讓聊天介面充滿氣勢與存在感，適合喜歡帥氣、霸氣且突破風格的使用者。",
+    "url": "https://store.line.me/themeshop/product/c084b9d3-f547-4faa-8605-42a9d0f060b7/zh-Hant"
   },
   {
-    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a0a7e58f014a8056ed8a9e7/iPhone/main.png?v=1",
-    "imgClass": "",
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/c8/f1/e7/c8f1e72d-b04f-4dcb-b787-63be040b6f94/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
     "labels": [
-      "表情貼",
-      "描金流光"
+      "LINE主題"
     ],
-    "title": "描金流光字母表情貼",
-    "desc": "描金外框搭配流光質感，華麗又清楚的英文字母表情貼，適合日常聊天、裝飾名字與可愛回覆。",
-    "url": "https://store.line.me/emojishop/product/6a0a7e58f014a8056ed8a9e7/zh-Hant"
+    "title": "奶呼呼小象・雲朵夢境",
+    "desc": "奶灰小象坐在柔軟雲朵裡，彩虹、泡泡與小水滴交織出甜甜夢境感。",
+    "url": "https://store.line.me/themeshop/product/c8f1e72d-b04f-4dcb-b787-63be040b6f94/zh-Hant"
   },
   {
-    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34206710/LINEStorePC/main.png?v=1",
-    "imgClass": "",
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/0c/9b/1f/0c9b1f76-0abd-40c5-92fc-a7ad55c4df01/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
     "labels": [
-      "貼圖",
-      "大哥"
+      "LINE主題"
     ],
-    "title": "大哥的江湖傳說",
-    "desc": "傳說中的大哥登場，用生動對白回應日常聊天。兄弟招呼、霸氣吐槽、直接表態都能派上用場，讓每句話更有江湖味。 ※本組貼圖在聊天室中將會顯示為長型大貼圖",
-    "url": "https://store.line.me/stickershop/product/34206710/zh-Hant"
+    "title": "森林郵差小浣熊",
+    "desc": "溫暖森林郵局裡的小浣熊郵差，帶著信件、包裹與小小心意出發。可愛童話風 LINE 主題，適合喜歡森林、郵局與療癒小動物的人。",
+    "url": "https://store.line.me/themeshop/product/0c9b1f76-0abd-40c5-92fc-a7ad55c4df01/zh-Hant"
   },
   {
-    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/33786923/LINEStorePC/main.png?v=1",
-    "imgClass": "",
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/3b/90/d0/3b90d0a9-e72e-4079-b6ab-d9492e837196/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
     "labels": [
-      "貼圖",
-      "義氣"
+      "LINE主題"
     ],
-    "title": "不想理你，有事說",
-    "desc": "少講話的日常回覆。沒有情緒，不多解釋，有事直接說。 適合各種聊天情境，簡單回應就好。",
-    "url": "https://store.line.me/stickershop/product/33786923/zh-Hant"
+    "title": "赤藍墨流・交界",
+    "desc": "赤紅與深藍墨流在灰綠霧色中交會，層層翻湧成抽象而深邃的流動世界，陪伴每一次對話。",
+    "url": "https://store.line.me/themeshop/product/3b90d0a9-e72e-4079-b6ab-d9492e837196/zh-Hant"
   },
   {
-    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34128364/LINEStorePC/main.png?v=1",
-    "imgClass": "",
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/c0/d9/90/c0d99044-1f42-4547-9cba-8fce49227545/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
     "labels": [
-      "貼圖",
-      "懶教人"
+      "LINE主題"
     ],
-    "title": "懶教人，就讓貼圖教之敷衍你剛好",
-    "desc": "懶得解釋、懶得認真回，就讓貼圖幫你敷衍剛好。冷淡、無奈、隨便、假裝有回應，日常社交省力用。",
-    "url": "https://store.line.me/stickershop/product/34128364/zh-Hant"
-  },
-  {
-    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34128397/LINEStorePC/main.png?v=1",
-    "imgClass": "",
-    "labels": [
-      "貼圖",
-      "冷淡回覆"
-    ],
-    "title": "懶教人，就讓貼圖教之真沒有敷衍",
-    "desc": "真的不是敷衍，也沒有敷衍，只是回得很省力。好、可以、知道了、沒問題，各種冷淡又實用的日常回覆，懶得解釋時剛好用。",
-    "url": "https://store.line.me/stickershop/product/34128397/zh-Hant"
+    "title": "炭筆柴柴・迎向你",
+    "desc": "黑白炭筆素描風的柴柴主題。奔跑而來的身影，像是正迎向你，帶來安靜又溫暖的陪伴感。",
+    "url": "https://store.line.me/themeshop/product/c0d99044-1f42-4547-9cba-8fce49227545/zh-Hant"
   }
 ];
 
 const featuredState = {
-  theme: { index: 0, timer: null, items: FEATURED_THEME_ITEMS, slidesId: 'featured-slides-theme' },
-  sticker: { index: 0, timer: null, items: FEATURED_STICKER_ITEMS, slidesId: 'featured-slides-sticker' }
+  sticker: { index:0, timer:null, items:FEATURED_STICKER_ITEMS, slidesId:'featured-slides-sticker' },
+  emoji: { index:0, timer:null, items:FEATURED_EMOJI_ITEMS, slidesId:'featured-slides-emoji' },
+  theme: { index:0, timer:null, items:FEATURED_THEME_ITEMS, slidesId:'featured-slides-theme' }
 };
+let featuredActiveKind = 'sticker';
+let featuredResizeTimer = null;
 
+function featuredItemsPerPage() { return window.innerWidth <= 700 ? 1 : 2; }
+function featuredPageCount(kind) {
+  const state = featuredState[kind];
+  return state ? Math.max(1, Math.ceil(state.items.length / featuredItemsPerPage())) : 1;
+}
+function escapeFeaturedText(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
 function featuredRender(kind) {
   const state = featuredState[kind];
   if (!state) return;
   const wrap = document.getElementById(state.slidesId);
-  if (!wrap || !state.items.length) return;
-  const totalPages = Math.ceil(state.items.length / 2);
+  if (!wrap) return;
+  const perPage = featuredItemsPerPage();
+  const totalPages = Math.max(1, Math.ceil(state.items.length / perPage));
+  state.index = Math.min(state.index, totalPages - 1);
   let html = '';
-  for (let p = 0; p < totalPages; p++) {
-    const items = state.items.slice(p * 2, p * 2 + 2);
+  for (let p=0; p<totalPages; p++) {
+    const items = state.items.slice(p*perPage, p*perPage+perPage);
     const cards = items.map(item => {
       const extraClass = item.imgClass ? ` ${item.imgClass}` : '';
-      const imgHtml = item.img
-        ? `<img class="featured-img${extraClass}" src="${item.img}" alt="${item.title}" loading="lazy">`
-        : `<div class="featured-img-placeholder">🎭</div>`;
-      return `
-        <a class="featured-card" href="${item.url}" target="_blank" rel="noopener">
-          ${imgHtml}
-          <div class="featured-info">
-            ${Array.isArray(item.labels) ? `<div class="featured-labels">${item.labels.map(label => `<span class="featured-label">${label}</span>`).join('')}</div>` : `<span class="featured-label">${item.label || ''}</span>`}
-            <div class="featured-title">${item.title}</div>
-            <div class="featured-desc">${item.desc || ''}</div>
-          </div>
-        </a>`;
+      const labels = Array.isArray(item.labels) ? item.labels : [item.label || ''];
+      return `<a class="featured-card" href="${escapeFeaturedText(item.url)}" target="_blank" rel="noopener">
+        <img class="featured-img${extraClass}" src="${escapeFeaturedText(item.img)}" alt="${escapeFeaturedText(item.title)}" loading="lazy" referrerpolicy="no-referrer">
+        <div class="featured-info">
+          <div class="featured-labels">${labels.map(label => `<span class="featured-label">${escapeFeaturedText(label)}</span>`).join('')}</div>
+          <div class="featured-title">${escapeFeaturedText(item.title)}</div>
+          <div class="featured-desc">${escapeFeaturedText(item.desc)}</div>
+        </div>
+      </a>`;
     }).join('');
-    html += `<div class="featured-slide${p === 0 ? ' active' : ''}" data-page="${p}">
+    html += `<div class="featured-slide${p===state.index?' active':''}" data-page="${p}">
       <div class="featured-page-inner">${cards}</div>
       <div class="featured-footer" style="padding:0 16px 12px;">
-        <div class="featured-dots">${Array.from({length: totalPages}, (_, j) =>
-          `<button class="featured-dot${j === 0 ? ' active' : ''}" onclick="featuredGo('${kind}', ${j})"></button>`
-        ).join('')}</div>
+        <div class="featured-dots">${Array.from({length:totalPages},(_,j)=>`<button type="button" aria-label="第 ${j+1} 組" class="featured-dot${j===state.index?' active':''}" onclick="featuredGo('${kind}',${j})"></button>`).join('')}</div>
       </div>
     </div>`;
   }
   wrap.innerHTML = html;
 }
-
 function featuredGo(kind, idx) {
-  const state = featuredState[kind];
-  if (!state) return;
-  const wrap = document.getElementById(state.slidesId);
-  if (!wrap) return;
-  const slides = wrap.querySelectorAll('.featured-slide');
-  if (!slides.length) return;
-  const totalPages = Math.ceil(state.items.length / 2);
-  slides.forEach(s => s.classList.remove('active'));
-  state.index = (idx + totalPages) % totalPages;
-  slides[state.index]?.classList.add('active');
-  wrap.querySelectorAll('.featured-dot').forEach((d, i) => {
-    d.classList.toggle('active', i === state.index);
-  });
+  const state = featuredState[kind], wrap = state && document.getElementById(state.slidesId);
+  if (!state || !wrap) return;
+  const total = featuredPageCount(kind);
+  state.index = (idx + total) % total;
+  wrap.querySelectorAll('.featured-slide').forEach((slide,i)=>slide.classList.toggle('active',i===state.index));
+  wrap.querySelectorAll('.featured-dot').forEach((dot,i)=>dot.classList.toggle('active',i===state.index));
 }
-
-function featuredNext(kind) {
-  const state = featuredState[kind];
-  if (!state) return;
-  const totalPages = Math.ceil(state.items.length / 2);
-  featuredGo(kind, (state.index + 1) % totalPages);
-}
-function featuredPrev(kind) {
-  const state = featuredState[kind];
-  if (!state) return;
-  const totalPages = Math.ceil(state.items.length / 2);
-  featuredGo(kind, (state.index - 1 + totalPages) % totalPages);
-}
-
+function featuredNext(kind) { const s=featuredState[kind]; if(s) featuredGo(kind,s.index+1); }
+function featuredPrev(kind) { const s=featuredState[kind]; if(s) featuredGo(kind,s.index-1); }
 function featuredStart(kind) {
-  const state = featuredState[kind];
-  if (!state) return;
-  clearInterval(state.timer);
-  state.timer = setInterval(() => featuredNext(kind), 4000);
+  const state=featuredState[kind]; if(!state || kind!==featuredActiveKind) return;
+  clearInterval(state.timer); state.timer=setInterval(()=>featuredNext(kind),4000);
 }
-function featuredPause(kind) {
-  const state = featuredState[kind];
-  if (state) clearInterval(state.timer);
+function featuredPause(kind) { const state=featuredState[kind]; if(state) { clearInterval(state.timer); state.timer=null; } }
+function featuredResume(kind) { if(kind===featuredActiveKind) featuredStart(kind); }
+function featuredActivateForStep(step) {
+  const kind = step===1 ? 'sticker' : (step===3 ? 'emoji' : (step===4 ? 'theme' : null));
+  Object.keys(featuredState).forEach(featuredPause);
+  featuredActiveKind = kind;
+  if (kind) featuredStart(kind);
 }
-function featuredResume(kind) { featuredStart(kind); }
-
-featuredRender('theme');
-featuredRender('sticker');
-featuredStart('theme');
-featuredStart('sticker');
+Object.keys(featuredState).forEach(featuredRender);
+featuredActivateForStep(1);
+window.addEventListener('resize',()=>{
+  clearTimeout(featuredResizeTimer);
+  featuredResizeTimer=setTimeout(()=>{ Object.keys(featuredState).forEach(featuredRender); },160);
+});
 </script>
 </body>
 </html>
