@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>網址 QRcode 產生器 0724V3</title>
+  <style>
+    :root {
+      --bg: #f7efe1;
+      --panel: rgba(255, 251, 243, 0.92);
+      --panel-strong: #fff9ef;
+      --line: rgba(104, 79, 42, 0.18);
+      --text: #4e381c;
+      --muted: #8a6d45;
+      --green: #6b7f3b;
+      --green-strong: #50612d;
+      --brown: #5a4020;
+      --shadow: 0 18px 40px rgba(105, 82, 40, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(125, 163, 78, 0.18), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(153, 112, 62, 0.16), transparent 28%),
+        linear-gradient(180deg, #fff9f0 0%, var(--bg) 100%);
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      filter: blur(6px);
+      opacity: 0.3;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::before {
+      top: -60px;
+      left: -50px;
+      background: radial-gradient(circle, rgba(133, 156, 82, 0.28), transparent 70%);
+    }
+
+    body::after {
+      right: -80px;
+      bottom: -80px;
+      background: radial-gradient(circle, rgba(158, 113, 55, 0.25), transparent 72%);
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(1160px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0 36px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      padding: 24px 24px 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-copy {
+      max-width: 720px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: var(--green-strong);
+      background: rgba(107, 127, 59, 0.12);
+      border: 1px solid rgba(107, 127, 59, 0.16);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    h1 {
+      margin: 16px 0 10px;
+      font-size: clamp(30px, 5vw, 54px);
+      line-height: 1.08;
+      letter-spacing: 0.01em;
+    }
+
+    .hero p,
+    .panel-note,
+    .field-help,
+    .hint-list,
+    .version-note,
+    .preview-meta,
+    .status {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .hero-tools {
+      min-width: 240px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .hero-card {
+      padding: 16px 18px;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+    }
+
+    .hero-card strong,
+    .preview-meta strong {
+      color: var(--text);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(420px, 1fr);
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel h2 {
+      margin: 0 0 6px;
+      font-size: 22px;
+    }
+
+    .field-group {
+      margin-top: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-weight: 800;
+    }
+
+    .field-help {
+      font-size: 13px;
+      margin: -2px 0 0;
+    }
+
+    input[type="url"],
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(104, 79, 42, 0.22);
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+    }
+
+    input[type="url"]:focus,
+    input[type="text"]:focus,
+    input[type="range"]:focus,
+    input[type="color"]:focus {
+      box-shadow: 0 0 0 4px rgba(107, 127, 59, 0.14);
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .choice-chip {
+      position: relative;
+      flex: 1 1 90px;
+      min-width: 86px;
+    }
+
+    .choice-chip input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .choice-chip span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(104, 79, 42, 0.18);
+      background: rgba(255, 255, 255, 0.86);
+      font-weight: 800;
+      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+
+    .choice-chip input:checked + span {
+      background: rgba(107, 127, 59, 0.14);
+      border-color: rgba(107, 127, 59, 0.38);
+      color: var(--green-strong);
+      transform: translateY(-1px);
+    }
+
+    .range-wrap {
+      display: grid;
+      gap: 8px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--green);
+    }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    input[type="color"] {
+      width: 58px;
+      height: 48px;
+      border: none;
+      border-radius: 16px;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    button,
+    .download-link {
+      min-height: 50px;
+      padding: 12px 18px;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      font: inherit;
+      font-weight: 900;
+      transition: transform 0.16s ease, filter 0.16s ease, border-color 0.16s ease;
+    }
+
+    button:hover,
+    .download-link:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.02);
+    }
+
+    .btn-primary {
+      color: #fffdf7;
+      background: linear-gradient(180deg, #6b7f3b 0%, #57682f 100%);
+      box-shadow: 0 10px 24px rgba(87, 104, 47, 0.2);
+    }
+
+    .btn-secondary,
+    .download-link {
+      color: var(--brown);
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(104, 79, 42, 0.18);
+    }
+
+    .preview-shell {
+      display: grid;
+      gap: 18px;
+      min-height: 100%;
+    }
+
+    .preview-stage {
+      display: grid;
+      place-items: center;
+      min-height: 460px;
+      padding: 24px;
+      border-radius: 24px;
+      border: 1px dashed rgba(104, 79, 42, 0.22);
+      background:
+        linear-gradient(45deg, rgba(101, 76, 40, 0.05) 25%, transparent 25%, transparent 75%, rgba(101, 76, 40, 0.05) 75%, rgba(101, 76, 40, 0.05)),
+        linear-gradient(45deg, rgba(101, 76, 40, 0.05) 25%, transparent 25%, transparent 75%, rgba(101, 76, 40, 0.05) 75%, rgba(101, 76, 40, 0.05));
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+    }
+
+    .preview-card {
+      width: min(100%, 540px);
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(104, 79, 42, 0.14);
+      box-shadow: 0 18px 38px rgba(116, 88, 46, 0.16);
+    }
+
+    .preview-card canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      image-rendering: pixelated;
+      border-radius: 16px;
+      background: transparent;
+    }
+
+    .preview-meta {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+
+    .meta-card {
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: var(--panel-strong);
+      border: 1px solid rgba(104, 79, 42, 0.12);
+    }
+
+    .status {
+      min-height: 24px;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .status.error {
+      color: #9b2f2f;
+    }
+
+    .inline-toggle {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .inline-toggle label {
+      flex: 1 1 140px;
+    }
+
+    .inline-toggle input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .inline-toggle span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(104, 79, 42, 0.18);
+      background: rgba(255, 255, 255, 0.86);
+      font-weight: 800;
+      transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
+    }
+
+    .inline-toggle input:checked + span {
+      background: rgba(107, 127, 59, 0.14);
+      border-color: rgba(107, 127, 59, 0.38);
+      color: var(--green-strong);
+      transform: translateY(-1px);
+    }
+
+    .upload-box {
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(104, 79, 42, 0.14);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    .upload-box input[type="file"] {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      font: inherit;
+      color: var(--muted);
+    }
+
+    .upload-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .hint-list {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .version-note {
+      margin-top: 16px;
+      font-size: 12px;
+    }
+
+    @media (max-width: 920px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        display: grid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">0724V3 大膽背景圖版</div>
+        <h1>網址 QRcode 產生器</h1>
+        <p>輸入網址後立即產生透明背景 QR 圖碼。這版新增最大膽的整面背景圖模式，讓整個碼區都帶浣熊圖效果，同時保留保底版與中心圖案版。</p>
+      </div>
+      <div class="hero-tools">
+        <div class="hero-card">
+          <strong>本版定位</strong>
+          <div class="panel-note">純網址、透明 PNG、單頁本機開啟，新增整面背景圖大膽模式，不含模板框架與海報合成。</div>
+        </div>
+        <div class="hero-card">
+          <strong>後續可擴充</strong>
+          <div class="panel-note">框架模板、SVG 輸出、Wi-Fi / vCard 類型、批次生成、海報互動式模板、角色承載 QR。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout">
+      <section class="panel">
+        <h2>控制區</h2>
+        <p class="panel-note">背景固定透明。這版多了整面背景圖模式，但仍建議保留純 QR 版本作為保底，再視情況用大膽版上稿。</p>
+
+        <div class="field-group">
+          <label class="field-label" for="urlInput">
+            <span>連結網址</span>
+          </label>
+          <p class="field-help">若未輸入 `http://` 或 `https://`，工具會自動補上 `https://`。</p>
+          <input id="urlInput" type="url" inputmode="url" placeholder="https://example.com" value="https://store.line.me/stickershop/author/123456/zh-Hant">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>輸出尺寸</span>
+          </div>
+          <div class="chip-row" id="sizeOptions">
+            <label class="choice-chip">
+              <input type="radio" name="size" value="256">
+              <span>256</span>
+            </label>
+            <label class="choice-chip">
+              <input type="radio" name="size" value="512" checked>
+              <span>512</span>
+            </label>
+            <label class="choice-chip">
+              <input type="radio" name="size" value="1024">
+              <span>1024</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>QR 顏色</span>
+            <span id="colorValue">#3A2A1A</span>
+          </div>
+          <div class="color-row">
+            <input id="fgColorInput" type="color" value="#3a2a1a">
+            <input id="fgColorText" type="text" value="#3A2A1A" maxlength="7" aria-label="QR 顏色十六進位值">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>邊界留白</span>
+            <span id="marginValue">4 格</span>
+          </div>
+          <div class="range-wrap">
+            <input id="marginInput" type="range" min="1" max="8" step="1" value="4">
+            <p class="field-help">保留掃描安靜區。若之後要貼上海報，建議不要低於 4 格。</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>容錯等級</span>
+          </div>
+          <div class="chip-row">
+            <label class="choice-chip">
+              <input type="radio" name="ecLevel" value="M">
+              <span>M</span>
+            </label>
+            <label class="choice-chip">
+              <input type="radio" name="ecLevel" value="Q">
+              <span>Q</span>
+            </label>
+            <label class="choice-chip">
+              <input type="radio" name="ecLevel" value="H" checked>
+              <span>H</span>
+            </label>
+          </div>
+          <p class="field-help">預設 `Q`，兼顧穩定與資料量。若後續要加中心小圖，再考慮 `H`。</p>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>輸出模式</span>
+          </div>
+          <div class="inline-toggle">
+            <label>
+              <input type="radio" name="renderMode" value="plain">
+              <span>純 QR 保底版</span>
+            </label>
+            <label>
+              <input type="radio" name="renderMode" value="center-image">
+              <span>中心小浣熊版</span>
+            </label>
+            <label>
+              <input type="radio" name="renderMode" value="full-image-bold" checked>
+              <span>整面背景圖大膽版</span>
+            </label>
+          </div>
+          <p class="field-help">大膽版會把整個碼區鋪上圖，再重畫定位角與深色模組。視覺最強，但掃碼風險也最高。</p>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>中心圖案大小</span>
+            <span id="logoSizeValue">16%</span>
+          </div>
+          <div class="range-wrap">
+            <input id="logoSizeInput" type="range" min="10" max="22" step="1" value="16">
+            <p class="field-help">建議先落在 12% 到 18%。太大會明顯增加掃碼風險。</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>背景圖濃度</span>
+            <span id="imageStrengthValue">78%</span>
+          </div>
+          <div class="range-wrap">
+            <input id="imageStrengthInput" type="range" min="40" max="95" step="1" value="78">
+            <p class="field-help">只影響整面背景圖大膽版。濃度越高，圖越明顯，但也越容易壓低辨識度。</p>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            <span>中心圖案</span>
+          </div>
+          <div class="upload-box">
+            <input id="logoFileInput" type="file" accept="image/png,image/webp,image/jpeg">
+            <div class="action-row" style="margin-top: 0;">
+              <button id="resetLogoBtn" class="btn-secondary" type="button">還原小浣熊示範圖</button>
+            </div>
+            <p class="upload-note">預設使用你提供的 `01.png`。建議用主體明確、留白乾淨的小圖，避免中心細節太碎。</p>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button id="generateBtn" class="btn-primary" type="button">重新產生 QR</button>
+          <button id="sampleBtn" class="btn-secondary" type="button">帶入範例網址</button>
+        </div>
+
+        <p class="version-note">
+          工程日誌：2026-07-24 建立 0724V3，新增整面背景圖大膽版、背景圖濃度控制與定位角保護重畫。
+        </p>
+      </section>
+
+      <section class="panel preview-shell">
+        <div>
+          <h2>預覽區</h2>
+          <p class="panel-note">棋盤格只用來顯示透明背景，不會輸出到 PNG 檔案裡。</p>
+        </div>
+
+        <div class="preview-stage">
+          <div class="preview-card">
+            <canvas id="qrCanvas" width="512" height="512" aria-label="QR 預覽"></canvas>
+          </div>
+        </div>
+
+        <div class="preview-meta">
+          <div class="meta-card">
+            <strong>輸出尺寸</strong>
+            <div id="metaSize">512 × 512</div>
+          </div>
+          <div class="meta-card">
+            <strong>背景</strong>
+            <div>透明</div>
+          </div>
+          <div class="meta-card">
+            <strong>容錯等級</strong>
+            <div id="metaEcLevel">Q</div>
+          </div>
+          <div class="meta-card">
+            <strong>輸出模式</strong>
+            <div id="metaRenderMode">整面背景圖大膽版</div>
+          </div>
+          <div class="meta-card">
+            <strong>檔名預覽</strong>
+            <div id="metaFilename">qrcode-example-com-512.png</div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <a id="downloadBtn" class="download-link" href="#" download="qrcode-512.png">下載目前預覽 PNG</a>
+        </div>
+
+        <p id="statusText" class="status" aria-live="polite"></p>
+
+        <ul class="hint-list">
+          <li>整面背景圖版是視覺展示型模式，請優先用 `H` 容錯等級並保留純 QR 作為保底稿。</li>
+          <li>若要放到淺色海報上，建議保持深色 QR 與足夠留白。</li>
+          <li>若內容網址很長或圖案偏大，請先做手機掃描實測再正式使用。</li>
+        </ul>
+      </section>
+    </section>
+  </main>
+
+  <script src="./vendor/qrcode.js"></script>
+  <script>
+    const urlInput = document.getElementById('urlInput');
+    const fgColorInput = document.getElementById('fgColorInput');
+    const fgColorText = document.getElementById('fgColorText');
+    const colorValue = document.getElementById('colorValue');
+    const marginInput = document.getElementById('marginInput');
+    const marginValue = document.getElementById('marginValue');
+    const logoSizeInput = document.getElementById('logoSizeInput');
+    const logoSizeValue = document.getElementById('logoSizeValue');
+    const imageStrengthInput = document.getElementById('imageStrengthInput');
+    const imageStrengthValue = document.getElementById('imageStrengthValue');
+    const logoFileInput = document.getElementById('logoFileInput');
+    const resetLogoBtn = document.getElementById('resetLogoBtn');
+    const generateBtn = document.getElementById('generateBtn');
+    const sampleBtn = document.getElementById('sampleBtn');
+    const qrCanvas = document.getElementById('qrCanvas');
+    const statusText = document.getElementById('statusText');
+    const metaSize = document.getElementById('metaSize');
+    const metaEcLevel = document.getElementById('metaEcLevel');
+    const metaRenderMode = document.getElementById('metaRenderMode');
+    const metaFilename = document.getElementById('metaFilename');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const context = qrCanvas.getContext('2d');
+
+    const state = {
+      sampleUrl: 'https://store.line.me/stickershop/product/12345678/zh-Hant',
+      defaultLogoPath: './assets/01.png',
+      logoReady: false,
+      logoFailed: false,
+    };
+
+    const centerLogo = new Image();
+    centerLogo.decoding = 'async';
+
+    function getSelectedValue(name) {
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      return checked ? checked.value : '';
+    }
+
+    function normalizeUrl(value) {
+      const trimmed = value.trim();
+      if (!trimmed) return '';
+      if (/^https?:\/\//i.test(trimmed)) return trimmed;
+      return 'https://' + trimmed;
+    }
+
+    function sanitizeHex(value) {
+      const normalized = value.trim().toUpperCase();
+      return /^#[0-9A-F]{6}$/.test(normalized) ? normalized : null;
+    }
+
+    function getRenderMode() {
+      const checked = document.querySelector('input[name="renderMode"]:checked');
+      return checked ? checked.value : 'plain';
+    }
+
+    function slugifyUrl(value) {
+      try {
+        const parsed = new URL(value);
+        const host = parsed.hostname.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'link';
+        return host.slice(0, 40);
+      } catch (error) {
+        return 'link';
+      }
+    }
+
+    function drawQrToCanvas(qr, size, color, margin) {
+      const moduleCount = qr.getModuleCount();
+      const totalUnits = moduleCount + margin * 2;
+      const cellSize = size / totalUnits;
+
+      qrCanvas.width = size;
+      qrCanvas.height = size;
+
+      context.clearRect(0, 0, size, size);
+      context.fillStyle = color;
+
+      for (let row = 0; row < moduleCount; row += 1) {
+        for (let col = 0; col < moduleCount; col += 1) {
+          if (!qr.isDark(row, col)) continue;
+          const x = (col + margin) * cellSize;
+          const y = (row + margin) * cellSize;
+          const w = Math.ceil((col + margin + 1) * cellSize) - Math.floor(x);
+          const h = Math.ceil((row + margin + 1) * cellSize) - Math.floor(y);
+          context.fillRect(Math.floor(x), Math.floor(y), w, h);
+        }
+      }
+    }
+
+    function drawRoundedRect(x, y, width, height, radius) {
+      const r = Math.min(radius, width / 2, height / 2);
+      context.beginPath();
+      context.moveTo(x + r, y);
+      context.arcTo(x + width, y, x + width, y + height, r);
+      context.arcTo(x + width, y + height, x, y + height, r);
+      context.arcTo(x, y + height, x, y, r);
+      context.arcTo(x, y, x + width, y, r);
+      context.closePath();
+    }
+
+    function drawCenterLogo(size) {
+      if (!state.logoReady) return false;
+
+      const logoPercent = Number(logoSizeInput.value) / 100;
+      const logoSize = Math.round(size * logoPercent);
+      const backdropSize = Math.round(logoSize * 1.34);
+      const x = Math.round((size - backdropSize) / 2);
+      const y = Math.round((size - backdropSize) / 2);
+      const imageX = Math.round((size - logoSize) / 2);
+      const imageY = Math.round((size - logoSize) / 2);
+
+      context.save();
+      context.fillStyle = 'rgba(255,255,255,0.96)';
+      drawRoundedRect(x, y, backdropSize, backdropSize, Math.round(backdropSize * 0.26));
+      context.fill();
+      context.restore();
+
+      context.save();
+      drawRoundedRect(imageX, imageY, logoSize, logoSize, Math.round(logoSize * 0.22));
+      context.clip();
+      context.drawImage(centerLogo, imageX, imageY, logoSize, logoSize);
+      context.restore();
+      return true;
+    }
+
+    function getQrGeometry(qr, size, margin) {
+      const moduleCount = qr.getModuleCount();
+      const totalUnits = moduleCount + margin * 2;
+      const cellSize = size / totalUnits;
+      const activeStart = margin * cellSize;
+      const activeSize = moduleCount * cellSize;
+      return { moduleCount, totalUnits, cellSize, activeStart, activeSize };
+    }
+
+    function drawFinderProtection(x, y, blockSize) {
+      context.save();
+      context.fillStyle = 'rgba(255,255,255,0.96)';
+      drawRoundedRect(x, y, blockSize, blockSize, Math.round(blockSize * 0.14));
+      context.fill();
+      context.restore();
+    }
+
+    function drawFullImageBold(qr, size, color, margin) {
+      if (!state.logoReady) return false;
+
+      const { moduleCount, cellSize, activeStart, activeSize } = getQrGeometry(qr, size, margin);
+      const imageStrength = Number(imageStrengthInput.value) / 100;
+      const finderSize = cellSize * 8.6;
+
+      context.save();
+      context.beginPath();
+      drawRoundedRect(activeStart, activeStart, activeSize, activeSize, Math.round(activeSize * 0.06));
+      context.clip();
+      context.filter = 'saturate(1.08) contrast(1.02)';
+      context.globalAlpha = imageStrength;
+      context.drawImage(centerLogo, activeStart, activeStart, activeSize, activeSize);
+      context.filter = 'none';
+      context.globalAlpha = 0.18;
+      context.fillStyle = '#fffaf1';
+      context.fillRect(activeStart, activeStart, activeSize, activeSize);
+      context.restore();
+
+      drawFinderProtection(activeStart - cellSize * 0.3, activeStart - cellSize * 0.3, finderSize);
+      drawFinderProtection(activeStart + activeSize - finderSize + cellSize * 0.3, activeStart - cellSize * 0.3, finderSize);
+      drawFinderProtection(activeStart - cellSize * 0.3, activeStart + activeSize - finderSize + cellSize * 0.3, finderSize);
+
+      context.save();
+      context.fillStyle = color;
+      context.globalAlpha = 0.86;
+      for (let row = 0; row < moduleCount; row += 1) {
+        for (let col = 0; col < moduleCount; col += 1) {
+          if (!qr.isDark(row, col)) continue;
+          const x = (col + margin) * cellSize;
+          const y = (row + margin) * cellSize;
+          const w = Math.ceil((col + margin + 1) * cellSize) - Math.floor(x);
+          const h = Math.ceil((row + margin + 1) * cellSize) - Math.floor(y);
+          context.fillRect(Math.floor(x), Math.floor(y), w, h);
+        }
+      }
+      context.globalAlpha = 1;
+      context.restore();
+
+      return true;
+    }
+
+    function updateDownload(filename) {
+      const dataUrl = qrCanvas.toDataURL('image/png');
+      downloadBtn.href = dataUrl;
+      downloadBtn.download = filename;
+      metaFilename.textContent = filename;
+    }
+
+    function updateStatus(message, isError) {
+      statusText.textContent = message;
+      statusText.classList.toggle('error', Boolean(isError));
+    }
+
+    function generateQr() {
+      const normalizedUrl = normalizeUrl(urlInput.value);
+      const size = Number(getSelectedValue('size') || 512);
+      const ecLevel = getSelectedValue('ecLevel') || 'Q';
+      const margin = Number(marginInput.value || 4);
+      const color = sanitizeHex(fgColorText.value) || '#3A2A1A';
+      const renderMode = getRenderMode();
+
+      if (!normalizedUrl) {
+        context.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+        updateStatus('請先輸入網址。', true);
+        return;
+      }
+
+      try {
+        new URL(normalizedUrl);
+      } catch (error) {
+        updateStatus('網址格式無效，請檢查後再產生。', true);
+        return;
+      }
+
+      try {
+        const qr = qrcode(0, ecLevel);
+        qr.addData(normalizedUrl, 'Byte');
+        qr.make();
+
+        drawQrToCanvas(qr, size, color, margin);
+        let usedImageMode = false;
+        if (renderMode === 'center-image') {
+          usedImageMode = drawCenterLogo(size);
+        } else if (renderMode === 'full-image-bold') {
+          usedImageMode = drawFullImageBold(qr, size, color, margin);
+        }
+
+        metaSize.textContent = `${size} × ${size}`;
+        metaEcLevel.textContent = ecLevel;
+        metaRenderMode.textContent =
+          renderMode === 'center-image'
+            ? '中心小浣熊版'
+            : renderMode === 'full-image-bold'
+              ? '整面背景圖大膽版'
+              : '純 QR 保底版';
+        const filenameSuffix =
+          renderMode === 'center-image'
+            ? 'center'
+            : renderMode === 'full-image-bold'
+              ? 'fullimage-bold'
+              : 'plain';
+        const filename = `qrcode-${slugifyUrl(normalizedUrl)}-${filenameSuffix}-${size}.png`;
+        updateDownload(filename);
+        urlInput.value = normalizedUrl;
+        fgColorInput.value = color;
+        fgColorText.value = color;
+        colorValue.textContent = color;
+        marginValue.textContent = `${margin} 格`;
+        logoSizeValue.textContent = `${logoSizeInput.value}%`;
+        imageStrengthValue.textContent = `${imageStrengthInput.value}%`;
+        if (renderMode !== 'plain' && !usedImageMode) {
+          if (state.logoFailed) {
+            updateStatus('圖案素材載入失敗，已先輸出純 QR。', true);
+          } else {
+            updateStatus('圖案素材尚未載入完成，已先輸出純 QR。', true);
+          }
+        } else if (renderMode === 'full-image-bold') {
+          updateStatus('已輸出整面背景圖大膽版。這版以視覺展示優先，請務必再做手機掃碼實測。', false);
+        } else {
+          updateStatus('QR 產生完成，可直接下載透明 PNG。', false);
+        }
+      } catch (error) {
+        updateStatus('產生失敗，可能是網址過長或設定組合不適合。', true);
+      }
+    }
+
+    function loadLogoFromUrl(src) {
+      state.logoReady = false;
+      state.logoFailed = false;
+      centerLogo.src = src;
+    }
+
+    fgColorInput.addEventListener('input', () => {
+      const color = fgColorInput.value.toUpperCase();
+      fgColorText.value = color;
+      colorValue.textContent = color;
+      generateQr();
+    });
+
+    fgColorText.addEventListener('change', () => {
+      const color = sanitizeHex(fgColorText.value);
+      if (!color) {
+        fgColorText.value = fgColorInput.value.toUpperCase();
+        updateStatus('顏色格式需為 #RRGGBB。', true);
+        return;
+      }
+      fgColorInput.value = color;
+      colorValue.textContent = color;
+      generateQr();
+    });
+
+    marginInput.addEventListener('input', () => {
+      marginValue.textContent = `${marginInput.value} 格`;
+      generateQr();
+    });
+
+    logoSizeInput.addEventListener('input', () => {
+      logoSizeValue.textContent = `${logoSizeInput.value}%`;
+      generateQr();
+    });
+
+    imageStrengthInput.addEventListener('input', () => {
+      imageStrengthValue.textContent = `${imageStrengthInput.value}%`;
+      generateQr();
+    });
+
+    document.getElementById('sizeOptions').addEventListener('change', generateQr);
+    document.querySelectorAll('input[name="ecLevel"]').forEach((input) => {
+      input.addEventListener('change', generateQr);
+    });
+    document.querySelectorAll('input[name="renderMode"]').forEach((input) => {
+      input.addEventListener('change', generateQr);
+    });
+
+    urlInput.addEventListener('change', generateQr);
+    urlInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        generateQr();
+      }
+    });
+
+    generateBtn.addEventListener('click', generateQr);
+    sampleBtn.addEventListener('click', () => {
+      urlInput.value = state.sampleUrl;
+      generateQr();
+    });
+
+    logoFileInput.addEventListener('change', (event) => {
+      const [file] = event.target.files || [];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        updateStatus('請選擇 PNG、WebP 或 JPEG 圖檔。', true);
+        return;
+      }
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        loadLogoFromUrl(reader.result);
+      });
+      reader.readAsDataURL(file);
+    });
+
+    resetLogoBtn.addEventListener('click', () => {
+      logoFileInput.value = '';
+      loadLogoFromUrl(state.defaultLogoPath);
+    });
+
+    centerLogo.addEventListener('load', () => {
+      state.logoReady = true;
+      state.logoFailed = false;
+      generateQr();
+    });
+
+    centerLogo.addEventListener('error', () => {
+      state.logoReady = false;
+      state.logoFailed = true;
+      generateQr();
+    });
+
+    loadLogoFromUrl(state.defaultLogoPath);
+    generateQr();
+  </script>
+</body>
+</html>

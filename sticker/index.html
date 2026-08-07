@@ -1,0 +1,3686 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINE 免費工具｜煩躁胖子</title>
+<meta name="description" content="免費公開版工具，支援去 Gemini 浮水印、圖片去背、切成 LINE 貼圖尺寸，並打包成 ZIP。">
+<meta property="og:title" content="LINE 免費工具｜煩躁胖子">
+<meta property="og:description" content="免費公開版工具，支援去 Gemini 浮水印、圖片去背、切成 LINE 貼圖尺寸，並打包成 ZIP。">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LINE 免費工具｜煩躁胖子">
+<meta name="twitter:description" content="免費公開版工具，支援去 Gemini 浮水印、圖片去背、切成 LINE 貼圖尺寸，並打包成 ZIP。">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --bg: #0a0e1a;
+  --bg2: #111827;
+  --bg3: #1a2235;
+  --border: rgba(255,255,255,0.08);
+  --text1: #f0f4ff;
+  --text2: #8899bb;
+  --accent: #ff6b35;
+  --accent2: #ffd166;
+  --accent3: #06d6a0;
+  --card: #151e2e;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text1);
+  font-family: 'Noto Sans TC', sans-serif;
+  min-height: 100vh;
+}
+
+header {
+  background: linear-gradient(135deg, #1a1f35, #2d1b4e 50%, #1a2a35);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.logo { font-size: 18px; font-weight: 900; color: var(--text1); }
+.logo span { color: var(--accent); }
+.version { font-size: 10px; color: var(--text2); font-family: 'Share Tech Mono', monospace; position: absolute; right: 16px; top: 10px; }
+
+.steps-nav {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+@media (max-width: 700px) {
+  .steps-nav {
+    justify-content: flex-start;
+  }
+}
+
+.step-tab {
+  padding: 14px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text2);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.step-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.step-tab.done { color: var(--accent3); }
+.step-tab:hover:not(.active) { color: var(--text1); }
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--bg3);
+  font-size: 11px;
+  margin-right: 6px;
+  color: var(--text2);
+}
+
+.step-tab.active .step-num { background: var(--accent); color: #fff; }
+.step-tab.done .step-num { background: var(--accent3); color: #fff; }
+
+main { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text1);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Upload */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  background: var(--bg3);
+}
+
+.upload-zone:hover { border-color: var(--accent); background: rgba(255,107,53,0.05); }
+.upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.upload-zone .icon { font-size: 40px; margin-bottom: 12px; }
+.upload-zone p { color: var(--text2); font-size: 13px; }
+.upload-zone .btn-upload {
+  margin-top: 16px;
+  display: inline-block;
+  padding: 10px 28px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.preview-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  margin-bottom: 16px;
+}
+
+.preview-img { display: block; max-width: 100%; max-height: 400px; margin: 0 auto; }
+
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255,107,53,0.4) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,107,53,0.4) 1px, transparent 1px);
+  background-size: 20% 25%;
+  border: 2px solid rgba(255,107,53,0.6);
+}
+
+.slider-group { margin-bottom: 12px; }
+.slider-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+
+.preset-btns { display: flex; gap: 8px; margin-bottom: 16px; }
+.preset-btn.active-size { border-color: var(--accent2); color: var(--accent2); background: rgba(255,209,102,0.12); }
+.preset-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+
+.preset-btn.active-green { border-color: var(--accent3); color: var(--accent3); background: rgba(6,214,160,0.08); }
+.preset-btn.active-black { border-color: #aaa; color: #ddd; background: rgba(255,255,255,0.05); }
+.preset-btn.active-white { border-color: var(--accent2); color: var(--accent2); background: rgba(255,209,102,0.12); }
+
+.mode-btns { display: flex; gap: 8px; margin-bottom: 16px; }
+.mode-btn {
+  flex: 1;
+  padding: 12px 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+
+.mode-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(255,107,53,0.08); }
+
+.adv-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+  user-select: none;
+}
+
+.adv-toggle:hover { color: var(--text1); }
+
+.adv-content { display: none; padding-top: 12px; }
+.adv-content.open { display: block; }
+
+.color-pick-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.color-pick-row label { font-size: 11px; color: var(--text2); flex: 1; }
+input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; padding: 2px; background: var(--bg2); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* Grid results */
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.sticker-cell {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 6px;
+  position: relative;
+}
+
+.sticker-cell .checker {
+  background-image:
+    linear-gradient(45deg, #334155 25%, transparent 25%),
+    linear-gradient(-45deg, #334155 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #334155 75%),
+    linear-gradient(-45deg, transparent 75%, #334155 75%);
+  background-size: 12px 12px;
+  background-color: #1e293b;
+  border-radius: 6px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.sticker-cell img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.sticker-cell .num { font-size: 9px; color: var(--text2); text-align: center; font-family: 'Share Tech Mono', monospace; }
+.sticker-cell .cell-btns { display: flex; gap: 3px; margin-top: 4px; }
+.sticker-cell .cell-btn {
+  flex: 1;
+  padding: 3px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text2);
+  font-size: 9px;
+  cursor: pointer;
+  text-align: center;
+  font-family: 'Noto Sans TC', sans-serif;
+  transition: all 0.15s;
+}
+
+.sticker-cell .cell-btn.sel-main { background: #f97316; color: #fff; border-color: #f97316; }
+.sticker-cell .cell-btn.sel-tab { background: var(--accent3); color: #fff; border-color: var(--accent3); }
+
+/* Buttons */
+.btn-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  font-family: 'Noto Sans TC', sans-serif;
+}
+
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover { background: #e85a28; transform: translateY(-1px); }
+.btn-green { background: var(--accent3); color: #fff; }
+.btn-green:hover { background: #05b87a; transform: translateY(-1px); }
+.btn-outline { background: transparent; color: var(--text2); border: 1.5px solid var(--border); }
+.btn-outline:hover { border-color: var(--text1); color: var(--text1); }
+.btn-main:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.action-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+
+.progress-bar {
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent3);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.status-text { font-size: 12px; color: var(--text2); text-align: center; margin-bottom: 8px; font-family: 'Share Tech Mono', monospace; }
+
+.info-box {
+  background: rgba(255,209,102,0.08);
+  border: 1px solid rgba(255,209,102,0.25);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 12px;
+  color: #ffd166;
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.start-num-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.start-num-row label { font-size: 12px; color: var(--text2); }
+.start-num-row input[type=number] {
+  width: 70px;
+  padding: 6px 10px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text1);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+
+
+/* ===== Star Removal Integration v9.2 ===== */
+.star-layout {
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
+.star-side {
+  width:290px;
+  flex-shrink:0;
+}
+.star-main {
+  flex:1;
+  min-width:300px;
+}
+.star-note {
+  font-size:12px;
+  color:var(--text2);
+  line-height:1.7;
+}
+.star-mini-note {
+  font-size:11px;
+  color:var(--text2);
+  line-height:1.6;
+}
+.star-value {
+  font-family:'Share Tech Mono', monospace;
+  color:var(--accent2);
+  font-size:12px;
+}
+.star-stage-grid {
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:16px;
+}
+.star-stage {
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+}
+.star-stage-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+  font-size:13px;
+  font-weight:700;
+  color:var(--accent2);
+}
+.star-canvas-wrap {
+  position:relative;
+  width:100%;
+  min-height:330px;
+  border-radius:12px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.05) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.05) 75%),
+    var(--bg3);
+  background-size:16px 16px;
+  background-position:0 0, 0 8px, 8px -8px, -8px 0;
+  border:1px solid var(--border);
+}
+.star-preview-canvas {
+  display:block;
+  max-width:100%;
+  max-height:520px;
+}
+.star-mask-box {
+  position:absolute;
+  border:2px solid var(--accent);
+  background:rgba(255,107,53,0.14);
+  cursor:move;
+  display:none;
+  z-index:3;
+}
+.star-mask-box::after {
+  content:'拖拉星星區';
+  position:absolute;
+  left:0;
+  top:-24px;
+  background:rgba(0,0,0,0.65);
+  color:#fff;
+  font-size:11px;
+  padding:3px 6px;
+  border-radius:6px;
+  white-space:nowrap;
+}
+.star-file-list {
+  max-height:280px;
+  overflow:auto;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--bg3);
+}
+.star-file-item {
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 10px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  font-size:12px;
+  color:var(--text2);
+  cursor:pointer;
+}
+.star-file-item:last-child { border-bottom:none; }
+.star-file-item.active {
+  background:rgba(255,107,53,0.08);
+  color:var(--text1);
+}
+.star-file-name {
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.star-tag {
+  display:inline-flex;
+  align-items:center;
+  padding:2px 6px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:700;
+  background:rgba(255,209,102,0.12);
+  color:var(--accent2);
+  margin-right:6px;
+}
+.star-ok { color: var(--accent3); }
+.star-error { color: #ff6b6b; }
+.star-inline-actions {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.star-divider {
+  height:1px;
+  background:var(--border);
+  margin:16px 0;
+}
+@media (max-width: 900px) {
+  .star-side { width:100%; }
+  .star-stage-grid { grid-template-columns:1fr; }
+}
+
+
+
+/* ===== Magic Wand Color Picker v9.3 ===== */
+.wand-row {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin:8px 0 12px;
+}
+.wand-btn {
+  width:100%;
+  padding:10px 12px;
+  border-radius:8px;
+  border:1.5px solid var(--border);
+  background:var(--bg3);
+  color:var(--accent2);
+  font-size:12px;
+  font-weight:900;
+  cursor:pointer;
+  font-family:'Noto Sans TC', sans-serif;
+}
+.wand-btn.active {
+  border-color:var(--accent2);
+  background:rgba(255,209,102,0.12);
+  box-shadow:0 0 0 2px rgba(255,209,102,0.08) inset;
+}
+.wand-status {
+  font-size:11px;
+  color:var(--text2);
+  line-height:1.5;
+}
+#grid-canvas.wand-picking {
+  outline:2px solid var(--accent2);
+  box-shadow:0 0 0 4px rgba(255,209,102,0.14);
+}
+
+@media (max-width: 600px) {
+  .sticker-grid { grid-template-columns: repeat(4, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+}
+
+/* ===== 05031205V10 Dual Background Preview ===== */
+.dual-preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.dual-preview-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:10px;}
+.dual-preview-title{font-size:12px;font-weight:900;color:var(--accent2);text-align:center;margin-bottom:8px;}
+.dual-canvas-stage{position:relative;aspect-ratio:1.54;min-height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:10px;border:1px solid var(--border);background-image:linear-gradient(45deg,#334155 25%,transparent 25%),linear-gradient(-45deg,#334155 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#334155 75%),linear-gradient(-45deg,transparent 75%,#334155 75%);background-size:12px 12px;background-color:#1e293b;}
+.dual-canvas-stage canvas{max-width:100%;max-height:100%;display:block;}
+.wand-layer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;max-width:100%;max-height:100%;display:block;}
+.wand-pick-active{outline:2px solid var(--accent2);box-shadow:0 0 0 4px rgba(255,209,102,.16);cursor:crosshair;}
+.bg-mode-btn.active-none{border-color:#aaa;color:#eee;background:rgba(255,255,255,.08)}
+.bg-mode-btn.active-traditional{border-color:var(--accent3);color:var(--accent3);background:rgba(6,214,160,.08)}
+.bg-mode-btn.active-wand{border-color:var(--accent2);color:var(--accent2);background:rgba(255,209,102,.12)}
+.bg-param-panel{display:none}.bg-param-panel.active{display:block}
+@media(max-width:760px){.dual-preview-grid{grid-template-columns:1fr;}}
+
+
+
+
+/* ===== 0605V21 Split Featured + Drag Grid Lines UI cleanup ===== */
+.featured-section {
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:rgba(255,255,255,.025);
+  padding:10px 12px 12px;
+}
+.featured-section + .featured-section { margin-top:10px; }
+.featured-section-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:6px;
+}
+.featured-section-title { font-size:13px; font-weight:900; color:var(--accent2); }
+.featured-section-sub { display:none; }
+.featured-img.theme-img { object-fit:contain; background:#0f172a; }
+.grid-canvas-wrap{position:relative;display:inline-block;width:100%;line-height:0;}
+.grid-canvas-wrap.drag-ready::after{
+  content:'可拖拉橘色切線微調分割位置';
+  position:absolute; left:10px; top:10px; z-index:2;
+  padding:5px 8px; border-radius:999px;
+  background:rgba(0,0,0,.55); color:#fff;
+  font-size:11px; line-height:1; pointer-events:none;
+}
+.grid-drag-status{
+  font-size:11px; color:var(--accent2); text-align:center; margin-top:6px;
+  font-family:'Share Tech Mono', monospace; line-height:1.6;
+}
+.grid-mini-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+.grid-mini-btn{
+  padding:6px 10px; border-radius:8px; border:1px solid var(--border);
+  background:var(--bg3); color:var(--text2); font-size:11px; font-weight:900;
+  cursor:pointer; font-family:'Noto Sans TC', sans-serif;
+}
+.grid-mini-btn:hover{border-color:var(--accent); color:var(--accent2);}
+
+/* ===== Product Landing / Promotion Add-on v9.1 ===== */
+.product-hero {
+  max-width:1100px;
+  margin:22px auto 0;
+  padding:22px 20px 16px;
+  background:linear-gradient(135deg, rgba(255,107,53,.16), rgba(6,214,160,.08));
+  border:1px solid var(--border);
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.product-hero-top {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.product-hero h1 { font-size:18px; line-height:1.35; margin:0 0 8px; }
+.product-hero p { color:var(--text2); font-size:12px; line-height:1.8; margin:0; }
+.product-hero-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+/* ===== Featured Carousel ===== */
+.featured-carousel {
+  position:relative; border-radius:14px; overflow:hidden;
+  background:var(--bg2); border:1px solid var(--border);
+  width:100%;
+}
+.featured-slide {
+  display:none; flex-direction:column; padding:16px;
+  text-decoration:none; color:var(--text1);
+}
+.featured-slide.active { display:flex; flex-direction:column; }
+.featured-page-inner { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:16px 16px 8px; }
+.featured-card {
+  display:flex; gap:16px; align-items:center; padding:14px;
+  border-radius:12px; background:var(--bg3); border:1px solid var(--border);
+  text-decoration:none; color:var(--text1); transition:border-color 0.15s;
+}
+.featured-card:hover { border-color:var(--accent); }
+.featured-img {
+  width:140px; height:140px; object-fit:cover; border-radius:12px;
+  border:1px solid var(--border); flex-shrink:0; background:var(--bg3);
+}
+.featured-img-placeholder {
+  width:140px; height:140px; border-radius:12px; border:1px solid var(--border);
+  flex-shrink:0; background:var(--bg3);
+  display:flex; align-items:center; justify-content:center; font-size:48px;
+}
+.featured-info { flex:1; min-width:0; }
+.featured-label {
+  display:inline-block; font-size:10px; font-weight:900;
+  padding:2px 8px; border-radius:999px; background:var(--accent);
+  color:#fff; margin-bottom:6px;
+}
+.featured-labels { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:6px; }
+.featured-labels .featured-label { margin-bottom:0; background:rgba(255,107,53,.9); }
+.featured-title {
+  font-size:14px; font-weight:900; line-height:1.4; margin-bottom:4px;
+  overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+}
+.featured-desc {
+  font-size:11px; color:var(--text2); line-height:1.6;
+  overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+}
+.featured-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-top:10px; gap:8px;
+}
+.featured-btn {
+  display:inline-flex; align-items:center; gap:5px; padding:6px 14px;
+  border-radius:8px; font-size:12px; font-weight:900;
+  background:var(--accent); color:#fff; text-decoration:none;
+  border:none; cursor:pointer; transition:background 0.15s;
+}
+.featured-btn:hover { background:#e85a28; }
+.featured-dots { display:flex; gap:5px; }
+.featured-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:rgba(255,255,255,0.2); cursor:pointer;
+  transition:background 0.2s; border:none; padding:0;
+}
+.featured-dot.active { background:var(--accent); }
+.featured-arrows {
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:100%; left:0; display:flex; justify-content:space-between;
+  pointer-events:none; padding:0 6px;
+}
+.featured-arrow {
+  pointer-events:all; background:rgba(0,0,0,0.4);
+  border:1px solid rgba(255,255,255,0.1); color:#fff;
+  border-radius:50%; width:26px; height:26px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:12px; transition:background 0.15s;
+}
+.featured-arrow:hover { background:rgba(255,107,53,0.6); }
+@media (max-width:820px) {
+  .product-hero { grid-template-columns:1fr; }
+}
+.product-link-btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:10px 14px; border-radius:10px; font-size:13px; font-weight:900;
+  text-decoration:none; border:1px solid var(--border); color:var(--text1); background:var(--bg3);
+}
+.product-link-btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+.product-link-btn:hover { transform:translateY(-1px); }
+.promo-products { margin-top:20px; }
+.promo-head { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.promo-head h3 { margin:0; font-size:17px; color:var(--accent2); }
+.promo-head p { margin:4px 0 0; color:var(--text2); font-size:12px; }
+.product-grid {
+  display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:10px;
+}
+.product-card {
+  display:block; min-height:132px; padding:14px 12px; border-radius:14px;
+  background:var(--bg3); border:1px solid var(--border); text-decoration:none; color:var(--text1);
+  transition:all .18s; position:relative; overflow:hidden;
+}
+.product-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+.product-card .emoji { font-size:30px; display:block; margin-bottom:8px; }
+.product-card .name { font-size:13px; font-weight:900; line-height:1.35; margin-bottom:6px; }
+.product-card .desc { font-size:11px; color:var(--text2); line-height:1.45; }
+.product-card .mini { position:absolute; right:10px; bottom:9px; font-size:10px; color:var(--accent2); }
+.devlog-trigger {
+  position:fixed; right:14px; bottom:14px; z-index:9998;
+  border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.45); color:rgba(255,255,255,.35);
+  border-radius:10px; padding:8px 10px; font-size:11px; cursor:pointer;
+}
+.devlog-panel {
+  display:none; position:fixed; inset:0; z-index:9999; background:#020204; color:#9cff9c;
+  padding:24px; overflow:auto; font-family:Consolas, monospace;
+}
+.devlog-panel h2 { color:#fff; margin-top:0; }
+.devlog-panel button { padding:8px 12px; border-radius:8px; border:1px solid #333; background:#111; color:#fff; cursor:pointer; }
+@media (max-width: 820px){ .product-grid{grid-template-columns:repeat(2,1fr)} .product-hero{margin:14px 12px 0} }
+
+
+/* ===== 0507V12 Public Landing Label Patch ===== */
+.product-db-toggle {
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  padding:10px 14px; border-radius:10px; font-size:13px; font-weight:900;
+  border:1px solid var(--border); color:var(--text1); background:var(--bg3);
+  cursor:pointer; font-family:'Noto Sans TC', sans-serif;
+}
+.product-db-toggle:hover { border-color:var(--accent); transform:translateY(-1px); }
+.product-db-body { display:none; }
+.product-db-body.open { display:block; }
+.product-db-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+/* ===== Built-in Product Database v9.4 ===== */
+.db-toolbar {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+  margin-bottom:12px;
+}
+.db-search {
+  flex:1;
+  min-width:220px;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--bg3);
+  color:var(--text1);
+  font-size:13px;
+  font-family:'Noto Sans TC', sans-serif;
+}
+.db-filter-row {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:10px 0 14px;
+}
+.db-filter {
+  padding:7px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--bg3);
+  color:var(--text2);
+  font-size:11px;
+  font-weight:900;
+  cursor:pointer;
+  font-family:'Noto Sans TC', sans-serif;
+}
+.db-filter.active {
+  border-color:var(--accent);
+  background:rgba(255,107,53,0.12);
+  color:var(--accent);
+}
+.db-summary {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:12px;
+}
+.db-stat {
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:10px;
+}
+.db-stat strong { display:block; font-size:18px; color:var(--accent2); font-family:'Share Tech Mono', monospace; }
+.db-stat span { display:block; font-size:11px; color:var(--text2); margin-top:4px; }
+.db-products {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  max-height:520px;
+  overflow:auto;
+  padding-right:4px;
+}
+.db-card {
+  display:block;
+  min-height:112px;
+  padding:12px 11px;
+  border-radius:14px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  text-decoration:none;
+  color:var(--text1);
+  transition:all .16s;
+  position:relative;
+}
+.db-card:hover {
+  transform:translateY(-2px);
+  border-color:var(--accent);
+}
+.db-name {
+  font-size:12px;
+  line-height:1.45;
+  font-weight:900;
+  margin-bottom:8px;
+}
+.db-meta {
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+}
+.db-pill {
+  font-size:10px;
+  color:var(--text2);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:999px;
+  padding:2px 6px;
+}
+.db-pill.emoji { color:var(--accent2); border-color:rgba(255,209,102,.25); }
+.db-pill.sticker { color:var(--accent3); border-color:rgba(6,214,160,.25); }
+.db-id {
+  position:absolute;
+  right:10px;
+  bottom:8px;
+  font-size:9px;
+  color:rgba(255,255,255,.25);
+  font-family:'Share Tech Mono', monospace;
+}
+@media (max-width: 900px) {
+  .db-summary { grid-template-columns:repeat(2,1fr); }
+  .db-products { grid-template-columns:repeat(2,1fr); }
+}
+
+
+/* ===== 0711V22｜分頁輪播＋成品排版 ===== */
+.page-featured { margin-bottom:16px; }
+.page-featured .featured-section { margin-top:0; }
+.output-layout-options { display:grid; gap:10px; }
+.output-layout-row { display:grid; grid-template-columns:58px 1fr; gap:8px; align-items:center; }
+.output-layout-label { font-size:11px; font-weight:900; color:var(--text2); }
+.output-layout-btns { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+.output-layout-btns.two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.output-layout-btn {
+  border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text2);
+  border-radius:8px; padding:9px 6px; cursor:pointer; font-size:11px; font-weight:800; text-align:center;
+}
+.output-layout-btn:hover { border-color:rgba(255,107,53,.7); color:var(--text); }
+.output-layout-btn.active { border-color:var(--accent); background:rgba(255,107,53,.18); color:#fff; }
+.output-layout-btn:disabled, .output-layout-btn.disabled { opacity:.35; cursor:not-allowed; border-color:rgba(255,255,255,.08); }
+.output-layout-note { font-size:10px; line-height:1.65; color:var(--text2); margin-top:8px; }
+@media (max-width:700px) {
+  .featured-page-inner { grid-template-columns:1fr; }
+  .product-hero-actions { width:100%; }
+  .product-link-btn { flex:1 1 calc(50% - 8px); text-align:center; }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">煩躁胖子<span>・免費公開版工具</span></div>
+  <div class="version" id="ver-tag">更新日期 2026/07/11</div>
+</header>
+
+<section class="product-hero">
+  <div class="product-hero-top">
+    <div>
+      <h1>一鍵去 Gemini 浮水印、去背、切格、打包，可每頁獨立上傳、獨立打包</h1>
+      <p style="color:var(--text2);font-size:12px;margin:6px 0 0;line-height:1.8;">
+        免費公開版工具，可完整流程使用，也可單獨使用某一功能：<br>
+        支援 LINE 貼圖 / 表情貼 / 動態貼圖尺寸整理，可自由調整欄列、手拉切割線、裁邊、母圖位置與成品排版，並輸出 PNG ZIP、Main、Tab。<br>
+        切割預覽與 ZIP 輸出會依照目前切線及成品排版設定處理；工具免費使用，也歡迎查看我的 LINE 作品。
+      </p>
+    </div>
+    <div class="product-hero-actions" style="margin-top:0;">
+      <a class="product-link-btn primary" href="#page1">開始使用工具</a>
+      <a class="product-link-btn" href="https://store.line.me/search/sticker/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看 LINE 貼圖</a>
+      <a class="product-link-btn" href="https://store.line.me/search/emoji/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看 LINE 表情貼</a>
+      <a class="product-link-btn" href="https://store.line.me/search/theme/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看 LINE 主題</a>
+    </div>
+  </div>
+</section>
+
+
+<div class="steps-nav">
+  <div class="step-tab active" id="tab1" onclick="goStep(1)"><span class="step-num">1</span>上傳</div>
+  <div class="step-tab" id="tab2" onclick="goStep(2)"><span class="step-num">2</span>去 Gemini 浮水印</div>
+  <div class="step-tab" id="tab3" onclick="goStep(3)"><span class="step-num">3</span>去背</div>
+  <div class="step-tab" id="tab4" onclick="goStep(4)"><span class="step-num">4</span>分割＋打包</div>
+</div>
+
+<main>
+
+<!-- STEP 1: 上傳 -->
+<div class="page active" id="page1">
+  <div class="page-featured">
+    <div class="featured-section">
+      <div class="featured-section-head"><div><div class="featured-section-title">LINE 貼圖精選</div></div></div>
+      <div class="featured-carousel" id="featured-carousel-sticker" onmouseenter="featuredPause('sticker')" onmouseleave="featuredResume('sticker')">
+        <div id="featured-slides-sticker"></div>
+        <div class="featured-arrows">
+          <button class="featured-arrow" type="button" aria-label="上一組" onclick="featuredPrev('sticker')">&#8249;</button>
+          <button class="featured-arrow" type="button" aria-label="下一組" onclick="featuredNext('sticker')">&#8250;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📂 上傳母圖</div>
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" accept="image/*" id="file-input" onchange="handleUpload(event)">
+      <div class="icon">🖼️</div>
+      <p>點擊或拖曳圖片上傳</p>
+      <p style="font-size:11px;margin-top:4px;">支援 JPG / PNG，建議 2560×1664 px</p>
+      <div class="btn-upload">選擇檔案</div>
+    </div>
+    <div id="upload-preview" style="display:none;margin-top:16px;">
+      <div class="preview-wrap">
+        <img id="preview-img" class="preview-img">
+        <div class="grid-overlay"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text2);text-align:center;margin-top:6px;" id="img-info"></div>
+    </div>
+  </div>
+
+
+  
+
+  <div class="action-row">
+    <button class="btn-main btn-accent" id="btn-to-step2" onclick="goStep(2)" disabled>下一步：去 Gemini 浮水印處理 →</button>
+  </div>
+</div>
+
+<!-- STEP 2: 去 Gemini 浮水印 -->
+<div class="page" id="page2">
+  <div class="card">
+    <div class="card-title">✨ 去 Gemini 浮水印前處理</div>
+    <div class="info-box" style="margin-bottom:12px;">
+      <strong>規則固定：</strong><br>
+      單張目前預覽圖：可直接下載，也可匯入去背流程。<br>
+      批次處理：只支援下載 ZIP，不匯入去背頁。
+    </div>
+    <div class="action-row" style="justify-content:flex-start;margin-top:0;">
+      <button class="btn-main btn-outline" onclick="goStep(3)">略過去 Gemini 浮水印，直接進入去背 →</button>
+    </div>
+  </div>
+
+  <div class="star-layout">
+    <div class="star-side">
+      <div class="card">
+        <div class="card-title">📂 圖片來源</div>
+        <div class="star-note">Step 1 上傳的母圖會自動帶進來；你也可以在這裡追加更多圖片做批次去 Gemini 浮水印。</div>
+        <div class="upload-zone" style="margin-top:14px;">
+          <input type="file" accept="image/png,image/jpeg,image/webp" id="star-file-input" multiple onchange="starHandleFiles(this.files)">
+          <div class="icon">✨</div>
+          <p>追加 PNG / JPG / WEBP</p>
+          <p style="font-size:11px;margin-top:4px;">可多張批次；目前預覽圖可匯入去背</p>
+          <div class="btn-upload">追加圖片</div>
+        </div>
+        <div class="action-row" style="margin-top:14px;justify-content:flex-start;">
+          <button class="btn-main btn-outline" onclick="starClearAll()">清空去 Gemini 浮水印列表</button>
+          <button class="btn-main btn-outline" onclick="starResetSettings()">重置位置</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🎛️ 去 Gemini 浮水印設定</div>
+        <div class="slider-group">
+          <div class="slider-label"><span>遮罩模式</span><span class="star-value" id="star-mask-mode-label">自動 48 / 96</span></div>
+          <select id="star-mode" onchange="starAutoMargin();starUpdateCurrent();document.getElementById('star-mask-mode-label').textContent=this.options[this.selectedIndex].text;">
+            <option value="auto">自動 48 / 96</option>
+            <option value="48">固定 48</option>
+            <option value="96">固定 96</option>
+          </select>
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>輸出格式</span><span class="star-value" id="star-out-label">PNG</span></div>
+          <select id="star-out" onchange="document.getElementById('star-out-label').textContent=this.value.toUpperCase();starUpdateCurrent();">
+            <option value="png">PNG</option>
+            <option value="webp">WEBP</option>
+          </select>
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>右邊距</span><span class="star-value" id="star-mxv">auto</span></div>
+          <input id="star-mx" type="range" min="0" max="220" value="32" oninput="this.dataset.auto=0;document.getElementById('star-mxv').textContent=this.value+'px';starUpdateCurrent()">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>下邊距</span><span class="star-value" id="star-myv">auto</span></div>
+          <input id="star-my" type="range" min="0" max="220" value="32" oninput="this.dataset.auto=0;document.getElementById('star-myv').textContent=this.value+'px';starUpdateCurrent()">
+        </div>
+        <div class="slider-group" style="margin-bottom:0;">
+          <div class="slider-label"><span>去浮水印強度</span><span class="star-value" id="star-sv">100%</span></div>
+          <input id="star-strength" type="range" min="50" max="140" value="100" oninput="document.getElementById('star-sv').textContent=this.value+'%';starUpdateCurrent()">
+        </div>
+        <div class="star-divider"></div>
+        <div class="star-mini-note">遮罩狀態：
+          <span id="star-s48" class="star-value">載入中</span>
+          ／
+          <span id="star-s96" class="star-value">載入中</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🚀 輸出動作</div>
+        <div class="action-row" style="justify-content:flex-start;margin-top:0;">
+          <button class="btn-main btn-accent" id="star-process-one" onclick="starUpdateCurrent()" disabled>處理目前預覽圖</button>
+          <button class="btn-main btn-green" id="star-download-current" onclick="starDownloadCurrent()" disabled>下載目前結果</button>
+          <button class="btn-main btn-green" id="star-import-btn" onclick="starImportCurrentToBg()" disabled>匯入去背流程</button>
+          <button class="btn-main btn-accent" id="star-batch-btn" onclick="starProcessBatch()" disabled>批次處理＋下載 ZIP</button>
+        </div>
+        <div class="action-row" style="justify-content:flex-start;margin-top:10px;">
+          <button class="btn-main btn-outline" onclick="starPrev()">上一張</button>
+          <button class="btn-main btn-outline" onclick="starNext()">下一張</button>
+        </div>
+        <div class="progress-bar" style="margin-top:14px;"><div class="progress-fill" id="star-progress-fill" style="width:0%;"></div></div>
+        <div class="status-text" id="star-status">尚未載入去 Gemini 浮水印圖片</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🗂️ 檔案清單</div>
+        <div class="star-file-list" id="star-file-list"><div class="star-file-item"><span class="star-file-name">尚未載入圖片。</span><span>-</span></div></div>
+      </div>
+    </div>
+
+    <div class="star-main">
+      <div class="star-stage-grid">
+        <div class="star-stage">
+          <div class="star-stage-head"><span>原圖</span><span id="star-oi" class="star-value">-</span></div>
+          <div class="star-canvas-wrap" id="star-orig-wrap">
+            <canvas id="star-orig" class="star-preview-canvas"></canvas>
+            <div id="star-box" class="star-mask-box"></div>
+          </div>
+        </div>
+        <div class="star-stage">
+          <div class="star-stage-head"><span>去浮水印後</span><span id="star-oo" class="star-value">-</span></div>
+          <div class="star-canvas-wrap">
+            <canvas id="star-outc" class="star-preview-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-title">📌 使用說明</div>
+        <div class="star-note">
+          1. 這裡沿用 Gemini 去 Gemini 浮水印工具的遮罩邏輯。<br>
+          2. 若只是目前這張圖要接續去背，直接按「匯入去背流程」。<br>
+          3. 若是多張一起處理，請用「批次處理＋下載 ZIP」，批次結果不會自動帶入去背頁。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3: 去背頁｜05031245V13 整張魔術棒多選區版 -->
+<div class="page" id="page3">
+  <div class="page-featured">
+    <div class="featured-section">
+      <div class="featured-section-head"><div><div class="featured-section-title">LINE 表情貼精選</div></div></div>
+      <div class="featured-carousel" id="featured-carousel-emoji" onmouseenter="featuredPause('emoji')" onmouseleave="featuredResume('emoji')">
+        <div id="featured-slides-emoji"></div>
+        <div class="featured-arrows">
+          <button class="featured-arrow" type="button" aria-label="上一組" onclick="featuredPrev('emoji')">&#8249;</button>
+          <button class="featured-arrow" type="button" aria-label="下一組" onclick="featuredNext('emoji')">&#8250;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="width:300px;flex-shrink:0;">
+      <div class="card">
+        <div class="card-title">📂 去背頁獨立上傳</div>
+        <div class="upload-zone">
+          <input type="file" accept="image/*" id="step3-file-input" onchange="handleIndependentUpload(event, 3)">
+          <div class="icon">🖼️</div>
+          <p>只想去背時，可在這裡直接上傳</p>
+          <p style="font-size:11px;margin-top:4px;">上傳後會更新雙預覽，可直接下載目前去背圖</p>
+          <div class="btn-upload">選擇圖片</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎨 去背模式（三選一）</div>
+        <div class="mode-btns">
+          <div class="mode-btn bg-mode-btn active-none" id="bg-mode-none" onclick="setBgMode('none')">A 不去背<br><span style="font-size:10px;font-weight:400;opacity:.7;">原圖輸出</span></div>
+          <div class="mode-btn bg-mode-btn" id="bg-mode-traditional" onclick="setBgMode('traditional')">B 傳統去背<br><span style="font-size:10px;font-weight:400;opacity:.7;">只跑傳統</span></div>
+          <div class="mode-btn bg-mode-btn" id="bg-mode-wand" onclick="setBgMode('wand')">C 魔術棒去背<br><span style="font-size:10px;font-weight:400;opacity:.7;">只跑魔術棒</span></div>
+        </div>
+        <div class="info-box" style="font-size:11px;line-height:1.6;margin-bottom:12px;">模式互斥：選 A 就關 B/C；選 B 只套傳統；選 C 只套魔術棒。預覽與匯出使用同一個模式。</div>
+        <div class="bg-param-panel" id="panel-none">
+          <div class="card-title" style="margin-top:12px;">A｜不去背</div>
+          <div class="wand-status">不套任何去背效果，分割打包時直接輸出原圖。</div>
+        </div>
+        <div class="bg-param-panel active" id="panel-traditional">
+          <div class="card-title" style="margin-top:12px;">B｜傳統去背參數</div>
+          <div class="preset-btns">
+            <div class="preset-btn active-green" id="preset-green" onclick="applyPreset('green')">🟩 綠幕</div>
+            <div class="preset-btn" id="preset-black" onclick="applyPreset('black')">⬛ 黑底</div>
+            <div class="preset-btn" id="preset-white" onclick="applyPreset('white')">⬜ 白幕</div>
+          </div>
+          <div class="mode-btns">
+            <div class="mode-btn active" id="trad-mode-complete" onclick="setTraditionalEffect('complete')">完全去背</div>
+            <div class="mode-btn" id="trad-mode-preserve" onclick="setTraditionalEffect('preserve')">保留文字</div>
+          </div>
+          <div class="color-pick-row">
+            <label>傳統目標顏色</label>
+            <input type="color" id="target-color" value="#00FF00">
+            <span id="color-hex" style="font-size:11px;font-family:'Share Tech Mono',monospace;color:var(--text2);">#00FF00</span>
+          </div>
+          <div class="slider-group">
+            <div class="slider-label"><span>傳統容許度</span><span id="tol-val">30</span></div>
+            <input type="range" id="tolerance" min="1" max="100" value="30" oninput="document.getElementById('tol-val').textContent=this.value;runPreview()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label"><span>傳統邊緣柔化</span><span id="smooth-val">2</span></div>
+            <input type="range" id="smoothness" min="0" max="10" value="2" oninput="document.getElementById('smooth-val').textContent=this.value;runPreview()">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-bottom:12px;">
+            <input type="checkbox" id="despill" checked style="accent-color:var(--accent3);" onchange="runPreview()">
+            <label for="despill">傳統溢色去除 Despill</label>
+          </div>
+        </div>
+        <div class="bg-param-panel" id="panel-wand">
+          <div class="card-title" style="margin-top:12px;">C｜魔術棒去背參數</div>
+          <div class="slider-group">
+            <div class="slider-label"><span>魔術棒容許度</span><span id="wand-tol-val">30</span></div>
+            <input type="range" id="wand-tolerance" min="1" max="120" value="30" oninput="document.getElementById('wand-tol-val').textContent=this.value;runPreview()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label"><span>魔術棒邊緣柔化</span><span id="wand-smooth-val">2</span></div>
+            <input type="range" id="wand-smoothness" min="0" max="10" value="2" oninput="document.getElementById('wand-smooth-val').textContent=this.value;runPreview()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label"><span>魔術棒清邊吃入</span><span id="wand-erode-val">1px</span></div>
+            <input type="range" id="wand-erode" min="0" max="3" value="1" oninput="document.getElementById('wand-erode-val').textContent=this.value+'px';runPreview()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label"><span>魔術棒 Despill 強度</span><span id="wand-despill-strength-val">75%</span></div>
+            <input type="range" id="wand-despill-strength" min="0" max="100" value="75" oninput="document.getElementById('wand-despill-strength-val').textContent=this.value+'%';runPreview()">
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-bottom:12px;">
+            <input type="checkbox" id="wand-despill" checked style="accent-color:var(--accent3);" onchange="runPreview()">
+            <label for="wand-despill">魔術棒溢色去除 Despill</label>
+          </div>
+          <div class="wand-row">
+            <button type="button" class="wand-btn" id="magic-wand-btn" onclick="toggleMagicWandPicker()">🪄 魔術棒連續選取：點整張母圖</button>
+            <button type="button" class="wand-btn" onclick="undoMagicWandV13()">復原上一點</button>
+            <button type="button" class="wand-btn" onclick="clearMagicWandV10()">清除魔術棒選區</button>
+            <div class="wand-status" id="magic-wand-status">尚未選取。啟用後可在右側整張母圖連續點選多個背景區。</div>
+          </div>
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>裁切縮放（去黑邊）</span><span id="zoom-val">0%</span></div>
+          <input type="range" id="zoom" min="1.00" max="1.50" step="0.01" value="1.00" oninput="document.getElementById('zoom-val').textContent=Math.round((this.value-1)*100)+'%';invalidateFinalOutput('裁切縮放已變更');runPreview();updateSlicePreview()">
+        </div>
+        <div class="action-row" style="margin-top:14px;">
+          <button class="btn-main btn-accent" onclick="runPreview()">重新整理雙預覽</button>
+          <button class="btn-main btn-green" onclick="goStep(4)">匯入切割 →</button>
+          <button class="btn-main btn-outline" onclick="downloadCurrentWorkImage()">下載目前去背圖</button>
+        </div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:320px;">
+      <div class="card" style="padding:12px;">
+        <div class="card-title" style="margin-bottom:8px;">🔍 去背雙預覽（整張母圖）</div>
+        <div id="preview-status" style="font-size:11px;color:var(--text2);margin-bottom:10px;">左邊是整張傳統去背，右邊是整張魔術棒去背。魔術棒可多次點選，分割打包會吃同一張去背後工作圖。</div>
+        <div class="dual-preview-grid">
+          <div class="dual-preview-box">
+            <div class="dual-preview-title">A｜傳統去背</div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-align:center;">原始整張母圖</div>
+            <div class="dual-canvas-stage" style="margin-bottom:8px;"><canvas id="preview-before"></canvas></div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-align:center;">傳統結果</div>
+            <div class="dual-canvas-stage"><canvas id="preview-after"></canvas></div>
+          </div>
+          <div class="dual-preview-box">
+            <div class="dual-preview-title">B｜魔術棒去背</div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-align:center;">點這張整張母圖選背景</div>
+            <div class="dual-canvas-stage" style="margin-bottom:8px;"><canvas id="wand-source"></canvas><canvas id="wand-mask-overlay" class="wand-layer"></canvas></div>
+            <div style="font-size:10px;color:var(--text2);margin-bottom:4px;text-align:center;">魔術棒結果</div>
+            <div class="dual-canvas-stage"><canvas id="wand-after"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 4: 分割＋打包 -->
+<div class="page" id="page4">
+  <div class="page-featured">
+    <div class="featured-section">
+      <div class="featured-section-head"><div><div class="featured-section-title">LINE 主題精選</div></div></div>
+      <div class="featured-carousel" id="featured-carousel-theme" onmouseenter="featuredPause('theme')" onmouseleave="featuredResume('theme')">
+        <div id="featured-slides-theme"></div>
+        <div class="featured-arrows">
+          <button class="featured-arrow" type="button" aria-label="上一組" onclick="featuredPrev('theme')">&#8249;</button>
+          <button class="featured-arrow" type="button" aria-label="下一組" onclick="featuredNext('theme')">&#8250;</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="width:260px;flex-shrink:0;">
+      <div class="card">
+        <div class="card-title">📂 切割頁獨立上傳</div>
+        <div class="upload-zone">
+          <input type="file" accept="image/*" id="step4-file-input" onchange="handleIndependentUpload(event, 4)">
+          <div class="icon">🧩</div>
+          <p>只想切格打包時，可在這裡直接上傳</p>
+          <p style="font-size:11px;margin-top:4px;">上傳後可調整欄列、裁邊、縮放，再輸出 ZIP / Main / Tab</p>
+          <div class="btn-upload">選擇圖片</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📐 分割格數</div>
+        <div class="slider-group"><div class="slider-label"><span>欄數 (Columns)</span><span id="cols-val">5</span></div><input type="range" id="cols" min="1" max="8" value="5" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('cols-val').textContent=this.value;updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>列數 (Rows)</span><span id="rows-val">4</span></div><input type="range" id="rows" min="1" max="8" value="4" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('rows-val').textContent=this.value;updateGridCanvas();updateSlicePreview();runPreview()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📋 母圖調整</div>
+        <div class="slider-group"><div class="slider-label"><span>水平偏移</span><span id="x-val">0px</span></div><input type="range" id="grid-x" min="-1280" max="1280" value="0" oninput="document.getElementById('x-val').textContent=this.value+'px';onSourceLayoutChange()"></div>
+        <div class="slider-group"><div class="slider-label"><span>垂直偏移</span><span id="y-val">0px</span></div><input type="range" id="grid-y" min="-832" max="832" value="0" oninput="document.getElementById('y-val').textContent=this.value+'px';onSourceLayoutChange()"></div>
+        <div class="slider-group"><div class="slider-label"><span>縮放</span><span id="scale-val">100%</span></div><input type="range" id="grid-scale" min="0.5" max="1.5" step="0.01" value="1.0" oninput="document.getElementById('scale-val').textContent=Math.round(this.value*100)+'%';onSourceLayoutChange()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🧭 成品排版</div>
+        <div class="output-layout-options">
+          <div class="output-layout-row">
+            <div class="output-layout-label">位置</div>
+            <div class="output-layout-btns two">
+              <button type="button" class="output-layout-btn active" id="out-pos-center" onclick="setOutputPosition('center')">置中</button>
+              <button type="button" class="output-layout-btn" id="out-pos-original" onclick="setOutputPosition('original')">原位</button>
+            </div>
+          </div>
+          <div class="output-layout-row">
+            <div class="output-layout-label">比例</div>
+            <div class="output-layout-btns">
+              <button type="button" class="output-layout-btn active" id="out-scale-full" onclick="setOutputScale('full')">滿版</button>
+              <button type="button" class="output-layout-btn" id="out-scale-90" onclick="setOutputScale('90')">90%</button>
+              <button type="button" class="output-layout-btn" id="out-scale-original" onclick="setOutputScale('original')">原尺寸</button>
+            </div>
+          </div>
+        </div>
+        <div class="output-layout-note" id="output-layout-note">置中可搭配滿版、90% 或原尺寸；滿版依可見內容等比例放大，不變形、不裁切。</div>
+      </div>
+      <div class="card">
+        <div class="card-title">✂️ 裁邊（去空白）</div>
+        <div class="slider-group"><div class="slider-label"><span>裁左</span><span id="crop-l-val">0px</span></div><input type="range" id="crop-l" min="0" max="500" value="0" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('crop-l-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>裁右</span><span id="crop-r-val">0px</span></div><input type="range" id="crop-r" min="0" max="500" value="0" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('crop-r-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>裁上</span><span id="crop-t-val">0px</span></div><input type="range" id="crop-t" min="0" max="400" value="0" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('crop-t-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>裁下</span><span id="crop-b-val">0px</span></div><input type="range" id="crop-b" min="0" max="400" value="0" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('crop-b-val').textContent=this.value+'px';updateGridCanvas();updateSlicePreview();runPreview()"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📦 打包設定</div>
+        <div class="start-num-row" style="margin-bottom:12px;"><label>完成尺寸：</label><div class="preset-btns" style="margin-bottom:0;flex-wrap:wrap;"><div class="preset-btn active-size" id="size-btn-370" onclick="selectOutputSize(370,320,this)" style="min-width:70px;">貼圖<br><span style="font-size:10px;">370×320</span></div><div class="preset-btn" id="size-btn-320" onclick="selectOutputSize(320,270,this)" style="min-width:70px;">貼圖<br><span style="font-size:10px;">320×270</span></div><div class="preset-btn" id="size-btn-180" onclick="selectOutputSize(180,180,this)" style="min-width:70px;">表情貼<br><span style="font-size:10px;">180×180</span></div></div></div>
+        <div class="start-num-row" style="margin-bottom:12px;"><label>檔名碼數：</label><div class="preset-btns" style="margin-bottom:0;"><div class="preset-btn active-size" id="digits-btn-2" onclick="selectDigits(2,this)">2碼<br><span style="font-size:10px;font-weight:400">01 02 03</span></div><div class="preset-btn" id="digits-btn-3" onclick="selectDigits(3,this)">3碼<br><span style="font-size:10px;font-weight:400">001 002 003</span></div></div></div>
+        <div class="start-num-row"><label>起始編號：</label><input type="number" id="start-num" value="1" min="1"></div>
+      </div>
+      <div class="action-row" style="flex-direction:column;gap:8px;margin-top:0;">
+        <button class="btn-main btn-green" style="width:100%;justify-content:center;" onclick="startProcess()">✂️ 開始切割＋打包</button>
+        <button class="btn-main btn-green" style="width:100%;justify-content:center;" id="btn-download" onclick="downloadZip()" disabled>⬇️ 下載 ZIP</button>
+        <button class="btn-main btn-outline" style="width:100%;justify-content:center;" onclick="goStep(3)">← 回去背預覽</button>
+        <button class="btn-main btn-outline" style="width:100%;justify-content:center;" onclick="resetToUpload()">🔄 重新上傳</button>
+      </div>
+    </div>
+    <div style="flex:1;min-width:300px;">
+      <div class="card" style="padding:12px;"><div class="card-title" style="margin-bottom:8px;">🗺️ 格線預覽 <span style="font-size:10px;font-weight:400;color:var(--text2);margin-left:6px;">可直接拖拉橘色切線</span></div><div class="grid-canvas-wrap drag-ready"><canvas id="grid-canvas" style="width:100%;border-radius:8px;display:block;cursor:crosshair;touch-action:none;"></canvas></div><div style="font-size:11px;color:var(--text2);text-align:center;margin-top:8px;font-family:'Share Tech Mono',monospace;">共 <span id="total-cells" style="color:var(--accent);font-weight:700;">20</span> 格 · 每格約 <span id="cell-size" style="color:var(--accent2);">512×416</span> px</div><div class="grid-drag-status" id="grid-drag-status">提示：進入第4步後，可拖拉橘色切線微調每格範圍。</div><div class="grid-mini-actions"><button type="button" class="grid-mini-btn" onclick="resetGridLineAdjustments()">重置切線</button></div></div>
+      <div class="card" style="padding:12px;"><div class="card-title" style="margin-bottom:8px;">✂️ 切割預覽（目前去背結果）<span style="font-size:10px;font-weight:400;color:var(--text2);margin-left:6px;">調整設定後自動更新</span></div><div class="sticker-grid" id="slice-preview-grid"></div></div>
+      <div class="card" style="padding:12px;display:none;" id="result-card"><div class="card-title" style="margin-bottom:8px;">✅ 去背結果</div><div id="progress-area" style="display:none;"><div class="status-text" id="status-text">處理中...</div><div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div></div><div class="info-box" style="margin-bottom:12px;">· 點擊每張貼圖下方的 <strong>Main</strong> 設定封面圖<br>· 點擊 <strong>Tab</strong> 設定標籤圖</div><div class="sticker-grid" id="sticker-grid"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Page 4 已改為分割＋打包頁 -->
+
+</main>
+
+
+
+<button class="devlog-trigger" onclick="openDevLogV91()">log</button>
+<div class="devlog-panel" id="devlog-v91">
+  <h2>隱藏頁｜工程日誌</h2>
+  <button onclick="closeDevLogV91()">關閉</button>
+  <pre>
+0711V22｜2026-07-11｜三頁獨立輪播＋成品排版
+- 上方導流拆成貼圖、表情貼、主題三個搜尋按鈕。
+- 貼圖、表情貼、主題輪播分別放在第1、第3、第4頁最上方，採正常頁面排列，不浮動、不吸頂、不覆蓋操作區。
+- 輪播更新為貼圖14款、表情貼10款、主題10款；卡片主圖、正式標題、說明與商品頁一對一綁定。
+- 第4頁「圖片位置」改名「母圖調整」；新增成品位置「置中／原位」與比例「滿版／90%／原尺寸」。
+- 原位模式固定原尺寸，不重新放大、不置中；預覽、正式輸出與ZIP共用同一排版函式。
+- 保留去 Gemini 浮水印、傳統去背、魔術棒、手拉切線、Main/Tab與ZIP核心流程。
+
+0605V21｜2026-06-05｜首頁文案補新功能＋輪播說明清理
+- 首頁工具說明補上「手拉切割線」新功能，明確標示切割預覽與 ZIP 輸出會依目前切線位置處理。
+- 移除「LINE 主題精選」與「貼圖 / 表情貼精選」區塊下方的指定順序說明小字，版面往上收，避免作品輪播區出現多餘提示文字。
+- 將 20 組輪播卡片描述由通用句改為商品頁說明文字；不改 20 組商品順序。
+- 未修改去 Gemini 浮水印、傳統去背、魔術棒、手拉切線核心、ZIP、Main/Tab 流程。
+
+0605V20｜2026-06-05｜首頁輪播分區＋手拉切線移植
+- 以去背工具_0526V19.html 為基底，首頁精選輪播拆成「LINE 主題精選」與「貼圖 / 表情貼精選」兩個獨立區塊。
+- 主題區依使用者指定順序固定 10 組：T01、T02、T05、T06、T08、T03、T04、T09、T11、T13。
+- 貼圖 / 表情貼區依使用者指定順序固定 10 組：S002、S003、S009、S015、S037、S039、S007、S083、S034、S035。
+- Step 4 分割頁移植自用版既有手拉切割線資料流：gridLineState、getGridRangesFromCanvas、initGridLineDrag，並接到格線預覽、切割預覽與正式 ZIP 分割。
+- 新增「重置切線」與切線狀態提示；更換圖片時會重置自訂切線。
+- 修補 renderPackGrid 在公開版沒有 pack-grid 容器時的空值防護，避免切割完成後報錯。
+- 未修改去 Gemini 浮水印、傳統去背、魔術棒去背、Main/Tab 選取與 ZIP 命名核心流程。
+
+0526V19｜2026-05-26｜公開分享標題與 Meta 資訊修正
+- 將瀏覽器標題改為「LINE 免費工具｜煩躁胖子」，避免社群分享卡片顯示舊版號。
+- 新增 description / og:title / og:description / twitter:title / twitter:description，供 Threads、LINE、Facebook 等平台抓取公開分享資訊。
+- 存檔版本改為 0526V19；不修改首頁 UI、輪播、去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab 核心流程。
+
+0516V18｜2026-05-26｜公開版首頁 UI 清理與資料庫移除
+- Header 左側改為「煩躁胖子・免費公開版工具」，右側只顯示「更新日期 2026/06/05」，移除公開畫面中的工程版號與動態時間碼。
+- 首頁導流按鈕維持三顆：開始使用工具、看 LINE 主題、看 LINE 貼圖 + 表情貼。
+- 移除首頁底部「更多作品」作品資料庫整排 UI，並移除內建作品資料庫 JS 初始化與資料庫函式，公開版改以輪播與兩個作者頁按鈕導流。
+- 未修改去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab 與輪播資料內容。
+
+0516V17｜2026-05-26｜首頁導流與輸出前檢查
+- 首頁說明新增「工具免費使用，也歡迎查看 LINE 主題與貼圖作品」導流文案。
+- 首頁按鈕拆成「看 LINE 主題」與「看 LINE 貼圖」，保留「開始使用工具」。
+- 新增切割打包前檢查提示，顯示尺寸、格數、檔名範圍與目前去背模式；不自動修改檔名碼數。
+- 補充輪播排序註解：LINE 主題新品 → 最新貼圖 → 最新表情貼 → 長賣代表作。
+- 本版未新增 ZIP readme、未自動把 180×180 表情貼切成 3 碼；未修改去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab、作品資料庫核心流程。
+
+0516V16｜2026-05-26｜輪播補上 LINE 主題新品
+- 首頁精選作品輪播最前面新增「冷豔科技狐」與「義氣哥・衝出」兩組 LINE 主題。
+- 保留 V15 已新增的兩組懶教人貼圖，並維持母親節項目移除。
+- 僅修改 FEATURED_ITEMS、版本資訊與工程日誌；未修改去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab、作品資料庫核心流程。
+
+0516V15｜2026-05-26｜輪播移除母親節＋新增懶教人兩組
+- 首頁精選作品輪播移除「阿鵑姊與胖胖鬍渣：有妳在就好」母親節項目。
+- 新增「懶教人，就讓貼圖教之敷衍你剛好」與「懶教人，就讓貼圖教之真沒有敷衍」至輪播最前面。
+- 僅修改 FEATURED_ITEMS、版本資訊與工程日誌；未修改去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab、作品資料庫核心流程。
+
+0516V14｜2026-05-16｜流程頁籤置中修正
+- 將 steps-nav 新增 justify-content:center，使「上傳／去 Gemini 浮水印／去背／分割＋打包」流程頁籤在桌機版置中顯示。
+- 新增 700px 以下手機版 fallback：steps-nav 改回 flex-start，避免窄螢幕橫向捲動時切到左側項目。
+- 僅修改 CSS 顯示位置、頁面版本與工程日誌；未修改上傳、去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab、作品資料庫與輪播資料。
+
+0516V13｜2026-05-16｜免費公開版工具首頁與獨立流程入口
+- 頁面定位改為「免費公開版工具」，首頁標題改為「一鍵去 Gemini 浮水印、去背、切格、打包，可每頁獨立上傳、獨立打包」。
+- 公開文字由「去星星」統一改為「去 Gemini 浮水印」，內部 starXXX 函式與遮罩核心不改。
+- Step 3 去背頁與 Step 4 切割頁新增獨立上傳入口；完整流程仍保留。
+- 首頁精選作品輪播改為 10 組主打，支援每組 2～3 個標籤。
+- 未修改去 Gemini 浮水印遮罩核心、傳統去背、魔術棒、切割、ZIP、Main/Tab、作品資料庫核心流程。
+
+0507V12｜2026-05-07｜推薦特集標籤修正
+- 將母親節推薦特集標籤由「情侶」改為「親情」，避免商品定位誤導。
+- 僅修改推薦特集標籤與版本資訊，不動去 Gemini 浮水印、去背、魔術棒、切割、ZIP、Main/Tab、作品資料庫核心流程。
+
+0507V11｜2026-05-07｜公開版推薦特集更新＋作品資料庫收合
+- 以公開版去背工具為基底，保留原有 featured-carousel 輪播格式，不重寫版型。
+- 推薦特集更新為 8 組：保留母親節、義氣兄，新增粗麥筆／白飄飄／白光毛筆／飄逸手寫／派阿白等推薦作品。
+- 首頁「內建作品資料庫」調整為「更多作品」並預設收合，保留搜尋、分類、LINE STORE 連結功能。
+- 未修改去 Gemini 浮水印、去背、魔術棒、自由切割、尺寸輸出、Main/Tab、ZIP 下載核心流程。
+
+05031347V16｜2026-05-03｜魔術棒預覽回正＋多點保留版
+- 回修 V13 起的魔術棒預覽污染：未點選前，魔術棒原圖與魔術棒結果一律從乾淨母圖重畫，不能預先套用任何去背。
+- 保留整張母圖多點魔術棒；多次點選後才累積遮罩，並維持可復原上一點、清除選區。
+- 新增上傳／去 Gemini 浮水印匯入時自動清除舊魔術棒點，避免上一張圖的選區污染新圖。
+- 僅修改魔術棒預覽初始化與狀態清理，不更動去 Gemini 浮水印、切割、ZIP、Main/Tab、作品資料庫。
+
+05031314V15｜2026-05-03｜魔術棒清邊補強版
+- 魔術棒參數新增「清邊吃入」0～3px，解決綠幕邊緣殘留、抗鋸齒清不乾淨問題。
+- 魔術棒 Despill 新增強度滑桿，避免只有開關造成修邊過強或不足。
+- 僅修改魔術棒遮罩後處理與工程日誌，不更動去 Gemini 浮水印、切割、ZIP、Main/Tab、作品資料庫。
+
+05031305V14｜2026-05-03｜命名 UI 修正版
+- 移除使用者畫面中的「手動版本」欄位，避免把內部工程命名規則放到外部操作。
+- ZIP 下載檔名恢復 stickers.zip；ZIP 內圖片仍依使用者選擇輸出 01/02 或 001/002。
+- 僅修改命名 UI 與下載 ZIP 檔名，不更動去背、魔術棒、切割、Main/Tab、去 Gemini 浮水印、作品資料庫核心流程。
+
+05031205V10｜2026-05-03｜去背／分割分頁＋雙預覽測試版
+- 以 V9.9 公開版為基底。
+- 將流程調整為：上傳 → 去 Gemini 浮水印 → 去背 → 分割＋打包。
+- 去背頁新增雙預覽：左為傳統去背，右為魔術棒去背。
+- 魔術棒支援容許度、邊緣柔化、Despill，且每次從乾淨原始整張母圖重算，避免傳統去背＋魔術棒去背疊加。
+- 分割、ZIP、Main/Tab、去 Gemini 浮水印核心流程未修改。
+
+
+05031245V13｜2026-05-03｜整張母圖魔術棒多選區版
+- 魔術棒去背預覽從「第1格」改為「整張母圖」，避免匯入切割後只有局部處理。
+- 魔術棒改為可連續多次點選，多個選區會累積套用，並新增「復原上一點」。
+- 分割與ZIP改為先吃整張目前工作圖，再切割；不再於單格階段重跑傳統/魔術棒，避免預覽與匯出不一致。
+- 存檔規則維持：日期自動＋時間自動＋版本手動。
+
+v9.9｜2026-05-02｜輪播展示區＋去背預覽整合版
+v9.7｜2026-05-02｜分類關鍵字補強版
+- 新增分類「神明」，關鍵字：財神、保平安。
+- 「車」分類新增關鍵字：小巴。
+- 「鮮肉」分類新增關鍵字：小男孩。
+- 僅修改內建作品資料庫分類規則與工程日誌，不更動去背、去 Gemini 浮水印、切格、ZIP、Main/Tab 核心流程。
+
+v9.6｜2026-05-02｜分類規則修正版
+- 89義氣新增關鍵字：「不想理你，有事說」、「飛龍在天」。
+- 表情貼「色盆內的小白飄，與你互動」強制歸為靜態，避免因「互動」誤判為動態。
+- 僅修改內建作品資料庫分類規則與工程日誌，不更動去背、去 Gemini 浮水印、切格、ZIP、Main/Tab 核心流程。
+
+v9.5｜2026-05-02｜修正資料庫商品名稱
+- 修正內建資料庫中原本顯示為「Animation only icon」的商品名稱。
+- 依重新抓取到的 LINE STORE 名稱覆蓋，不再保留假標題。
+- 僅修改資料庫文字與工程日誌，不更動去背、去 Gemini 浮水印、切格、ZIP、Main/Tab 核心流程。
+
+v9.4｜2026-05-02｜內建作品資料庫＋表情貼 v22 分類
+- 內建 133 筆貼圖／表情貼資料，首頁新增作品資料庫、搜尋與分類篩選。
+- 表情貼分類改為先分「動態／靜態」，再分「完整_144／字母_104／其他_40」。
+- 貼圖分類新增並保留：小姐姐系列、抹布、車、鮮肉、89義氣、煩躁胖子、刀疤霆、小白飄、白飄飄、肥滋滋、阿鵑姊、柴柴、沐沐、其他。
+- 本次只新增資料庫與首頁顯示，不改去背、去 Gemini 浮水印、切格、ZIP、Main／Tab 核心流程。
+
+v9.3｜2026-05-01｜去 Gemini 浮水印＋魔術棒版
+- 依指定命名為「0501去背工具V9.3」。
+- 補回去背區「魔術棒取色」功能：啟用後可在右側格線預覽點擊背景，自動更新目標顏色。
+- 魔術棒只做取樣輔助，不改 Web Worker 去背核心、不重寫切割與 ZIP 流程。
+- 取色來源使用乾淨取樣畫布，不讀取橘色格線、裁邊遮罩或格子編號，避免取錯色。
+- 依取樣色自動建議 tolerance / despill：綠色偏高容許度＋despill；白底、黑底使用較低容許度。
+
+v9.2｜2026-05-01｜去 Gemini 浮水印整合版
+- 以 v9.1 去背工具為主體，新增 Step 2「去 Gemini 浮水印前處理」模組。
+- 整合 Gemini 星星去除工具核心：固定遮罩 bg_48.png / bg_96.png + white alpha unmixing。
+- 規則明確化：單張目前預覽圖可直接下載，也可匯入去背流程；批次僅支援 ZIP 下載。
+- 新增 3-step 導覽：上傳 → 去 Gemini 浮水印 → 去背／切割／打包。
+- 保留原 v9.1 的去背、切格、Main / Tab、ZIP 打包核心流程，未重寫 Web Worker 演算法。
+- 新增去 Gemini 浮水印區檔案清單、遮罩拖曳、位置微調、匯入去背流程按鈕。
+- 本版僅完成靜態整合與程式碼層級檢查，未宣稱完整實機測試。
+  </pre>
+</div>
+<script>
+function openDevLogV91(){ document.getElementById('devlog-v91').style.display='block'; }
+function closeDevLogV91(){ document.getElementById('devlog-v91').style.display='none'; }
+</script>
+
+<script>
+
+
+// ===== Star Removal Integration v9.2 =====
+const STAR_MASK_48_URL = 'https://meikochang.github.io/line-apng/masks/bg_48.png';
+const STAR_MASK_96_URL = 'https://meikochang.github.io/line-apng/masks/bg_96.png';
+let starMask48 = null, starMask96 = null;
+let starItems = [];
+let starIndex = 0;
+let starCurrentBlob = null;
+let starCurrentOutName = null;
+let starDrag = false;
+let starDragState = null;
+let starImportedPreviewUrl = null;
+
+function starEl(id) { return document.getElementById(id); }
+function starEscape(str) {
+  return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function starSetStatus(msg) { const el = starEl('star-status'); if (el) el.textContent = msg; }
+function starSetProgress(pct) { const el = starEl('star-progress-fill'); if (el) el.style.width = `${pct}%`; }
+function starMime() { return starEl('star-out')?.value === 'webp' ? 'image/webp' : 'image/png'; }
+function starMakeName(name) {
+  const ext = starEl('star-out')?.value === 'webp' ? 'webp' : 'png';
+  return String(name || 'image').replace(/\.[^.]+$/, '') + `_star_removed.${ext}`;
+}
+function starRefreshButtons() {
+  const hasItems = starItems.length > 0;
+  const hasCurrent = !!starCurrentBlob;
+  if (starEl('star-process-one')) starEl('star-process-one').disabled = !hasItems;
+  if (starEl('star-batch-btn')) starEl('star-batch-btn').disabled = !hasItems;
+  if (starEl('star-download-current')) starEl('star-download-current').disabled = !hasCurrent;
+  if (starEl('star-import-btn')) starEl('star-import-btn').disabled = !hasCurrent;
+}
+function starCurrentItem() {
+  return starItems[starIndex] || null;
+}
+function starRevokeItem(item) {
+  if (item && item.url) {
+    try { URL.revokeObjectURL(item.url); } catch(e) {}
+  }
+}
+function starRenderList() {
+  const list = starEl('star-file-list');
+  if (!list) return;
+  if (!starItems.length) {
+    list.innerHTML = '<div class="star-file-item"><span class="star-file-name">尚未載入圖片。</span><span>-</span></div>';
+    return;
+  }
+  list.innerHTML = '';
+  starItems.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'star-file-item' + (i === starIndex ? ' active' : '');
+    let statusClass = '';
+    if (item.status === 'done') statusClass = 'star-ok';
+    else if (item.status === 'error') statusClass = 'star-error';
+    const tag = item.sourceType === 'main' ? '<span class="star-tag">母圖</span>' : '';
+    div.innerHTML = `<span class="star-file-name">${tag}${starEscape(item.name)}</span><span class="${statusClass}">${i === starIndex ? '目前' : starEscape(item.status || 'pending')}</span>`;
+    div.onclick = () => starSelect(i);
+    list.appendChild(div);
+  });
+}
+function starCreateItem(file, sourceType = 'extra') {
+  const url = URL.createObjectURL(file);
+  return {
+    file,
+    name: file.name,
+    url,
+    img: null,
+    status: 'pending',
+    blob: null,
+    outName: null,
+    sourceType
+  };
+}
+function starInsertItems(newItems, insertAtFront = false) {
+  if (!newItems.length) return;
+  if (insertAtFront) starItems = [...newItems, ...starItems];
+  else starItems.push(...newItems);
+  starRenderList();
+  const loadPromises = newItems.map(item => new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => { item.img = img; resolve(); };
+    img.onerror = () => { item.status = 'error'; resolve(); };
+    img.src = item.url;
+  }));
+  Promise.all(loadPromises).then(() => {
+    starRenderList();
+    const nextIndex = insertAtFront ? 0 : Math.max(0, starItems.length - newItems.length);
+    starSelect(nextIndex);
+    starSetStatus(`已載入 ${starItems.length} 張去 Gemini 浮水印圖片`);
+  });
+}
+function starHandleFiles(fileList) {
+  const files = [...(fileList || [])].filter(f => /^image\/(png|jpeg|webp)$/.test(f.type));
+  if (!files.length) {
+    starSetStatus('沒有可用圖片');
+    return;
+  }
+  const items = files.map(file => starCreateItem(file, 'extra'));
+  starInsertItems(items, false);
+  const input = starEl('star-file-input');
+  if (input) input.value = '';
+}
+function starUpsertMainFile(file) {
+  starItems = starItems.filter(item => {
+    const keep = item.sourceType !== 'main';
+    if (!keep) starRevokeItem(item);
+    return keep;
+  });
+  const item = starCreateItem(file, 'main');
+  starInsertItems([item], true);
+}
+function starSelect(i) {
+  if (!starItems[i]) return;
+  starIndex = i;
+  starDrawCurrent();
+  starUpdateCurrent();
+  starRenderList();
+}
+function starPrev() { if (starItems.length) starSelect(Math.max(0, starIndex - 1)); }
+function starNext() { if (starItems.length) starSelect(Math.min(starItems.length - 1, starIndex + 1)); }
+function starChooseMask(img) {
+  const mode = starEl('star-mode')?.value || 'auto';
+  const isLarge = img.width > 1024 && img.height > 1024;
+  if (mode === '48') return starMask48 || starMask96;
+  if (mode === '96') return starMask96 || starMask48;
+  return isLarge ? (starMask96 || starMask48) : (starMask48 || starMask96);
+}
+function starAutoMargin() {
+  const mx = starEl('star-mx');
+  const my = starEl('star-my');
+  if (mx) mx.dataset.auto = '1';
+  if (my) my.dataset.auto = '1';
+}
+function starGetGeom(img) {
+  const large = img.width > 1024 && img.height > 1024;
+  const mask = starChooseMask(img);
+  const def = large ? 64 : 32;
+  const mxEl = starEl('star-mx');
+  const myEl = starEl('star-my');
+  const mx = mxEl?.dataset.auto === '1' ? def : +(mxEl?.value || 0);
+  const my = myEl?.dataset.auto === '1' ? def : +(myEl?.value || 0);
+  if (starEl('star-mxv')) starEl('star-mxv').textContent = `${mx}px`;
+  if (starEl('star-myv')) starEl('star-myv').textContent = `${my}px`;
+  const w = mask ? mask.width : (large ? 96 : 48);
+  const h = mask ? mask.height : (large ? 96 : 48);
+  return { mask, w, h, x: img.width - w - mx, y: img.height - h - my, mx, my };
+}
+function starDrawCurrent() {
+  const item = starCurrentItem();
+  const orig = starEl('star-orig');
+  if (!item || !item.img || !orig) {
+    if (orig) { orig.width = 1; orig.height = 1; }
+    const outc = starEl('star-outc');
+    if (outc) { outc.width = 1; outc.height = 1; }
+    if (starEl('star-box')) starEl('star-box').style.display = 'none';
+    if (starEl('star-oi')) starEl('star-oi').textContent = '-';
+    if (starEl('star-oo')) starEl('star-oo').textContent = '-';
+    starCurrentBlob = null;
+    starCurrentOutName = null;
+    starRefreshButtons();
+    return;
+  }
+  orig.width = item.img.width;
+  orig.height = item.img.height;
+  const ctx = orig.getContext('2d');
+  ctx.clearRect(0,0,orig.width,orig.height);
+  ctx.drawImage(item.img, 0, 0);
+  if (starEl('star-oi')) starEl('star-oi').textContent = `${item.img.width} × ${item.img.height}`;
+  starPositionMask();
+}
+function starPositionMask() {
+  const item = starCurrentItem();
+  const box = starEl('star-box');
+  const orig = starEl('star-orig');
+  const wrap = starEl('star-orig-wrap');
+  if (!item || !item.img || !box || !orig || !wrap) {
+    if (box) box.style.display = 'none';
+    return;
+  }
+  const geom = starGetGeom(item.img);
+  const rect = orig.getBoundingClientRect();
+  const wrapRect = wrap.getBoundingClientRect();
+  if (!rect.width || !rect.height) {
+    box.style.display = 'none';
+    return;
+  }
+  const sx = rect.width / item.img.width;
+  const sy = rect.height / item.img.height;
+  box.style.display = 'block';
+  box.style.width = `${geom.w * sx}px`;
+  box.style.height = `${geom.h * sy}px`;
+  box.style.left = `${rect.left - wrapRect.left + geom.x * sx}px`;
+  box.style.top = `${rect.top - wrapRect.top + geom.y * sy}px`;
+}
+function starRemove(img) {
+  const geom = starGetGeom(img);
+  const mask = geom.mask;
+  if (!mask) throw new Error('mask not loaded');
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  canvas.width = img.width;
+  canvas.height = img.height;
+  ctx.drawImage(img, 0, 0);
+  const mc = document.createElement('canvas');
+  const mctx = mc.getContext('2d', { willReadFrequently: true });
+  mc.width = mask.width;
+  mc.height = mask.height;
+  mctx.drawImage(mask, 0, 0);
+  const x = Math.max(0, Math.min(img.width - mask.width, Math.round(geom.x)));
+  const y = Math.max(0, Math.min(img.height - mask.height, Math.round(geom.y)));
+  const w = Math.min(mask.width, img.width - x);
+  const h = Math.min(mask.height, img.height - y);
+  const imgData = ctx.getImageData(x, y, w, h);
+  const maskData = mctx.getImageData(0, 0, w, h);
+  const str = (+(starEl('star-strength')?.value || 100)) / 100;
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    let a = (maskData.data[i] / 255) * str;
+    if (a > 0.001) {
+      if (a >= 1) a = 0.999;
+      imgData.data[i] = Math.max(0, (imgData.data[i] - a * 255) / (1 - a));
+      imgData.data[i+1] = Math.max(0, (imgData.data[i+1] - a * 255) / (1 - a));
+      imgData.data[i+2] = Math.max(0, (imgData.data[i+2] - a * 255) / (1 - a));
+    }
+  }
+  ctx.putImageData(imgData, x, y);
+  return canvas;
+}
+function starUpdateCurrent() {
+  const item = starCurrentItem();
+  if (!item || !item.img) {
+    starCurrentBlob = null;
+    starCurrentOutName = null;
+    starRefreshButtons();
+    return;
+  }
+  starDrawCurrent();
+  try {
+    const canvas = starRemove(item.img);
+    const outc = starEl('star-outc');
+    if (outc) {
+      outc.width = canvas.width;
+      outc.height = canvas.height;
+      const octx = outc.getContext('2d');
+      octx.clearRect(0, 0, outc.width, outc.height);
+      octx.drawImage(canvas, 0, 0);
+    }
+    if (starEl('star-oo')) starEl('star-oo').textContent = `${canvas.width} × ${canvas.height}`;
+    canvas.toBlob(blob => {
+      starCurrentBlob = blob;
+      starCurrentOutName = starMakeName(item.name);
+      item.blob = blob;
+      item.outName = starCurrentOutName;
+      item.status = 'ready';
+      starRefreshButtons();
+      starRenderList();
+      starSetStatus('目前預覽圖已處理，可下載或匯入去背流程');
+    }, starMime(), 0.95);
+  } catch (err) {
+    console.error(err);
+    starSetStatus('處理失敗：遮罩可能未載入或圖片尚未準備好');
+  }
+}
+function starResetSettings() {
+  if (starEl('star-mode')) {
+    starEl('star-mode').value = 'auto';
+    starEl('star-mask-mode-label').textContent = '自動 48 / 96';
+  }
+  if (starEl('star-out')) {
+    starEl('star-out').value = 'png';
+    starEl('star-out-label').textContent = 'PNG';
+  }
+  if (starEl('star-mx')) { starEl('star-mx').value = 32; starEl('star-mx').dataset.auto = '1'; }
+  if (starEl('star-my')) { starEl('star-my').value = 32; starEl('star-my').dataset.auto = '1'; }
+  if (starEl('star-strength')) { starEl('star-strength').value = 100; }
+  if (starEl('star-mxv')) starEl('star-mxv').textContent = 'auto';
+  if (starEl('star-myv')) starEl('star-myv').textContent = 'auto';
+  if (starEl('star-sv')) starEl('star-sv').textContent = '100%';
+  starUpdateCurrent();
+}
+function starDownloadCurrent() {
+  if (!starCurrentBlob) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(starCurrentBlob);
+  a.download = starCurrentOutName || 'star_removed.png';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function starImportCurrentToBg() {
+  const item = starCurrentItem();
+  if (!item || !starCurrentBlob) {
+    starSetStatus('目前沒有可匯入的單張結果');
+    return;
+  }
+  if (starImportedPreviewUrl) {
+    try { URL.revokeObjectURL(starImportedPreviewUrl); } catch(e) {}
+  }
+  starImportedPreviewUrl = URL.createObjectURL(starCurrentBlob);
+  const img = new Image();
+  img.onload = () => {
+    originalImg = img;
+    resetMagicWandStateForNewImage();
+    document.getElementById('preview-img').src = starImportedPreviewUrl;
+    document.getElementById('upload-preview').style.display = 'block';
+    document.getElementById('img-info').textContent = `${img.width} × ${img.height} px ｜ 來源：去 Gemini 浮水印結果`;
+    document.getElementById('btn-to-step2').disabled = false;
+    updateCellInfo();
+    starSetStatus('已將目前結果匯入去背流程');
+    goStep(3);
+  };
+  img.src = starImportedPreviewUrl;
+}
+async function starProcessBatch() {
+  if (!starItems.length) return;
+  const zip = new JSZip();
+  starSetStatus(`批次處理中 0/${starItems.length}`);
+  starSetProgress(0);
+  for (let i = 0; i < starItems.length; i++) {
+    const item = starItems[i];
+    try {
+      if (!item.img) throw new Error('image not ready');
+      const canvas = starRemove(item.img);
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, starMime(), 0.95));
+      item.blob = blob;
+      item.outName = starMakeName(item.name);
+      item.status = 'done';
+      zip.file(item.outName, blob);
+    } catch (err) {
+      console.error(err);
+      item.status = 'error';
+    }
+    starSetProgress(Math.round((i + 1) / starItems.length * 100));
+    starSetStatus(`批次處理中 ${i + 1}/${starItems.length}`);
+    starRenderList();
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
+  starSetStatus('正在打包 ZIP...');
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(zipBlob);
+  a.download = 'star_removed_batch.zip';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  starSetStatus('批次完成，ZIP 已下載（批次結果不會自動匯入去背頁）');
+}
+function starClearAll() {
+  starItems.forEach(starRevokeItem);
+  starItems = [];
+  starIndex = 0;
+  starCurrentBlob = null;
+  starCurrentOutName = null;
+  if (starEl('star-file-input')) starEl('star-file-input').value = '';
+  const orig = starEl('star-orig');
+  const outc = starEl('star-outc');
+  if (orig) { orig.width = 1; orig.height = 1; }
+  if (outc) { outc.width = 1; outc.height = 1; }
+  if (starEl('star-box')) starEl('star-box').style.display = 'none';
+  if (starEl('star-oi')) starEl('star-oi').textContent = '-';
+  if (starEl('star-oo')) starEl('star-oo').textContent = '-';
+  starSetProgress(0);
+  starSetStatus('已清空去 Gemini 浮水印列表');
+  starRenderList();
+  starRefreshButtons();
+  starResetSettings();
+}
+function starBindDrag() {
+  const box = starEl('star-box');
+  if (!box) return;
+  box.addEventListener('mousedown', (e) => {
+    const item = starCurrentItem();
+    const orig = starEl('star-orig');
+    if (!item || !item.img || !orig) return;
+    e.preventDefault();
+    const geom = starGetGeom(item.img);
+    const rect = orig.getBoundingClientRect();
+    starDrag = true;
+    if (starEl('star-mx')) starEl('star-mx').dataset.auto = '0';
+    if (starEl('star-my')) starEl('star-my').dataset.auto = '0';
+    starDragState = {
+      x: e.clientX,
+      y: e.clientY,
+      mx: geom.mx,
+      my: geom.my,
+      rect
+    };
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!starDrag || !starDragState) return;
+    const item = starCurrentItem();
+    if (!item || !item.img) return;
+    const sx = starDragState.rect.width / item.img.width;
+    const sy = starDragState.rect.height / item.img.height;
+    const nextMx = Math.max(0, Math.min(220, Math.round(starDragState.mx - (e.clientX - starDragState.x) / sx)));
+    const nextMy = Math.max(0, Math.min(220, Math.round(starDragState.my - (e.clientY - starDragState.y) / sy)));
+    if (starEl('star-mx')) starEl('star-mx').value = nextMx;
+    if (starEl('star-my')) starEl('star-my').value = nextMy;
+    if (starEl('star-mxv')) starEl('star-mxv').textContent = `${nextMx}px`;
+    if (starEl('star-myv')) starEl('star-myv').textContent = `${nextMy}px`;
+    starUpdateCurrent();
+  });
+  window.addEventListener('mouseup', () => {
+    starDrag = false;
+    starDragState = null;
+  });
+  window.addEventListener('resize', () => starPositionMask());
+}
+function starLoadImage(src, crossOrigin = false) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    if (crossOrigin) img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+async function starLoadMask(url, statusElId) {
+  try {
+    const img = await starLoadImage(url, true);
+    const el = starEl(statusElId);
+    if (el) {
+      el.textContent = `成功 ${img.width}×${img.height}`;
+      el.style.color = 'var(--accent3)';
+    }
+    return img;
+  } catch (err) {
+    const el = starEl(statusElId);
+    if (el) {
+      el.textContent = '失敗';
+      el.style.color = '#ff6b6b';
+    }
+    return null;
+  }
+}
+async function starInit() {
+  if (starEl('star-mx')) starEl('star-mx').dataset.auto = '1';
+  if (starEl('star-my')) starEl('star-my').dataset.auto = '1';
+  starBindDrag();
+  starRenderList();
+  starRefreshButtons();
+  starMask48 = await starLoadMask(STAR_MASK_48_URL, 'star-s48');
+  starMask96 = await starLoadMask(STAR_MASK_96_URL, 'star-s96');
+  if (originalImg && document.getElementById('file-input')?.files?.[0]) {
+    starUpsertMainFile(document.getElementById('file-input').files[0]);
+  }
+}
+window.addEventListener('load', starInit);
+
+
+// ===== 輸出尺寸設定 =====
+let outputW = 370, outputH = 320;
+let outputDigits = 2;
+function selectDigits(d, btn) {
+  outputDigits = d;
+  document.querySelectorAll('#digits-btn-2,#digits-btn-3').forEach(b => b.className = 'preset-btn');
+  btn.classList.add('active-size');
+}
+function selectOutputSize(w, h, btn) {
+  outputW = w; outputH = h;
+  document.querySelectorAll('#size-btn-370,#size-btn-320,#size-btn-180').forEach(b => b.className = 'preset-btn');
+  btn.classList.add('active-size');
+  invalidateFinalOutput('完成尺寸已變更');
+  updateSlicePreview();
+}
+
+// ===== 0711V22｜成品排版 =====
+let outputPositionMode = 'center';
+let outputScaleMode = 'full';
+
+function onSourceLayoutChange() {
+  invalidateFinalOutput('母圖調整已變更');
+  updateGridCanvas();
+  updateSlicePreview();
+  runPreview();
+}
+
+function updateOutputLayoutUI() {
+  document.getElementById('out-pos-center')?.classList.toggle('active', outputPositionMode === 'center');
+  document.getElementById('out-pos-original')?.classList.toggle('active', outputPositionMode === 'original');
+  const scaleMap = { full:'out-scale-full', '90':'out-scale-90', original:'out-scale-original' };
+  Object.entries(scaleMap).forEach(([mode,id]) => document.getElementById(id)?.classList.toggle('active', outputScaleMode === mode));
+  const locked = outputPositionMode === 'original';
+  ['out-scale-full','out-scale-90'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) { btn.disabled = locked; btn.classList.toggle('disabled', locked); }
+  });
+  const note = document.getElementById('output-layout-note');
+  if (note) note.textContent = locked
+    ? '原位模式僅保留切割格內原始位置與原始尺寸，不重新放大、不置中；超過輸出尺寸時只會等比例縮小以避免裁切。'
+    : '置中可搭配滿版、90% 或原尺寸；滿版依可見內容等比例放大，不變形、不裁切。';
+}
+
+function setOutputPosition(mode) {
+  outputPositionMode = mode === 'original' ? 'original' : 'center';
+  if (outputPositionMode === 'original') outputScaleMode = 'original';
+  updateOutputLayoutUI();
+  invalidateFinalOutput('成品位置已變更');
+  updateSlicePreview();
+}
+
+function setOutputScale(mode) {
+  if (outputPositionMode === 'original' && mode !== 'original') return;
+  outputScaleMode = ['full','90','original'].includes(mode) ? mode : 'full';
+  updateOutputLayoutUI();
+  invalidateFinalOutput('成品比例已變更');
+  updateSlicePreview();
+}
+
+function getOutputLayoutLabel() {
+  const pos = outputPositionMode === 'original' ? '原位' : '置中';
+  const scale = outputScaleMode === 'full' ? '滿版' : (outputScaleMode === '90' ? '90%' : '原尺寸');
+  return `${pos}＋${scale}`;
+}
+
+function getVisibleAlphaBounds(canvas, threshold = 8) {
+  const w = canvas.width, h = canvas.height;
+  if (!w || !h) return { x:0, y:0, width:1, height:1, empty:true };
+  const data = canvas.getContext('2d', { willReadFrequently:true }).getImageData(0,0,w,h).data;
+  let minX=w, minY=h, maxX=-1, maxY=-1;
+  for (let y=0; y<h; y++) {
+    for (let x=0; x<w; x++) {
+      if (data[(y*w+x)*4+3] > threshold) {
+        if (x<minX) minX=x; if (x>maxX) maxX=x;
+        if (y<minY) minY=y; if (y>maxY) maxY=y;
+      }
+    }
+  }
+  if (maxX < minX || maxY < minY) return { x:0, y:0, width:w, height:h, empty:true };
+  return { x:minX, y:minY, width:maxX-minX+1, height:maxY-minY+1, empty:false };
+}
+
+function makeZoomedPieceCanvas(pieceCanvas, zoomLevel = 1) {
+  const out = document.createElement('canvas');
+  out.width = pieceCanvas.width; out.height = pieceCanvas.height;
+  const ctx = out.getContext('2d');
+  const z = Math.max(1, Number(zoomLevel) || 1);
+  const sW = pieceCanvas.width / z, sH = pieceCanvas.height / z;
+  const sX = (pieceCanvas.width - sW) / 2, sY = (pieceCanvas.height - sH) / 2;
+  ctx.drawImage(pieceCanvas, sX, sY, sW, sH, 0, 0, out.width, out.height);
+  return out;
+}
+
+function renderOutputCanvas(pieceCanvas, outW = outputW, outH = outputH) {
+  const out = document.createElement('canvas');
+  out.width = Math.max(1, Math.round(outW));
+  out.height = Math.max(1, Math.round(outH));
+  const ctx = out.getContext('2d');
+  ctx.clearRect(0,0,out.width,out.height);
+
+  if (outputPositionMode === 'original') {
+    const scale = Math.min(1, out.width / pieceCanvas.width, out.height / pieceCanvas.height);
+    ctx.drawImage(pieceCanvas, 0, 0, pieceCanvas.width, pieceCanvas.height, 0, 0, pieceCanvas.width*scale, pieceCanvas.height*scale);
+    return out;
+  }
+
+  const bounds = getVisibleAlphaBounds(pieceCanvas);
+  const fit = Math.min(out.width / Math.max(1,bounds.width), out.height / Math.max(1,bounds.height));
+  let scale = fit;
+  if (outputScaleMode === '90') scale = fit * 0.9;
+  if (outputScaleMode === 'original') scale = Math.min(1, fit);
+  const cx = bounds.x + bounds.width/2;
+  const cy = bounds.y + bounds.height/2;
+  const dx = out.width/2 - cx*scale;
+  const dy = out.height/2 - cy*scale;
+  ctx.drawImage(pieceCanvas, dx, dy, pieceCanvas.width*scale, pieceCanvas.height*scale);
+  return out;
+}
+// ===== Web Worker =====
+const workerScript = `
+self.onmessage = function(e) {
+  const { imageBitmap, id, targetColor, tolerance, smoothness, despill, mode, outW, outH, wandX, wandY, wandTolerance, wandSmoothness, wandDespill } = e.data;
+  const w = imageBitmap.width, h = imageBitmap.height;
+  const canvas = new OffscreenCanvas(w, h);
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(imageBitmap, 0, 0);
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const data = imgData.data;
+  const tr = parseInt(targetColor.slice(1,3),16), tg = parseInt(targetColor.slice(3,5),16), tb = parseInt(targetColor.slice(5,7),16);
+  // 不去背模式：直接依原圖面尺寸縮放輸出
+  if (mode === 'none') {
+    const finalCanvas=new OffscreenCanvas(outW,outH),finalCtx=finalCanvas.getContext('2d');
+    const scale=Math.min(outW/w,outH/h);
+    finalCtx.drawImage(imageBitmap,0,0,w,h,(outW-w*scale)/2,(outH-h*scale)/2,w*scale,h*scale);
+    finalCanvas.convertToBlob({type:'image/png'}).then(blob=>{const reader=new FileReader();reader.readAsDataURL(blob);reader.onloadend=()=>self.postMessage({id,dataUrl:reader.result});});
+    return;
+  }
+  // 魔術棒模式：只跑魔術棒，不疊加傳統色鍵
+  if (mode === 'wand') {
+    const sx = Math.max(0, Math.min(w-1, Math.floor((Number(wandX)||0) * w)));
+    const sy = Math.max(0, Math.min(h-1, Math.floor((Number(wandY)||0) * h)));
+    const start = (sy*w + sx) * 4;
+    const sr=data[start], sg=data[start+1], sb=data[start+2];
+    const tol = Math.max(0, Number(wandTolerance)||30);
+    const soft = Math.max(1, (Number(wandSmoothness)||0) * 10);
+    const visited = new Uint8Array(w*h);
+    const stackX = new Int32Array(w*h), stackY = new Int32Array(w*h);
+    let top=0; stackX[top]=sx; stackY[top]=sy; top++;
+    const maskAlpha = new Uint8Array(w*h);
+    while(top>0){
+      top--; const x=stackX[top], y=stackY[top];
+      if(x<0||x>=w||y<0||y>=h) continue;
+      const p=y*w+x; if(visited[p]) continue; visited[p]=1;
+      const idx=p*4; const dr=data[idx]-sr, dg=data[idx+1]-sg, db=data[idx+2]-sb;
+      const dist=Math.sqrt(dr*dr+dg*dg+db*db);
+      if(dist<=tol+soft){
+        maskAlpha[p]=dist<=tol?255:Math.max(0,Math.round(255*(1-(dist-tol)/soft)));
+        if(top+4<stackX.length){stackX[top]=x+1;stackY[top]=y;top++;stackX[top]=x-1;stackY[top]=y;top++;stackX[top]=x;stackY[top]=y+1;top++;stackX[top]=x;stackY[top]=y-1;top++;}
+      }
+    }
+    const doDespill = !!wandDespill;
+    const isGreenSample = sg > Math.max(sr,sb)*1.15 && sg > 80;
+    for(let p=0;p<maskAlpha.length;p++){
+      const a=maskAlpha[p]; if(!a) continue;
+      const idx=p*4;
+      data[idx+3]=Math.max(0,data[idx+3]-a);
+      if(doDespill && isGreenSample && data[idx+3]>0 && data[idx+1]>data[idx] && data[idx+1]>data[idx+2]) data[idx+1]=Math.min(data[idx],data[idx+2]);
+      if(data[idx+3]===0){data[idx]=0;data[idx+1]=0;data[idx+2]=0;}
+    }
+    ctx.putImageData(imgData,0,0);
+    const finalCanvas=new OffscreenCanvas(outW,outH),finalCtx=finalCanvas.getContext('2d');
+    const scale=Math.min(outW/w,outH/h);
+    finalCtx.drawImage(canvas,0,0,w,h,(outW-w*scale)/2,(outH-h*scale)/2,w*scale,h*scale);
+    finalCanvas.convertToBlob({type:'image/png'}).then(blob=>{const reader=new FileReader();reader.readAsDataURL(blob);reader.onloadend=()=>self.postMessage({id,dataUrl:reader.result});});
+    return;
+  }
+  const distThreshold = tolerance * 4.42, ramp = Math.max(1, smoothness * 5);
+  const isGreenTarget = targetColor.toLowerCase() === '#00ff00';
+  const isGreenPixel = new Uint8Array(w * h);
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2], idx = i/4;
+    let isGreen = false;
+    if (isGreenTarget) {
+      const dist = Math.sqrt((r-tr)**2+(g-tg)**2+(b-tb)**2);
+      if (dist < distThreshold) isGreen = true;
+      else if (g > Math.max(r,b)*1.15 && g > 80) isGreen = true;
+      else {
+        const max=Math.max(r,g,b),min=Math.min(r,g,b),delta=max-min;
+        if (delta>15&&max>50){let hue=0;if(max===g)hue=60*(((b-r)/delta)+2);if(hue<0)hue+=360;if(hue>=85&&hue<=165){const sat=max>0?delta/max:0;if(sat>0.2)isGreen=true;}}
+      }
+    } else {
+      const dist = Math.sqrt((r-tr)**2+(g-tg)**2+(b-tb)**2);
+      if (dist < distThreshold) isGreen = true;
+    }
+    isGreenPixel[idx] = isGreen ? 1 : 0;
+  }
+  const shouldKeep = new Uint8Array(w * h);
+  if (mode === 'preserve') {
+    const isExternal = new Uint8Array(w*h), queue = [];
+    for (let x=0;x<w;x++){if(isGreenPixel[x])queue.push(x);if(isGreenPixel[(h-1)*w+x])queue.push((h-1)*w+x);}
+    for (let y=1;y<h-1;y++){if(isGreenPixel[y*w])queue.push(y*w);if(isGreenPixel[y*w+w-1])queue.push(y*w+w-1);}
+    while(queue.length>0){const idx=queue.shift();if(isExternal[idx])continue;isExternal[idx]=1;const x=idx%w,y=Math.floor(idx/w);for(const[nx,ny] of[[x-1,y],[x+1,y],[x,y-1],[x,y+1]]){if(nx>=0&&nx<w&&ny>=0&&ny<h){const nIdx=ny*w+nx;if(isGreenPixel[nIdx]&&!isExternal[nIdx])queue.push(nIdx);}}}
+    const regionId=new Int32Array(w*h).fill(-1),regionSizes=[];let currentRegion=0;
+    for(let y=0;y<h;y++){for(let x=0;x<w;x++){const idx=y*w+x;if(isGreenPixel[idx]&&!isExternal[idx]&&regionId[idx]===-1){const rQueue=[idx];let size=0;while(rQueue.length>0){const cIdx=rQueue.shift();if(regionId[cIdx]!==-1)continue;regionId[cIdx]=currentRegion;size++;const cx=cIdx%w,cy=Math.floor(cIdx/w);for(const[nx,ny] of[[cx-1,cy],[cx+1,cy],[cx,cy-1],[cx,cy+1]]){if(nx>=0&&nx<w&&ny>=0&&ny<h){const nIdx=ny*w+nx;if(isGreenPixel[nIdx]&&!isExternal[nIdx]&&regionId[nIdx]===-1)rQueue.push(nIdx);}}}regionSizes[currentRegion]=size;currentRegion++;}}}
+    const MIN_AREA=30;for(let i=0;i<data.length;i+=4){const idx=i/4;if(isGreenPixel[idx]&&!isExternal[idx]){const rId=regionId[idx];if(rId>=0&&regionSizes[rId]>=MIN_AREA)shouldKeep[idx]=1;}}
+  }
+  let minX=w,minY=h,maxX=0,maxY=0,hasContent=false;
+  const alphas=new Uint8Array(w*h);
+  for(let i=0;i<data.length;i+=4){
+    const r=data[i],g=data[i+1],b=data[i+2],idx=i/4;
+    let alpha=255;
+    if(isGreenPixel[idx]&&!shouldKeep[idx]){
+      const dist=Math.sqrt((r-tr)**2+(g-tg)**2+(b-tb)**2);
+      if(dist<distThreshold)alpha=0;
+      else if(dist<distThreshold+ramp)alpha=((dist-distThreshold)/ramp)*255;
+      if(alpha>0&&alpha<200&&g>(r+b)/2)alpha=0;
+      if(despill&&alpha>0&&isGreenTarget&&g>r&&g>b)data[i+1]=Math.min(r,b);
+    }
+    if(alpha>50){const x=idx%w,y=Math.floor(idx/w);if(x<minX)minX=x;if(x>maxX)maxX=x;if(y<minY)minY=y;if(y>maxY)maxY=y;hasContent=true;}
+    alphas[idx]=alpha;
+  }
+  const trim=3,finalAlphas=new Uint8Array(alphas);
+  for(let y=0;y<h;y++){for(let x=0;x<w;x++){const idx=y*w+x;if(alphas[idx]>0){let shouldClear=false;for(let dy=-trim;dy<=trim;dy++){for(let dx=-trim;dx<=trim;dx++){const nx=x+dx,ny=y+dy;if(nx<0||nx>=w||ny<0||ny>=h||alphas[ny*w+nx]===0){shouldClear=true;break;}}if(shouldClear)break;}if(shouldClear)finalAlphas[idx]=0;}}}
+  for(let i=0;i<data.length;i+=4)data[i+3]=finalAlphas[i/4];
+  ctx.putImageData(imgData,0,0);
+  const finalCanvas=new OffscreenCanvas(outW,outH),finalCtx=finalCanvas.getContext('2d');
+  // 縮放依原始格子尺寸（w×h），不依去背後內容邊界
+  const scale=Math.min(outW/w,outH/h);
+  const finalDrawW=w*scale,finalDrawH=h*scale;
+  const dx=(outW-finalDrawW)/2,dy=(outH-finalDrawH)/2;
+  finalCtx.drawImage(canvas,0,0,w,h,dx,dy,finalDrawW,finalDrawH);
+  finalCanvas.convertToBlob({type:'image/png'}).then(blob=>{const reader=new FileReader();reader.readAsDataURL(blob);reader.onloadend=()=>self.postMessage({id,dataUrl:reader.result});});
+};
+`;
+
+const workerBlob = new Blob([workerScript], { type: 'text/javascript' });
+const workerUrl = URL.createObjectURL(workerBlob);
+let worker = null;
+
+// ===== State =====
+let originalImg = null;
+let slicedPieces = [];
+let finalImages = [];
+let processedCount = 0;
+let totalCells = 0;
+let mainId = null;
+let tabId = null;
+let bgMode = 'none';
+let traditionalEffect = 'complete';
+let advOpen = false;
+let gridLineState = { v: [], h: [], cols: 5, rows: 4, active: false };
+let gridLineDrag = null;
+
+function invalidateFinalOutput(reason) {
+  if (finalImages.length || document.getElementById('btn-download')?.disabled === false) {
+    finalImages = [];
+    processedCount = 0;
+    mainId = null;
+    tabId = null;
+    const btn = document.getElementById('btn-download');
+    if (btn) btn.disabled = true;
+    const grid = document.getElementById('sticker-grid');
+    if (grid) grid.innerHTML = '';
+    const result = document.getElementById('result-card');
+    if (result) result.style.display = 'none';
+  }
+  if (reason) console.info(reason);
+}
+
+function resetGridLineAdjustments(skipRender = false) {
+  const cols = parseInt(document.getElementById('cols')?.value || '5');
+  const rows = parseInt(document.getElementById('rows')?.value || '4');
+  gridLineState = { v: [], h: [], cols, rows, active: false };
+  const status = document.getElementById('grid-drag-status');
+  if (status) status.textContent = '提示：進入第4步後，可拖拉橘色切線微調每格範圍。';
+  if (!skipRender) {
+    invalidateFinalOutput('切線已重置');
+    updateGridCanvas?.();
+    updateSlicePreview?.();
+  }
+}
+
+function getGridRangesFromCanvas(workW, workH) {
+  const cols = parseInt(document.getElementById('cols')?.value || '5');
+  const rows = parseInt(document.getElementById('rows')?.value || '4');
+  const cropL = parseInt(document.getElementById('crop-l')?.value || '0') || 0;
+  const cropR = parseInt(document.getElementById('crop-r')?.value || '0') || 0;
+  const cropT = parseInt(document.getElementById('crop-t')?.value || '0') || 0;
+  const cropB = parseInt(document.getElementById('crop-b')?.value || '0') || 0;
+  const left = Math.max(0, Math.min(workW - 1, cropL));
+  const right = Math.max(left + 1, Math.min(workW, workW - cropR));
+  const top = Math.max(0, Math.min(workH - 1, cropT));
+  const bottom = Math.max(top + 1, Math.min(workH, workH - cropB));
+  const minGapX = Math.max(12, (right - left) / Math.max(cols, 1) * 0.18);
+  const minGapY = Math.max(12, (bottom - top) / Math.max(rows, 1) * 0.18);
+  const hasCustom = gridLineState.active && gridLineState.cols === cols && gridLineState.rows === rows && gridLineState.v.length === cols - 1 && gridLineState.h.length === rows - 1;
+  let v = [];
+  let h = [];
+  if (hasCustom) {
+    v = gridLineState.v.slice().sort((a, b) => a - b).map(x => Math.max(left + minGapX, Math.min(right - minGapX, x)));
+    h = gridLineState.h.slice().sort((a, b) => a - b).map(y => Math.max(top + minGapY, Math.min(bottom - minGapY, y)));
+  } else {
+    for (let c = 1; c < cols; c++) v.push(left + (right - left) * c / cols);
+    for (let r = 1; r < rows; r++) h.push(top + (bottom - top) * r / rows);
+  }
+  return { cols, rows, xCuts: [left, ...v, right], yCuts: [top, ...h, bottom], cropL, cropR, cropT, cropB, custom: hasCustom };
+}
+
+function initGridLineDrag() {
+  const canvas = document.getElementById('grid-canvas');
+  if (!canvas || canvas.dataset.dragReady === '1') return;
+  canvas.dataset.dragReady = '1';
+  const getPoint = (ev) => {
+    const rect = canvas.getBoundingClientRect();
+    return { x: (ev.clientX - rect.left) * canvas.width / rect.width, y: (ev.clientY - rect.top) * canvas.height / rect.height, rect };
+  };
+  canvas.addEventListener('pointerdown', (ev) => {
+    if (!originalImg || !canvas.width || !canvas.height) return;
+    const ranges = getGridRangesFromCanvas(canvas.width, canvas.height);
+    const pt = getPoint(ev);
+    const threshold = Math.max(12, 14 * canvas.width / Math.max(pt.rect.width, 1));
+    let best = null;
+    ranges.xCuts.slice(1, -1).forEach((x, i) => { const d = Math.abs(pt.x - x); if (d < threshold && (!best || d < best.d)) best = { axis: 'v', index: i, d }; });
+    ranges.yCuts.slice(1, -1).forEach((y, i) => { const d = Math.abs(pt.y - y); if (d < threshold && (!best || d < best.d)) best = { axis: 'h', index: i, d }; });
+    if (!best) return;
+    ev.preventDefault();
+    if (!gridLineState.active || gridLineState.cols !== ranges.cols || gridLineState.rows !== ranges.rows) {
+      gridLineState = { v: ranges.xCuts.slice(1, -1), h: ranges.yCuts.slice(1, -1), cols: ranges.cols, rows: ranges.rows, active: true };
+    }
+    gridLineDrag = best;
+    canvas.setPointerCapture?.(ev.pointerId);
+    const status = document.getElementById('grid-drag-status');
+    if (status) status.textContent = best.axis === 'v' ? `拖拉第 ${best.index + 1} 條直切線中...` : `拖拉第 ${best.index + 1} 條橫切線中...`;
+  });
+  canvas.addEventListener('pointermove', (ev) => {
+    if (!gridLineDrag) return;
+    ev.preventDefault();
+    const pt = getPoint(ev);
+    const ranges = getGridRangesFromCanvas(canvas.width, canvas.height);
+    const gapX = Math.max(12, (ranges.xCuts.at(-1) - ranges.xCuts[0]) / Math.max(ranges.cols, 1) * 0.12);
+    const gapY = Math.max(12, (ranges.yCuts.at(-1) - ranges.yCuts[0]) / Math.max(ranges.rows, 1) * 0.12);
+    if (gridLineDrag.axis === 'v') {
+      const i = gridLineDrag.index;
+      const min = (i === 0 ? ranges.xCuts[0] : gridLineState.v[i - 1]) + gapX;
+      const max = (i === gridLineState.v.length - 1 ? ranges.xCuts.at(-1) : gridLineState.v[i + 1]) - gapX;
+      gridLineState.v[i] = Math.max(min, Math.min(max, pt.x));
+    } else {
+      const i = gridLineDrag.index;
+      const min = (i === 0 ? ranges.yCuts[0] : gridLineState.h[i - 1]) + gapY;
+      const max = (i === gridLineState.h.length - 1 ? ranges.yCuts.at(-1) : gridLineState.h[i + 1]) - gapY;
+      gridLineState.h[i] = Math.max(min, Math.min(max, pt.y));
+    }
+    updateGridCanvas();
+  });
+  const endDrag = () => {
+    if (!gridLineDrag) return;
+    gridLineDrag = null;
+    const status = document.getElementById('grid-drag-status');
+    if (status) status.textContent = '已套用自訂切線；切割預覽與 ZIP 會依照目前切線輸出。';
+    invalidateFinalOutput('切線位置已變更');
+    updateGridCanvas();
+    updateSlicePreview();
+  };
+  canvas.addEventListener('pointerup', endDrag);
+  canvas.addEventListener('pointercancel', endDrag);
+}
+
+
+function resetMagicWandStateForNewImage() {
+  if (typeof wandPickPointsV10 !== 'undefined') wandPickPointsV10 = [];
+  if (typeof wandHistoryV13 !== 'undefined') wandHistoryV13 = [];
+  if (typeof wandPickingV10 !== 'undefined') wandPickingV10 = false;
+  const btn = document.getElementById('magic-wand-btn');
+  const src = document.getElementById('wand-source');
+  if (btn) btn.classList.remove('active');
+  if (src) src.classList.remove('wand-pick-active');
+  setMagicWandStatus?.('尚未選取魔術棒位置。');
+}
+
+// ===== Init =====
+function initWorker() {
+  if (worker) worker.terminate();
+  worker = new Worker(workerUrl);
+  worker.onmessage = (e) => {
+    const { id, dataUrl } = e.data;
+    if (!finalImages.find(i => i.id === id)) {
+      finalImages.push({ id, dataUrl });
+      finalImages.sort((a,b) => a.id - b.id);
+    }
+    processedCount++;
+    updateProgress();
+    if (processedCount === totalCells) onProcessDone();
+  };
+}
+
+// ===== Upload =====
+function loadImageIntoMainFlow(file, sourceLabel, targetStep) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = new Image();
+    img.onload = () => {
+      originalImg = img;
+      resetMagicWandStateForNewImage();
+      resetGridLineAdjustments(true);
+      finalImages = [];
+      slicedPieces = [];
+      processedCount = 0;
+      mainId = null;
+      tabId = null;
+      document.getElementById('preview-img').src = ev.target.result;
+      document.getElementById('upload-preview').style.display = 'block';
+      document.getElementById('img-info').textContent = `${img.width} × ${img.height} px ｜ 來源：${sourceLabel || '上傳圖片'}`;
+      document.getElementById('btn-to-step2').disabled = false;
+      document.getElementById('sticker-grid').innerHTML = '';
+      document.getElementById('slice-preview-grid').innerHTML = '';
+      document.getElementById('result-card').style.display = 'none';
+      document.getElementById('btn-download').disabled = true;
+      updateCellInfo();
+      starUpsertMainFile(file);
+      if (targetStep === 3) runPreview();
+      if (targetStep === 4) { updateGridCanvas(); updateSlicePreview(); }
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleUpload(e) {
+  const file = e.target.files[0];
+  loadImageIntoMainFlow(file, 'Step 1 完整流程', 1);
+}
+
+function handleIndependentUpload(e, targetStep) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const label = targetStep === 3 ? '去背頁獨立上傳' : '切割頁獨立上傳';
+  loadImageIntoMainFlow(file, label, targetStep);
+  e.target.value = '';
+}
+
+// ===== Step nav =====
+function goStep(n) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('page'+i)?.classList.toggle('active', i===n);
+    const tab = document.getElementById('tab'+i);
+    if (!tab) return;
+    tab.classList.remove('active','done');
+    if (i === n) tab.classList.add('active');
+    else if (i < n) tab.classList.add('done');
+  });
+  if (n === 2) {
+    starDrawCurrent();
+    starUpdateCurrent();
+  }
+  if (n === 3) {
+    runPreview();
+  }
+  if (n === 4) {
+    updateGridCanvas();
+    updateSlicePreview();
+    initGridLineDrag();
+  }
+  featuredActivateForStep?.(n);
+}
+
+function resetToUpload() {
+  originalImg = null;
+  finalImages = [];
+  slicedPieces = [];
+  processedCount = 0;
+  mainId = null;
+  tabId = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('btn-to-step2').disabled = true;
+  document.getElementById('sticker-grid').innerHTML = '';
+  document.getElementById('slice-preview-grid').innerHTML = '';
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('btn-download').disabled = true;
+  starClearAll();
+  goStep(1);
+}
+
+// ===== 目前工作圖：去背結果正式匯入切割 =====
+function copyCanvas(srcCanvas) {
+  const c = document.createElement('canvas');
+  c.width = srcCanvas.width;
+  c.height = srcCanvas.height;
+  c.getContext('2d').drawImage(srcCanvas, 0, 0);
+  return c;
+}
+
+function buildBaseSheetCanvas() {
+  if (!originalImg) return null;
+  const gridX = parseInt(document.getElementById('grid-x')?.value || '0');
+  const gridY = parseInt(document.getElementById('grid-y')?.value || '0');
+  const gridScale = parseFloat(document.getElementById('grid-scale')?.value || '1');
+  const workW = originalImg.width, workH = originalImg.height;
+  const canvas = document.createElement('canvas');
+  canvas.width = workW;
+  canvas.height = workH;
+  const ctx = canvas.getContext('2d', { willReadFrequently:true });
+  ctx.clearRect(0, 0, workW, workH);
+  const drawW = workW * gridScale;
+  const drawH = workH * gridScale;
+  const dx = (workW - drawW) / 2 + gridX;
+  const dy = (workH - drawH) / 2 + gridY;
+  ctx.drawImage(originalImg, dx, dy, drawW, drawH);
+  return canvas;
+}
+
+function processTraditionalCanvasSync(srcCanvas) {
+  const opt = getTraditionalOptions();
+  const out = copyCanvas(srcCanvas);
+  if ((traditionalEffect || 'complete') === 'none') return out;
+  const ctx = out.getContext('2d', { willReadFrequently:true });
+  const w = out.width, h = out.height;
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const data = imgData.data;
+  const targetColor = opt.targetColor || '#00FF00';
+  const tr = parseInt(targetColor.slice(1,3),16), tg = parseInt(targetColor.slice(3,5),16), tb = parseInt(targetColor.slice(5,7),16);
+  const distThreshold = (Number(opt.tolerance)||30) * 4.42;
+  const ramp = Math.max(1, (Number(opt.smoothness)||0) * 5);
+  const isGreenTarget = targetColor.toLowerCase() === '#00ff00';
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+    let hit = false;
+    const dist = Math.sqrt((r-tr)**2+(g-tg)**2+(b-tb)**2);
+    if (dist < distThreshold) hit = true;
+    else if (isGreenTarget && g > Math.max(r,b)*1.15 && g > 80) hit = true;
+    if (hit) {
+      data[i+3] = 0;
+      data[i] = 0; data[i+1] = 0; data[i+2] = 0;
+    } else if (dist < distThreshold + ramp) {
+      data[i+3] = Math.min(data[i+3], Math.round(255 * ((dist - distThreshold) / ramp)));
+    } else if (opt.despill && isGreenTarget && g > r && g > b) {
+      data[i+1] = Math.min(r, b);
+    }
+  }
+  ctx.putImageData(imgData, 0, 0);
+  return out;
+}
+
+function applySingleWandPointToImageData(srcCanvas, data, point, opt, overlayImg) {
+  if (!point) return 0;
+  const rx = point.x / Math.max(1, point.w || srcCanvas.width);
+  const ry = point.y / Math.max(1, point.h || srcCanvas.height);
+  const sx = Math.max(0, Math.min(srcCanvas.width - 1, Math.floor(rx * srcCanvas.width)));
+  const sy = Math.max(0, Math.min(srcCanvas.height - 1, Math.floor(ry * srcCanvas.height)));
+  let { maskAlpha, sample } = computeWandMaskV10(srcCanvas, sx, sy, opt.tolerance, opt.smoothness);
+  maskAlpha = expandWandMaskAlphaV15(maskAlpha, srcCanvas.width, srcCanvas.height, opt.erode || 0);
+  const [sr, sg, sb] = sample;
+  const isGreenSample = sg > Math.max(sr, sb) * 1.15 && sg > 80;
+  let count = 0;
+  for (let p = 0; p < maskAlpha.length; p++) {
+    const a = maskAlpha[p];
+    if (!a) continue;
+    count++;
+    const idx = p * 4;
+    if (overlayImg) {
+      overlayImg.data[idx] = 255;
+      overlayImg.data[idx+1] = 0;
+      overlayImg.data[idx+2] = 0;
+      overlayImg.data[idx+3] = Math.max(overlayImg.data[idx+3], Math.min(150, Math.max(55, a * 0.55)));
+    }
+    data[idx+3] = Math.max(0, data[idx+3] - a);
+    if (opt.despill && isGreenSample && data[idx+3] > 0 && data[idx+1] > data[idx] && data[idx+1] > data[idx+2]) {
+      const strength = Math.max(0, Math.min(1, (Number(opt.despillStrength) || 0) / 100));
+      const targetG = Math.min(data[idx], data[idx+2]);
+      data[idx+1] = Math.round(data[idx+1] + (targetG - data[idx+1]) * strength);
+    }
+    if (data[idx+3] === 0) { data[idx] = 0; data[idx+1] = 0; data[idx+2] = 0; }
+  }
+  return count;
+}
+
+function processWandCanvasSync(srcCanvas) {
+  const out = copyCanvas(srcCanvas);
+  const points = Array.isArray(wandPickPointsV10) ? wandPickPointsV10 : [];
+  if (!points.length) return out;
+  const opt = getWandOptions();
+  const ctx = out.getContext('2d', { willReadFrequently:true });
+  const imgData = ctx.getImageData(0, 0, out.width, out.height);
+  const data = imgData.data;
+  points.forEach(pt => applySingleWandPointToImageData(srcCanvas, data, pt, opt, null));
+  ctx.putImageData(imgData, 0, 0);
+  return out;
+}
+
+
+function processPieceForCurrentModeSync(pieceCanvas) {
+  if (bgMode === 'traditional') return processTraditionalCanvasSync(pieceCanvas);
+  if (bgMode === 'wand') return processWandCanvasSync(pieceCanvas);
+  return copyCanvas(pieceCanvas);
+}
+
+function buildCurrentWorkSheetCanvas() {
+  if (!originalImg) return null;
+  const base = buildBaseSheetCanvas();
+  if (!base || bgMode === 'none') return base;
+  if (bgMode === 'traditional') return processTraditionalCanvasSync(base);
+  if (bgMode === 'wand') return processWandCanvasSync(base);
+  return base;
+}
+
+
+function getCurrentBgModeLabel() {
+  if (bgMode === 'traditional') return '傳統去背';
+  if (bgMode === 'wand') return '魔術棒去背';
+  return '不去背';
+}
+
+function downloadCurrentWorkImage() {
+  const work = buildCurrentWorkSheetCanvas();
+  if (!work) return;
+  work.toBlob(blob => saveAs(blob, 'bg_removed.png'), 'image/png');
+}
+
+// ===== 即時切割預覽（吃目前工作圖）=====
+function updateSlicePreview() {
+  if (!originalImg) return;
+  const canvas = buildCurrentWorkSheetCanvas();
+  if (!canvas) return;
+  const workW = canvas.width, workH = canvas.height;
+  const ranges = getGridRangesFromCanvas(workW, workH);
+  const grid = document.getElementById('slice-preview-grid');
+  grid.style.gridTemplateColumns = `repeat(${Math.min(ranges.cols, 5)}, 1fr)`;
+  grid.innerHTML = '';
+  const zoomLevel = parseFloat(document.getElementById('zoom')?.value || '1');
+
+  for (let r = 0; r < ranges.rows; r++) {
+    for (let c = 0; c < ranges.cols; c++) {
+      const sx = ranges.xCuts[c];
+      const sy = ranges.yCuts[r];
+      const pieceW = ranges.xCuts[c + 1] - ranges.xCuts[c];
+      const pieceH = ranges.yCuts[r + 1] - ranges.yCuts[r];
+      const pc = document.createElement('canvas');
+      pc.width = Math.max(1, Math.round(pieceW));
+      pc.height = Math.max(1, Math.round(pieceH));
+      pc.getContext('2d').drawImage(canvas, sx, sy, pieceW, pieceH, 0, 0, pc.width, pc.height);
+      const zoomed = makeZoomedPieceCanvas(pc, zoomLevel);
+      const rendered = renderOutputCanvas(zoomed, outputW, outputH);
+      const cell = document.createElement('div');
+      cell.className = 'sticker-cell';
+      const num = r * ranges.cols + c + 1;
+      const cutLabel = ranges.custom ? '自訂切線' : '平均切線';
+      cell.innerHTML = `<div class="checker"><img src="${rendered.toDataURL('image/png')}"></div><div class="num">格${num}｜${getOutputLayoutLabel()}｜${cutLabel}</div>`;
+      grid.appendChild(cell);
+    }
+  }
+}
+
+// ===== 去背預覽（整張母圖）=====
+function buildPreviewSheetCanvas() {
+  return buildBaseSheetCanvas();
+}
+
+function buildPreviewPieceCanvas() {
+  // 保留舊函式名稱供舊呼叫不報錯；現在預覽改為整張母圖。
+  return buildPreviewSheetCanvas();
+}
+
+
+// ===== 去背雙預覽（整張母圖）=====
+let previewWorker = null;
+let wandPickPointsV10 = [];
+let wandHistoryV13 = [];
+let wandPickingV10 = false;
+
+function drawCanvasTo(targetId, srcCanvas) {
+  const c = document.getElementById(targetId);
+  if (!c || !srcCanvas) return;
+  c.width = srcCanvas.width;
+  c.height = srcCanvas.height;
+  c.getContext('2d').clearRect(0, 0, c.width, c.height);
+  c.getContext('2d').drawImage(srcCanvas, 0, 0);
+}
+
+function colorDistanceAt(data, idx, tr, tg, tb) {
+  const dr = data[idx] - tr, dg = data[idx+1] - tg, db = data[idx+2] - tb;
+  return Math.sqrt(dr*dr + dg*dg + db*db);
+}
+
+function computeWandMaskV10(srcCanvas, sx, sy, tolerance, smoothness) {
+  const w = srcCanvas.width, h = srcCanvas.height;
+  const ctx = srcCanvas.getContext('2d', { willReadFrequently:true });
+  const img = ctx.getImageData(0, 0, w, h);
+  const data = img.data;
+  sx = Math.max(0, Math.min(w - 1, Math.floor(sx)));
+  sy = Math.max(0, Math.min(h - 1, Math.floor(sy)));
+  const start = (sy * w + sx) * 4;
+  const tr = data[start], tg = data[start+1], tb = data[start+2];
+  const visited = new Uint8Array(w*h);
+  const maskAlpha = new Uint8Array(w*h);
+  const stackX = new Int32Array(w*h);
+  const stackY = new Int32Array(w*h);
+  let top = 0;
+  stackX[top] = sx; stackY[top] = sy; top++;
+  const tol = Math.max(0, Number(tolerance) || 0);
+  const soft = Math.max(1, (Number(smoothness)||0) * 10);
+  while (top > 0) {
+    top--;
+    const x = stackX[top], y = stackY[top];
+    if (x < 0 || x >= w || y < 0 || y >= h) continue;
+    const p = y*w + x;
+    if (visited[p]) continue;
+    visited[p] = 1;
+    const idx = p*4;
+    const dist = colorDistanceAt(data, idx, tr, tg, tb);
+    if (dist <= tol + soft) {
+      maskAlpha[p] = dist <= tol ? 255 : Math.max(0, Math.round(255 * (1 - (dist - tol) / soft)));
+      if (top + 4 < stackX.length) {
+        stackX[top] = x+1; stackY[top] = y; top++;
+        stackX[top] = x-1; stackY[top] = y; top++;
+        stackX[top] = x; stackY[top] = y+1; top++;
+        stackX[top] = x; stackY[top] = y-1; top++;
+      }
+    }
+  }
+  return { maskAlpha, sample:[tr,tg,tb] };
+}
+
+function expandWandMaskAlphaV15(maskAlpha, w, h, iterations) {
+  iterations = Math.max(0, Math.min(3, Math.round(Number(iterations) || 0)));
+  if (!iterations) return maskAlpha;
+  let cur = maskAlpha;
+  for (let n = 0; n < iterations; n++) {
+    const next = new Uint8Array(cur);
+    for (let y = 0; y < h; y++) {
+      const row = y * w;
+      for (let x = 0; x < w; x++) {
+        const p = row + x;
+        if (cur[p]) continue;
+        let maxA = 0;
+        if (x > 0) maxA = Math.max(maxA, cur[p - 1]);
+        if (x < w - 1) maxA = Math.max(maxA, cur[p + 1]);
+        if (y > 0) maxA = Math.max(maxA, cur[p - w]);
+        if (y < h - 1) maxA = Math.max(maxA, cur[p + w]);
+        if (maxA) next[p] = Math.max(next[p], Math.round(maxA * 0.85));
+      }
+    }
+    cur = next;
+  }
+  return cur;
+}
+
+function renderWandPreviewV10(srcCanvas) {
+  if (!srcCanvas) return;
+  drawCanvasTo('wand-source', srcCanvas);
+  const overlay = document.getElementById('wand-mask-overlay');
+  const after = document.getElementById('wand-after');
+  if (!overlay || !after) return;
+  overlay.width = srcCanvas.width; overlay.height = srcCanvas.height;
+  after.width = srcCanvas.width; after.height = srcCanvas.height;
+  overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);
+  const actx = after.getContext('2d', { willReadFrequently:true });
+  actx.clearRect(0,0,after.width,after.height);
+  actx.drawImage(srcCanvas, 0, 0);
+  const points = Array.isArray(wandPickPointsV10) ? wandPickPointsV10 : [];
+  if (!points.length) return;
+  const wandOpt = getWandOptions();
+  const w = srcCanvas.width, h = srcCanvas.height;
+  const octx = overlay.getContext('2d');
+  const overlayImg = octx.createImageData(w,h);
+  const out = actx.getImageData(0,0,w,h);
+  const data = out.data;
+  let total = 0;
+  points.forEach(pt => { total += applySingleWandPointToImageData(srcCanvas, data, pt, wandOpt, overlayImg); });
+  octx.putImageData(overlayImg, 0, 0);
+  actx.putImageData(out, 0, 0);
+  const status = document.getElementById('magic-wand-status');
+  if (status) status.textContent = `已累積 ${points.length} 個魔術棒點，選取約 ${total} px。清邊 ${wandOpt.erode}px，Despill ${wandOpt.despill ? wandOpt.despillStrength + '%' : '關'}。`;
+}
+
+
+function getWandOptions() {
+  return {
+    tolerance: parseInt(document.getElementById('wand-tolerance')?.value || '30'),
+    smoothness: parseInt(document.getElementById('wand-smoothness')?.value || '2'),
+    erode: parseInt(document.getElementById('wand-erode')?.value || '1'),
+    despill: !!document.getElementById('wand-despill')?.checked,
+    despillStrength: parseInt(document.getElementById('wand-despill-strength')?.value || '75')
+  };
+}
+function getTraditionalOptions() {
+  return {
+    targetColor: document.getElementById('target-color')?.value || '#00FF00',
+    tolerance: parseInt(document.getElementById('tolerance')?.value || '30'),
+    smoothness: parseInt(document.getElementById('smoothness')?.value || '2'),
+    despill: !!document.getElementById('despill')?.checked,
+    effect: traditionalEffect || 'complete'
+  };
+}
+
+function runPreview() {
+  if (!originalImg) return;
+  const status = document.getElementById('preview-status');
+  const pCanvas = buildPreviewSheetCanvas();
+  if (!pCanvas) return;
+
+  // 兩邊的「原圖預覽」永遠都從乾淨母圖重畫，不能吃 workImage / processedImage。
+  drawCanvasTo('preview-before', pCanvas);
+  drawCanvasTo('wand-source', pCanvas);
+
+  // 傳統結果只跑傳統，不影響魔術棒。
+  const tradCanvas = processTraditionalCanvasSync(pCanvas);
+  drawCanvasTo('preview-after', tradCanvas);
+
+  // 魔術棒結果：未點選前必須與原圖完全一致；多次點選後才累積套用。
+  const points = Array.isArray(wandPickPointsV10) ? wandPickPointsV10 : [];
+  const overlay = document.getElementById('wand-mask-overlay');
+  if (overlay) {
+    overlay.width = pCanvas.width;
+    overlay.height = pCanvas.height;
+    overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
+  }
+
+  if (!points.length) {
+    drawCanvasTo('wand-after', pCanvas);
+    if (status) {
+      const label = bgMode === 'none' ? '目前模式：不去背' : (bgMode === 'traditional' ? '目前模式：傳統去背' : '目前模式：魔術棒去背');
+      status.textContent = `✅ 預覽完成。${label}。魔術棒尚未選取，右側原圖與結果會保持原圖，不會預先去背。`;
+    }
+    return;
+  }
+
+  renderWandPreviewV10(pCanvas);
+  if (status) {
+    const label = bgMode === 'none' ? '目前模式：不去背' : (bgMode === 'traditional' ? '目前模式：傳統去背' : '目前模式：魔術棒去背');
+    status.textContent = `✅ 預覽完成。${label}。魔術棒已累積 ${points.length} 點；預覽與匯出同一模式，不會 1+2 疊加。`;
+  }
+}
+// ===== Settings =====
+function applyPreset(type) {
+  document.getElementById('preset-green').className = 'preset-btn' + (type==='green'?' active-green':'');
+  document.getElementById('preset-black').className = 'preset-btn' + (type==='black'?' active-black':'');
+  document.getElementById('preset-white').className = 'preset-btn' + (type==='white'?' active-white':'');
+  if (type === 'green') {
+    document.getElementById('target-color').value = '#00FF00';
+    document.getElementById('color-hex').textContent = '#00FF00';
+    document.getElementById('tolerance').value = 30;
+    document.getElementById('tol-val').textContent = 30;
+    document.getElementById('smoothness').value = 2;
+    document.getElementById('smooth-val').textContent = 2;
+    document.getElementById('zoom').value = 1.00;
+    document.getElementById('zoom-val').textContent = '0%';
+    document.getElementById('despill').checked = true;
+    traditionalEffect = 'complete';
+    setBgMode('traditional', false);
+  } else if (type === 'white') {
+    document.getElementById('target-color').value = '#FFFFFF';
+    document.getElementById('color-hex').textContent = '#FFFFFF';
+    document.getElementById('tolerance').value = 20;
+    document.getElementById('tol-val').textContent = 20;
+    document.getElementById('smoothness').value = 3;
+    document.getElementById('smooth-val').textContent = 3;
+    document.getElementById('zoom').value = 1.00;
+    document.getElementById('zoom-val').textContent = '0%';
+    document.getElementById('despill').checked = false;
+    traditionalEffect = 'complete';
+    setBgMode('traditional', false);
+  } else {
+    document.getElementById('target-color').value = '#000000';
+    document.getElementById('color-hex').textContent = '#000000';
+    document.getElementById('tolerance').value = 15;
+    document.getElementById('tol-val').textContent = 15;
+    document.getElementById('smoothness').value = 1;
+    document.getElementById('smooth-val').textContent = 1;
+    document.getElementById('zoom').value = 1.00;
+    document.getElementById('zoom-val').textContent = '0%';
+    document.getElementById('despill').checked = false;
+    traditionalEffect = 'complete';
+    setBgMode('traditional', false);
+  }
+}
+
+
+// ===== Magic Wand Color Picker v9.3 =====
+let magicWandPicking = false;
+
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+
+function setMagicWandStatus(text) {
+  const el = document.getElementById('magic-wand-status');
+  if (el) el.textContent = text;
+}
+
+function setMagicWandButtonActive(active) {
+  const btn = document.getElementById('magic-wand-btn');
+  const canvas = document.getElementById('grid-canvas');
+  if (btn) btn.classList.toggle('active', active);
+  if (canvas) canvas.classList.toggle('wand-picking', active);
+}
+
+function toggleMagicWandPicker(force) {
+  if (!originalImg) {
+    setMagicWandStatus('請先上傳或匯入圖片，再使用魔術棒。');
+    return;
+  }
+  wandPickingV10 = typeof force === 'boolean' ? force : !wandPickingV10;
+  const btn = document.getElementById('magic-wand-btn');
+  const src = document.getElementById('wand-source');
+  if (btn) btn.classList.toggle('active', wandPickingV10);
+  if (src) src.classList.toggle('wand-pick-active', wandPickingV10);
+  setMagicWandStatus(wandPickingV10 ? '魔術棒已啟用：可在右側整張母圖連續點選多個背景區。' : '魔術棒已關閉。');
+  runPreview();
+}
+
+function clearMagicWandV10() {
+  wandPickPointsV10 = [];
+  wandHistoryV13 = [];
+  wandPickingV10 = false;
+  const btn = document.getElementById('magic-wand-btn');
+  const src = document.getElementById('wand-source');
+  if (btn) btn.classList.remove('active');
+  if (src) src.classList.remove('wand-pick-active');
+  setMagicWandStatus('已清除全部魔術棒選區。');
+  runPreview();
+}
+
+function undoMagicWandV13() {
+  if (!wandPickPointsV10.length) {
+    setMagicWandStatus('目前沒有可復原的魔術棒點。');
+    return;
+  }
+  const last = wandPickPointsV10.pop();
+  wandHistoryV13.push(last);
+  setMagicWandStatus(`已復原上一點，剩 ${wandPickPointsV10.length} 個魔術棒點。`);
+  runPreview();
+}
+
+
+function handleWandSourceClickV10(event) {
+  if (!wandPickingV10 || !originalImg) return;
+  const canvas = document.getElementById('wand-source');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const x = Math.max(0, Math.min(canvas.width - 1, Math.floor((event.clientX - rect.left) * canvas.width / rect.width)));
+  const y = Math.max(0, Math.min(canvas.height - 1, Math.floor((event.clientY - rect.top) * canvas.height / rect.height)));
+  wandPickPointsV10.push({ x, y, w: canvas.width, h: canvas.height });
+  wandHistoryV13 = [];
+  canvas.classList.add('wand-pick-active');
+  const btn = document.getElementById('magic-wand-btn');
+  if (btn) btn.classList.add('active');
+  setMagicWandStatus(`新增魔術棒點：x=${x}, y=${y}。目前共 ${wandPickPointsV10.length} 點，可繼續點選。`);
+  setBgMode('wand', false);
+  runPreview();
+}
+
+
+
+function getCleanGridSampleCanvas() {
+  if (!originalImg) return null;
+  const gridX = parseInt(document.getElementById('grid-x').value) || 0;
+  const gridY = parseInt(document.getElementById('grid-y').value) || 0;
+  const gridScale = parseFloat(document.getElementById('grid-scale').value) || 1;
+  const workW = originalImg.width;
+  const workH = originalImg.height;
+  const canvas = document.createElement('canvas');
+  canvas.width = workW;
+  canvas.height = workH;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.clearRect(0, 0, workW, workH);
+  const drawW = workW * gridScale;
+  const drawH = workH * gridScale;
+  const dx = (workW - drawW) / 2 + gridX;
+  const dy = (workH - drawH) / 2 + gridY;
+  ctx.drawImage(originalImg, dx, dy, drawW, drawH);
+  return canvas;
+}
+
+function applyMagicWandColor(hex) {
+  const target = document.getElementById('target-color');
+  const colorHex = document.getElementById('color-hex');
+  const tolerance = document.getElementById('tolerance');
+  const tolVal = document.getElementById('tol-val');
+  const smoothness = document.getElementById('smoothness');
+  const smoothVal = document.getElementById('smooth-val');
+  const despill = document.getElementById('despill');
+  if (target) target.value = hex;
+  if (colorHex) colorHex.textContent = hex;
+
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  let suggestedTol = 25;
+  let suggestedSmooth = 2;
+  let suggestedDespill = false;
+
+  if (g > Math.max(r, b) * 1.15 && g > 80) {
+    suggestedTol = 30;
+    suggestedSmooth = 2;
+    suggestedDespill = true;
+  } else if (r > 235 && g > 235 && b > 235) {
+    suggestedTol = 20;
+    suggestedSmooth = 3;
+  } else if (r < 35 && g < 35 && b < 35) {
+    suggestedTol = 15;
+    suggestedSmooth = 1;
+  }
+
+  if (tolerance) tolerance.value = suggestedTol;
+  if (tolVal) tolVal.textContent = suggestedTol;
+  if (smoothness) smoothness.value = suggestedSmooth;
+  if (smoothVal) smoothVal.textContent = suggestedSmooth;
+  if (despill) despill.checked = suggestedDespill;
+  setMode('complete');
+}
+
+function handleMagicWandCanvasClick(event) {
+  if (!magicWandPicking || !originalImg) return;
+  const canvas = document.getElementById('grid-canvas');
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const x = Math.max(0, Math.min(canvas.width - 1, Math.floor((event.clientX - rect.left) * canvas.width / rect.width)));
+  const y = Math.max(0, Math.min(canvas.height - 1, Math.floor((event.clientY - rect.top) * canvas.height / rect.height)));
+  const sampleCanvas = getCleanGridSampleCanvas();
+  if (!sampleCanvas) return;
+  const data = sampleCanvas.getContext('2d', { willReadFrequently: true }).getImageData(x, y, 1, 1).data;
+  const hex = rgbToHex(data[0], data[1], data[2]);
+  applyMagicWandColor(hex);
+  magicWandPicking = false;
+  setMagicWandButtonActive(false);
+  setMagicWandStatus(`已取樣 ${hex}（x=${x}, y=${y}），並已更新目標顏色 / 容許度。`);
+}
+
+window.addEventListener('load', () => {
+  traditionalEffect = 'complete';
+  document.getElementById('trad-mode-complete')?.classList.add('active');
+  document.getElementById('trad-mode-preserve')?.classList.remove('active');
+  setBgMode('none', false);
+  const canvas = document.getElementById('grid-canvas');
+  if (canvas) canvas.addEventListener('click', handleMagicWandCanvasClick);
+  const wandSource = document.getElementById('wand-source');
+  if (wandSource) wandSource.addEventListener('click', handleWandSourceClickV10);
+});
+
+document.getElementById('target-color')?.addEventListener('input', function() {
+  document.getElementById('color-hex').textContent = this.value.toUpperCase();
+  runPreview();
+});
+
+function setTraditionalEffect(m) {
+  traditionalEffect = m === 'preserve' ? 'preserve' : 'complete';
+  document.getElementById('trad-mode-complete')?.classList.toggle('active', traditionalEffect === 'complete');
+  document.getElementById('trad-mode-preserve')?.classList.toggle('active', traditionalEffect === 'preserve');
+  if (bgMode !== 'traditional') setBgMode('traditional', false);
+  runPreview();
+}
+
+function setBgMode(m, doPreview = true) {
+  bgMode = (m === 'wand' || m === 'traditional' || m === 'none') ? m : 'none';
+  const none = document.getElementById('bg-mode-none');
+  const trad = document.getElementById('bg-mode-traditional');
+  const wand = document.getElementById('bg-mode-wand');
+  [none, trad, wand].forEach(btn => { if (btn) btn.className = 'mode-btn bg-mode-btn'; });
+  if (bgMode === 'none' && none) none.classList.add('active-none');
+  if (bgMode === 'traditional' && trad) trad.classList.add('active-traditional');
+  if (bgMode === 'wand' && wand) wand.classList.add('active-wand');
+  document.getElementById('panel-none')?.classList.toggle('active', bgMode === 'none');
+  document.getElementById('panel-traditional')?.classList.toggle('active', bgMode === 'traditional');
+  document.getElementById('panel-wand')?.classList.toggle('active', bgMode === 'wand');
+  if (doPreview) runPreview();
+}
+
+function toggleAdv() {
+  const adv = document.getElementById('adv-content');
+  const arrow = document.getElementById('adv-arrow');
+  if (!adv) return;
+  advOpen = !advOpen;
+  adv.classList.toggle('open', advOpen);
+  if (arrow) arrow.textContent = advOpen ? '▲' : '▼';
+}
+
+function toggleAdv() {
+  advOpen = !advOpen;
+  document.getElementById('adv-content').classList.toggle('open', advOpen);
+  document.getElementById('adv-arrow').textContent = advOpen ? '▲' : '▼';
+}
+
+function updateCellInfo() {
+  const cols = parseInt(document.getElementById('cols').value);
+  const rows = parseInt(document.getElementById('rows').value);
+  const cropL = parseInt(document.getElementById('crop-l').value) || 0;
+  const cropR = parseInt(document.getElementById('crop-r').value) || 0;
+  const cropT = parseInt(document.getElementById('crop-t').value) || 0;
+  const cropB = parseInt(document.getElementById('crop-b').value) || 0;
+  document.getElementById('total-cells').textContent = cols * rows;
+  if (originalImg) {
+    const effW = originalImg.width - cropL - cropR;
+    const effH = originalImg.height - cropT - cropB;
+    const cw = Math.round(effW / cols);
+    const ch = Math.round(effH / rows);
+    document.getElementById('cell-size').textContent = `${cw}×${ch}`;
+  }
+}
+
+function updateGridCanvas() {
+  if (!originalImg) return;
+  const workCanvas = buildCurrentWorkSheetCanvas();
+  if (!workCanvas) return;
+  const workW = workCanvas.width, workH = workCanvas.height;
+  const ranges = getGridRangesFromCanvas(workW, workH);
+  const canvas = document.getElementById('grid-canvas');
+  canvas.width = workW;
+  canvas.height = workH;
+  const ctx = canvas.getContext('2d');
+
+  ctx.clearRect(0, 0, workW, workH);
+  ctx.drawImage(workCanvas, 0, 0);
+
+  const cropL = ranges.xCuts[0];
+  const cropR = workW - ranges.xCuts.at(-1);
+  const cropT = ranges.yCuts[0];
+  const cropB = workH - ranges.yCuts.at(-1);
+  const effW = ranges.xCuts.at(-1) - ranges.xCuts[0];
+  const effH = ranges.yCuts.at(-1) - ranges.yCuts[0];
+
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  if (cropL > 0) ctx.fillRect(0, 0, cropL, workH);
+  if (cropR > 0) ctx.fillRect(workW - cropR, 0, cropR, workH);
+  if (cropT > 0) ctx.fillRect(0, 0, workW, cropT);
+  if (cropB > 0) ctx.fillRect(0, workH - cropB, workW, cropB);
+
+  ctx.strokeStyle = ranges.custom ? 'rgba(255,209,102,0.95)' : 'rgba(255,107,53,0.85)';
+  ctx.lineWidth = 6;
+  ctx.setLineDash([24, 16]);
+  for (let c = 1; c < ranges.xCuts.length - 1; c++) {
+    const x = ranges.xCuts[c];
+    ctx.beginPath(); ctx.moveTo(x, ranges.yCuts[0]); ctx.lineTo(x, ranges.yCuts.at(-1)); ctx.stroke();
+  }
+  for (let r = 1; r < ranges.yCuts.length - 1; r++) {
+    const y = ranges.yCuts[r];
+    ctx.beginPath(); ctx.moveTo(ranges.xCuts[0], y); ctx.lineTo(ranges.xCuts.at(-1), y); ctx.stroke();
+  }
+  ctx.setLineDash([]);
+  ctx.strokeStyle = 'rgba(255,107,53,0.8)';
+  ctx.lineWidth = 8;
+  ctx.strokeRect(ranges.xCuts[0] + 4, ranges.yCuts[0] + 4, effW - 8, effH - 8);
+
+  const avgColW = effW / Math.max(ranges.cols, 1);
+  ctx.font = `bold ${Math.round(avgColW * 0.18)}px Share Tech Mono, monospace`;
+  ctx.fillStyle = 'rgba(255,107,53,0.5)';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  for (let r = 0; r < ranges.rows; r++) {
+    for (let c = 0; c < ranges.cols; c++) {
+      const num = r * ranges.cols + c + 1;
+      const cx = (ranges.xCuts[c] + ranges.xCuts[c + 1]) / 2;
+      const cy = (ranges.yCuts[r] + ranges.yCuts[r + 1]) / 2;
+      ctx.fillText(num, cx, cy);
+    }
+  }
+  const status = document.getElementById('grid-drag-status');
+  if (status && !gridLineDrag) status.textContent = ranges.custom ? '目前使用自訂切線；切割預覽與 ZIP 會依照目前切線輸出。' : '提示：可拖拉橘色切線微調每格範圍。';
+  updateCellInfo();
+}
+
+document.getElementById('start-num').addEventListener('input', () => {
+  if (finalImages.length > 0) {
+    onProcessDone();
+    renderPackGrid();
+  }
+});
+
+// ===== Process =====
+function confirmExportPrecheckV17() {
+  const cols = parseInt(document.getElementById('cols')?.value || '0');
+  const rows = parseInt(document.getElementById('rows')?.value || '0');
+  const startNum = parseInt(document.getElementById('start-num')?.value || '1') || 1;
+  const count = cols * rows;
+  const endNum = startNum + count - 1;
+  const sizeLabel = `${outputW}×${outputH}`;
+  const digitExample = `${String(startNum).padStart(outputDigits, '0')}.png ～ ${String(endNum).padStart(outputDigits, '0')}.png`;
+  const lines = [
+    '輸出前檢查：',
+    `尺寸：${sizeLabel}`,
+    `格數：${cols} × ${rows} = ${count} 張`,
+    `檔名：${digitExample}`,
+    `去背模式：${getCurrentBgModeLabel()}`,
+    `成品排版：${getOutputLayoutLabel()}`,
+    '',
+    '請確認格數、起始編號、檔名碼數與 LINE 上傳需求一致。',
+    '若是表情貼或特殊編號素材，也請確認圖片內容與指定編號一致。',
+    '',
+    '是否繼續切割＋打包？'
+  ];
+  return window.confirm(lines.join('\n'));
+}
+
+async function startProcess() {
+  if (!originalImg) return;
+  if (!confirmExportPrecheckV17()) return;
+  if (bgMode === 'wand' && (!Array.isArray(wandPickPointsV10) || !wandPickPointsV10.length)) {
+    alert('請先在魔術棒整張母圖預覽上點選至少一個背景區，再開始分割打包。');
+    goStep(3);
+    return;
+  }
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('progress-area').style.display = 'block';
+  document.getElementById('btn-download').disabled = true;
+  slicedPieces = [];
+  finalImages = [];
+  processedCount = 0;
+  mainId = null;
+  tabId = null;
+  const failedIds = [];
+  const zoomLevel = parseFloat(document.getElementById('zoom').value);
+  const canvas = buildCurrentWorkSheetCanvas();
+  if (!canvas) return;
+  const ranges = getGridRangesFromCanvas(canvas.width, canvas.height);
+  totalCells = ranges.cols * ranges.rows;
+  document.getElementById('sticker-grid').innerHTML = '';
+  updateProgress();
+
+  for (let r = 0; r < ranges.rows; r++) {
+    for (let c = 0; c < ranges.cols; c++) {
+      const id = r * ranges.cols + c + 1;
+      try {
+        const sx = ranges.xCuts[c], sy = ranges.yCuts[r];
+        const pieceW = ranges.xCuts[c + 1] - ranges.xCuts[c];
+        const pieceH = ranges.yCuts[r + 1] - ranges.yCuts[r];
+        const piece = document.createElement('canvas');
+        piece.width = Math.max(1, Math.round(pieceW));
+        piece.height = Math.max(1, Math.round(pieceH));
+        piece.getContext('2d').drawImage(canvas, sx, sy, pieceW, pieceH, 0, 0, piece.width, piece.height);
+        const zoomed = makeZoomedPieceCanvas(piece, zoomLevel);
+        const rendered = renderOutputCanvas(zoomed, outputW, outputH);
+        slicedPieces.push({ id, previewUrl: rendered.toDataURL('image/png') });
+        finalImages.push({ id, dataUrl: rendered.toDataURL('image/png') });
+      } catch (err) {
+        failedIds.push(id);
+        console.error('切割失敗', id, err);
+      }
+      processedCount++;
+      updateProgress();
+      if (processedCount % 4 === 0) await new Promise(resolve => requestAnimationFrame(resolve));
+    }
+  }
+  finalImages.sort((a,b) => a.id - b.id);
+  onProcessDone();
+  if (failedIds.length) alert(`完成，但格 ${failedIds.join('、')} 處理失敗；其餘圖片已保留。`);
+}
+
+
+function updateProgress() {
+  const pct = totalCells > 0 ? Math.round(processedCount / totalCells * 100) : 0;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('status-text').textContent = `處理中 ${processedCount} / ${totalCells}`;
+}
+
+function onProcessDone() {
+  document.getElementById('progress-area').style.display = 'none';
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('btn-download').disabled = false;
+
+  const startNum = parseInt(document.getElementById('start-num').value) || 1;
+  const grid = document.getElementById('sticker-grid');
+  grid.innerHTML = '';
+
+  finalImages.forEach((img, idx) => {
+    const fileNum = (startNum + img.id - 1).toString().padStart(outputDigits, '0');
+    const cell = document.createElement('div');
+    cell.className = 'sticker-cell';
+    cell.innerHTML = `
+      <div class="checker"><img src="${img.dataUrl}" alt="${fileNum}"></div>
+      <div class="num">${fileNum}.png</div>
+      <div class="cell-btns">
+        <div class="cell-btn" id="main-${img.id}" onclick="selMain(${img.id})">Main</div>
+        <div class="cell-btn" id="tab-${img.id}" onclick="selTab(${img.id})">Tab</div>
+      </div>
+    `;
+    grid.appendChild(cell);
+  });
+
+  // Also populate pack grid
+  renderPackGrid();
+}
+
+function selMain(id) {
+  if (mainId) document.getElementById('main-'+mainId)?.classList.remove('sel-main');
+  mainId = id;
+  document.getElementById('main-'+id)?.classList.add('sel-main');
+  renderPackGrid();
+}
+
+function selTab(id) {
+  if (tabId) document.getElementById('tab-'+tabId)?.classList.remove('sel-tab');
+  tabId = id;
+  document.getElementById('tab-'+id)?.classList.add('sel-tab');
+  renderPackGrid();
+}
+
+function renderPackGrid() {
+  const startNum = parseInt(document.getElementById('start-num').value) || 1;
+  const grid = document.getElementById('pack-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  finalImages.forEach((img, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'sticker-cell';
+    cell.innerHTML = `
+      <div class="checker"><img src="${img.dataUrl}"></div>
+      <div class="num">${(startNum+img.id-1).toString().padStart(outputDigits,'0')}.png</div>
+      <div class="cell-btns">
+        <div class="cell-btn ${mainId===img.id?'sel-main':''}" onclick="selMain(${img.id})">Main</div>
+        <div class="cell-btn ${tabId===img.id?'sel-tab':''}" onclick="selTab(${img.id})">Tab</div>
+      </div>
+    `;
+    grid.appendChild(cell);
+  });
+}
+
+// ===== Download =====
+async function resizeImg(dataUrl, w, h) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d');
+      const scale = Math.min(w/img.width, h/img.height);
+      const nw = img.width*scale, nh = img.height*scale;
+      ctx.drawImage(img, 0, 0, img.width, img.height, (w-nw)/2, (h-nh)/2, nw, nh);
+      resolve(c.toDataURL('image/png').split(',')[1]);
+    };
+    img.src = dataUrl;
+  });
+}
+
+async function downloadZip() {
+  const startNum = parseInt(document.getElementById('start-num').value) || 1;
+  const zip = new JSZip();
+  finalImages.forEach((img, idx) => {
+    const base64 = img.dataUrl.split(',')[1];
+    zip.file(`${(startNum+img.id-1).toString().padStart(outputDigits,'0')}.png`, base64, { base64: true });
+  });
+  if (mainId) {
+    const m = finalImages.find(i => i.id === mainId);
+    if (m) zip.file('main.png', await resizeImg(m.dataUrl, 240, 240), { base64: true });
+  }
+  if (tabId) {
+    const t = finalImages.find(i => i.id === tabId);
+    if (t) zip.file('tab.png', await resizeImg(t.dataUrl, 96, 74), { base64: true });
+  }
+  zip.generateAsync({ type: 'blob' }).then(c => saveAs(c, 'stickers.zip'));
+}
+
+
+// Init
+applyPreset('green');
+updateCellInfo();
+updateOutputLayoutUI();
+// ===== 公開版更新日期顯示 =====
+(function(){
+  const tag = document.getElementById('ver-tag');
+  if (tag) tag.textContent = '更新日期 2026/07/11';
+})();
+
+// ===== 精選作品輪播｜0711V22 三頁獨立版 =====
+const FEATURED_STICKER_ITEMS = [
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/35100805/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "煩躁胖子・又見嘴砲",
+    "desc": "煩躁胖子又回來嘴砲了，日常吐槽、崩潰、敷衍、裝沒事都能用，讓生活增加不少樂趣",
+    "url": "https://store.line.me/stickershop/product/35100805/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/35085299/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "柴柴就是吐你沒保留",
+    "desc": "柴柴就是要吐槽你，沒保留、沒客氣。日常聊天、傻眼、回嘴、嘴一下都能用。",
+    "url": "https://store.line.me/stickershop/product/35085299/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34959948/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "煩躁黑青犬・臭臉上線",
+    "desc": "黑青眼、方胖身、臭臉又煩躁的醜萌犬無字登場！適合日常敷衍、厭世反應、無聲吐槽與各種不想說話的時刻。",
+    "url": "https://store.line.me/stickershop/product/34959948/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/35058060/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "奶呼呼小象",
+    "desc": "可愛的奶呼呼小象無字貼圖，用柔軟表情傳達心情，不用文字也能自然回覆聊天。",
+    "url": "https://store.line.me/stickershop/product/35058060/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34982060/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "懶教人，就讓貼圖教之可以先停了",
+    "desc": "不是不聽，也不是沒禮貌，只是覺得可以先停了。冷淡、禮貌、句點式日常回覆，適合不想繼續解釋的時候使用。",
+    "url": "https://store.line.me/stickershop/product/34982060/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34959941/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "百變粉紅小豬・就想愛你",
+    "desc": "粉紅小豬的甜甜戀愛貼圖，想你、抱抱、撒嬌、吃醋、等回覆都能用，適合情侶聊天與日常可愛互動。",
+    "url": "https://store.line.me/stickershop/product/34959941/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34642879/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "歹命抹布・台語碎念",
+    "desc": "一塊被生活用到快乾掉的抹布，厭世又歹命，用台語碎念回覆日常、加班、被催、被凹和各種有夠煩的時刻。",
+    "url": "https://store.line.me/stickershop/product/34642879/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34863173/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "軟萌小刺蝟來撒嬌",
+    "desc": "軟萌小刺蝟帶著可愛表情來撒嬌，適合聊天、問候、加油與日常回覆。",
+    "url": "https://store.line.me/stickershop/product/34863173/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34405642/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "招福達摩來賜福（福氣滿滿）",
+    "desc": "繽紛福福達摩搭配各種吉祥小元素，帶來祝福、守護、好運與滿滿福氣，讓聊天更有喜氣與心意。",
+    "url": "https://store.line.me/stickershop/product/34405642/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34434855/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "福福達摩祝福徽章",
+    "desc": "把招財、平安、好運都收錄。送祝福、討吉利、日常打氣都剛好。一切都在福福達摩祝福徽章。",
+    "url": "https://store.line.me/stickershop/product/34434855/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34958267/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "被突破的手機，爆裂衝出",
+    "desc": "手機畫面被強烈文字突破，爆裂感從螢幕中心衝出來。適合震驚、吐槽、爆氣、不耐煩、拒絕廢話與強烈回覆，讓每一句訊息都像從手機裡炸出來一樣有存在感。",
+    "url": "https://store.line.me/stickershop/product/34958267/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34937666/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "阿醜的白爛雞屁梯",
+    "desc": "黑框胖胖阿醜化身白爛雞屁梯，專門用欠揍表情亂回朋友。裝懂、胡扯、傻眼、崩潰、賤嘴反應都有。",
+    "url": "https://store.line.me/stickershop/product/34937666/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34955913/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "柴柴的問候・溫暖你心",
+    "desc": "柴柴用溫暖的問候陪著你。早安、晚安、謝謝、辛苦了，讓聊天多一點貼心與溫度。",
+    "url": "https://store.line.me/stickershop/product/34955913/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/stickershop/v1/product/34897609/LINEStorePC/main.png?v=1",
+    "labels": [
+      "貼圖"
+    ],
+    "title": "奶橘小毛球・暖心問候",
+    "desc": "奶橘小毛球帶著早安、想你了、謝謝你、晚安囉等暖心短句，適合聊天開場、即時回覆、店家接待與親友互動。橘白毛茸茸的小身影配上呆萌表情，讓每一句話都更親切可愛。",
+    "url": "https://store.line.me/stickershop/product/34897609/zh-Hant"
+  }
+];
+const FEATURED_EMOJI_ITEMS = [
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4f52f6a9ee5b3be23631ac/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "常用單詞印章2",
+    "desc": "常用聊天單詞表情貼，收錄動作、狀態、日常回應與對話常見用字，適合快速貼出。",
+    "url": "https://store.line.me/emojishop/product/6a4f52f6a9ee5b3be23631ac/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4f52babfc6ef757e559b42/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "常用單詞印章1",
+    "desc": "常用聊天單詞印章，收錄情緒、反應、吐槽與簡短回覆，適合日常對話快速使用。",
+    "url": "https://store.line.me/emojishop/product/6a4f52babfc6ef757e559b42/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4f14c8bfc6ef757e5599aa/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "滑金影字母貼",
+    "desc": "滑金影風格的字母、數字與符號表情貼，帶有順滑筆畫與金色點綴感，適合日常聊天與文字拼貼。",
+    "url": "https://store.line.me/emojishop/product/6a4f14c8bfc6ef757e5599aa/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4e0763bfc6ef757e55965a/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "金靛滑筆字母假名貼",
+    "desc": "金靛滑筆風格的字母、假名與符號表情貼，帶有順滑筆畫與金砂點點感，適合日常聊天與文字拼貼。",
+    "url": "https://store.line.me/emojishop/product/6a4e0763bfc6ef757e55965a/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4e075c37efe94940a2a30c/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "緋霞礦晶字母假名貼",
+    "desc": "緋霞礦晶質感的字母、假名與符號表情貼，適合日常聊天、裝飾訊息與文字拼貼。",
+    "url": "https://store.line.me/emojishop/product/6a4e075c37efe94940a2a30c/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4e074bbfc6ef757e559656/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "赤影礦晶字母假名貼",
+    "desc": "赤影礦晶質感的字母、假名與符號表情貼，適合日常聊天、裝飾訊息與文字拼貼。",
+    "url": "https://store.line.me/emojishop/product/6a4e074bbfc6ef757e559656/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4cb5eaa9ee5b3be23628ec/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "孤菇紅白貼",
+    "desc": "紅白傘帽的小菇表情貼，害羞、開心、驚訝、搞笑與日常反應都能用，讓聊天多一點孤菇感。",
+    "url": "https://store.line.me/emojishop/product/6a4cb5eaa9ee5b3be23628ec/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a4b61a837efe94940a29add/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "熔金晶紋字母假名貼",
+    "desc": "熔金晶紋質感的字母、假名與符號表情貼，適合日常聊天、裝飾訊息與文字拼貼。",
+    "url": "https://store.line.me/emojishop/product/6a4b61a837efe94940a29add/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a10056acb1c2e53ef8365bf/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "公文印章表情貼",
+    "desc": "收到、確認、核准、通過、退回、待辦等公文章風格表情貼。適合工作回覆、日常確認、聊天敷衍與正式感回應。",
+    "url": "https://store.line.me/emojishop/product/6a10056acb1c2e53ef8365bf/zh-Hant"
+  },
+  {
+    "img": "https://stickershop.line-scdn.net/sticonshop/v1/product/6a111507ca472a3a9ec3067f/iPhone/main.png?v=1",
+    "labels": [
+      "表情貼"
+    ],
+    "title": "嗆聲印章表情貼",
+    "desc": "把閉嘴、少來、免談、別吵、閃開、退下、不准、你敢等嗆聲短句做成紅色印章表情貼，適合朋友互嗆、吐槽、玩笑回覆與日常聊天使用。",
+    "url": "https://store.line.me/emojishop/product/6a111507ca472a3a9ec3067f/zh-Hant"
+  }
+];
+const FEATURED_THEME_ITEMS = [
+  {
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/bb/d8/0e/bbd80ef5-be88-4b14-867d-8ebef124daeb/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題"
+    ],
+    "title": "小青蛙也躲雨",
+    "desc": "小青蛙也會躲雨。荷葉、水滴、小花與柔和彩虹，組成清新可愛的雨後森林主題，讓你的 LINE 聊天畫面變得明亮又舒服。",
+    "url": "https://store.line.me/themeshop/product/bbd80ef5-be88-4b14-867d-8ebef124daeb/zh-Hant"
+  },
+  {
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/f2/e6/1b/f2e61b33-1bdf-478e-a803-75a45b5573f4/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題"
+    ],
+    "title": "水豚奶呼呼・溫泉暖呼呼",
+    "desc": "水豚奶呼呼在秋日溫泉裡放鬆泡湯，柚子、楓葉與暖光陪你一起慢慢休息，讓 LINE 變得柔軟又暖呼呼。",
+    "url": "https://store.line.me/themeshop/product/f2e61b33-1bdf-478e-a803-75a45b5573f4/zh-Hant"
+  },
+  {
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/c6/2c/58/c62c58dd-712d-4109-9ddd-5a5a81127e18/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題"
+    ],
+    "title": "懶教人，就讓主題教之童戰神",
+    "desc": "懶教人主題登場。童戰神造型、手繪小戰盔，氣勢有了，熱血沒有。懶懶的 LINE 介面，陪你每天一起被迫營業。",
+    "url": "https://store.line.me/themeshop/product/c62c58dd-712d-4109-9ddd-5a5a81127e18/zh-Hant"
+  },
+  {
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/1e/ce/12/1ece1286-b8ca-4492-97a3-d1021acd2319/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題"
+    ],
+    "title": "暖心柴柴・笑臉迎你",
+    "desc": "暖心柴柴帶著笑臉迎接每一天。柔和色調、可愛腳印與溫暖陪伴感，讓聊天畫面變得輕鬆又療癒。",
+    "url": "https://store.line.me/themeshop/product/1ece1286-b8ca-4492-97a3-d1021acd2319/zh-Hant"
+  },
+  {
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/fe/1b/1e/fe1b1e89-dffe-46c6-a755-9e9cc05ee94f/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題"
+    ],
+    "title": "雨後森林-小青蛙",
+    "desc": "小青蛙們在雨後森林裡躲雨、玩水與發呆。荷葉、水滴、小花與柔和光線，陪你的 LINE 聊天畫面變得清新可愛。",
+    "url": "https://store.line.me/themeshop/product/fe1b1e89-dffe-46c6-a755-9e9cc05ee94f/zh-Hant"
+  },
+  {
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/c0/84/b9/c084b9d3-f547-4faa-8605-42a9d0f060b7/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題"
+    ],
+    "title": "義氣哥・衝出",
+    "desc": "義氣哥從破裂的手機畫面中衝出，黑金色系搭配碎玻璃與爆裂光感，讓聊天介面充滿氣勢與存在感，適合喜歡帥氣、霸氣且突破風格的使用者。",
+    "url": "https://store.line.me/themeshop/product/c084b9d3-f547-4faa-8605-42a9d0f060b7/zh-Hant"
+  },
+  {
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/c8/f1/e7/c8f1e72d-b04f-4dcb-b787-63be040b6f94/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題"
+    ],
+    "title": "奶呼呼小象・雲朵夢境",
+    "desc": "奶灰小象坐在柔軟雲朵裡，彩虹、泡泡與小水滴交織出甜甜夢境感。",
+    "url": "https://store.line.me/themeshop/product/c8f1e72d-b04f-4dcb-b787-63be040b6f94/zh-Hant"
+  },
+  {
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/0c/9b/1f/0c9b1f76-0abd-40c5-92fc-a7ad55c4df01/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題"
+    ],
+    "title": "森林郵差小浣熊",
+    "desc": "溫暖森林郵局裡的小浣熊郵差，帶著信件、包裹與小小心意出發。可愛童話風 LINE 主題，適合喜歡森林、郵局與療癒小動物的人。",
+    "url": "https://store.line.me/themeshop/product/0c9b1f76-0abd-40c5-92fc-a7ad55c4df01/zh-Hant"
+  },
+  {
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/3b/90/d0/3b90d0a9-e72e-4079-b6ab-d9492e837196/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題"
+    ],
+    "title": "赤藍墨流・交界",
+    "desc": "赤紅與深藍墨流在灰綠霧色中交會，層層翻湧成抽象而深邃的流動世界，陪伴每一次對話。",
+    "url": "https://store.line.me/themeshop/product/3b90d0a9-e72e-4079-b6ab-d9492e837196/zh-Hant"
+  },
+  {
+    "img": "https://shop.line-scdn.net/themeshop/v1/products/c0/d9/90/c0d99044-1f42-4547-9cba-8fce49227545/1/WEBSTORE/icon_198x278.png",
+    "imgClass": "theme-img",
+    "labels": [
+      "LINE主題"
+    ],
+    "title": "炭筆柴柴・迎向你",
+    "desc": "黑白炭筆素描風的柴柴主題。奔跑而來的身影，像是正迎向你，帶來安靜又溫暖的陪伴感。",
+    "url": "https://store.line.me/themeshop/product/c0d99044-1f42-4547-9cba-8fce49227545/zh-Hant"
+  }
+];
+
+const featuredState = {
+  sticker: { index:0, timer:null, items:FEATURED_STICKER_ITEMS, slidesId:'featured-slides-sticker' },
+  emoji: { index:0, timer:null, items:FEATURED_EMOJI_ITEMS, slidesId:'featured-slides-emoji' },
+  theme: { index:0, timer:null, items:FEATURED_THEME_ITEMS, slidesId:'featured-slides-theme' }
+};
+let featuredActiveKind = 'sticker';
+let featuredResizeTimer = null;
+
+function featuredItemsPerPage() { return window.innerWidth <= 700 ? 1 : 2; }
+function featuredPageCount(kind) {
+  const state = featuredState[kind];
+  return state ? Math.max(1, Math.ceil(state.items.length / featuredItemsPerPage())) : 1;
+}
+function escapeFeaturedText(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function featuredRender(kind) {
+  const state = featuredState[kind];
+  if (!state) return;
+  const wrap = document.getElementById(state.slidesId);
+  if (!wrap) return;
+  const perPage = featuredItemsPerPage();
+  const totalPages = Math.max(1, Math.ceil(state.items.length / perPage));
+  state.index = Math.min(state.index, totalPages - 1);
+  let html = '';
+  for (let p=0; p<totalPages; p++) {
+    const items = state.items.slice(p*perPage, p*perPage+perPage);
+    const cards = items.map(item => {
+      const extraClass = item.imgClass ? ` ${item.imgClass}` : '';
+      const labels = Array.isArray(item.labels) ? item.labels : [item.label || ''];
+      return `<a class="featured-card" href="${escapeFeaturedText(item.url)}" target="_blank" rel="noopener">
+        <img class="featured-img${extraClass}" src="${escapeFeaturedText(item.img)}" alt="${escapeFeaturedText(item.title)}" loading="lazy" referrerpolicy="no-referrer">
+        <div class="featured-info">
+          <div class="featured-labels">${labels.map(label => `<span class="featured-label">${escapeFeaturedText(label)}</span>`).join('')}</div>
+          <div class="featured-title">${escapeFeaturedText(item.title)}</div>
+          <div class="featured-desc">${escapeFeaturedText(item.desc)}</div>
+        </div>
+      </a>`;
+    }).join('');
+    html += `<div class="featured-slide${p===state.index?' active':''}" data-page="${p}">
+      <div class="featured-page-inner">${cards}</div>
+      <div class="featured-footer" style="padding:0 16px 12px;">
+        <div class="featured-dots">${Array.from({length:totalPages},(_,j)=>`<button type="button" aria-label="第 ${j+1} 組" class="featured-dot${j===state.index?' active':''}" onclick="featuredGo('${kind}',${j})"></button>`).join('')}</div>
+      </div>
+    </div>`;
+  }
+  wrap.innerHTML = html;
+}
+function featuredGo(kind, idx) {
+  const state = featuredState[kind], wrap = state && document.getElementById(state.slidesId);
+  if (!state || !wrap) return;
+  const total = featuredPageCount(kind);
+  state.index = (idx + total) % total;
+  wrap.querySelectorAll('.featured-slide').forEach((slide,i)=>slide.classList.toggle('active',i===state.index));
+  wrap.querySelectorAll('.featured-dot').forEach((dot,i)=>dot.classList.toggle('active',i===state.index));
+}
+function featuredNext(kind) { const s=featuredState[kind]; if(s) featuredGo(kind,s.index+1); }
+function featuredPrev(kind) { const s=featuredState[kind]; if(s) featuredGo(kind,s.index-1); }
+function featuredStart(kind) {
+  const state=featuredState[kind]; if(!state || kind!==featuredActiveKind) return;
+  clearInterval(state.timer); state.timer=setInterval(()=>featuredNext(kind),4000);
+}
+function featuredPause(kind) { const state=featuredState[kind]; if(state) { clearInterval(state.timer); state.timer=null; } }
+function featuredResume(kind) { if(kind===featuredActiveKind) featuredStart(kind); }
+function featuredActivateForStep(step) {
+  const kind = step===1 ? 'sticker' : (step===3 ? 'emoji' : (step===4 ? 'theme' : null));
+  Object.keys(featuredState).forEach(featuredPause);
+  featuredActiveKind = kind;
+  if (kind) featuredStart(kind);
+}
+Object.keys(featuredState).forEach(featuredRender);
+featuredActivateForStep(1);
+window.addEventListener('resize',()=>{
+  clearTimeout(featuredResizeTimer);
+  featuredResizeTimer=setTimeout(()=>{ Object.keys(featuredState).forEach(featuredRender); },160);
+});
+</script>
+</body>
+</html>
+

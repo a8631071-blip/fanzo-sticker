@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LINE 上架前自主檢查 0723V2</title>
+<style>
+  :root{
+    --ui-bg:#111318;
+    --panel:#1b1f27;
+    --panel2:#232936;
+    --line:#343b4d;
+    --text:#f2f4f8;
+    --muted:#aab1c0;
+    --accent:#78a6ff;
+    --warn:#ffcc66;
+    --danger:#ff7b7b;
+    --inspect-bg:#000000;
+    --left-width:360px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ui-bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;font-size:14px;overflow:hidden}
+  button,input,select{font:inherit}
+  .app{display:grid;grid-template-columns:minmax(300px,var(--left-width)) 1fr;height:100vh;min-width:980px}
+  .left{background:var(--panel);border-right:1px solid var(--line);overflow:auto;resize:horizontal;min-width:300px;max-width:720px;padding:14px;display:flex;flex-direction:column;gap:12px}
+  .right{overflow:auto;background:#0f1117;padding:12px;position:relative}
+  .box{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px}
+  h1{font-size:18px;line-height:1.2;margin:0 0 8px 0}
+  h2{font-size:14px;margin:0 0 10px 0;color:#dbe5ff;letter-spacing:.03em}
+  .note{color:var(--muted);font-size:12px;line-height:1.5}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+  .row.tight{gap:6px;margin:6px 0}
+  .grow{flex:1}
+  .btn{border:1px solid var(--line);background:#303849;color:var(--text);padding:7px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:#315ca8;border-color:#4b7fe0}
+  .btn.warn{background:#5c4420;border-color:#8f6b2d}
+  .file-btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center}
+  .file-btn input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:200px}
+  .native-file{display:block;width:100%;max-width:100%;background:#111823;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px;margin:6px 0}
+  .status{font-size:12px;line-height:1.45;color:#d9e4f7;background:#101722;border:1px solid #30394a;border-radius:8px;padding:8px;margin-top:8px;white-space:pre-wrap}
+  select,input[type="number"],input[type="text"]{background:#111823;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 8px;min-height:34px}
+  input[type="color"]{width:38px;height:34px;padding:0;border:1px solid var(--line);border-radius:8px;background:#111823}
+  input[type="range"]{width:160px}
+  .drop{border:1px dashed #56627a;border-radius:10px;padding:13px;text-align:center;color:#cbd5e8;background:#161b24}
+  .drop.drag{background:#1d2b42;border-color:#7eb0ff}
+  .drop-overlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(10,16,28,.74);border:4px dashed #86b7ff;color:#fff;font-size:30px;font-weight:800;letter-spacing:.04em;pointer-events:none}
+  body.drag-active .drop-overlay{display:flex}
+  .bg-pick{width:34px;height:30px;border-radius:8px;border:2px solid #596377;cursor:pointer}
+  .bg-pick.active{outline:2px solid var(--accent);outline-offset:2px}
+  .statline{display:grid;grid-template-columns:92px 1fr;gap:6px 10px;color:#d4d9e6;font-size:12px;line-height:1.45}
+  .statline span:nth-child(odd){color:#9da8ba}
+  .preview-wrap{background:#121722;border:1px solid var(--line);border-radius:10px;min-height:260px;max-height:54vh;overflow:auto;display:flex;align-items:center;justify-content:center;padding:14px}
+  .preview-canvas-stage{background:var(--inspect-bg);border:1px solid #3a4355;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .preview-canvas-stage img{display:block;max-width:none;max-height:none;width:100%;height:100%}
+  .empty{color:#7f889b;text-align:center;padding:30px 8px;line-height:1.7}
+  .toolbar{position:sticky;top:0;z-index:10;background:#0f1117cc;backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:12px}
+  .grid{display:flex;flex-wrap:wrap;gap:12px;align-content:flex-start;min-height:calc(100vh - 120px)}
+  .card{border:1px solid var(--line);background:#171c25;border-radius:10px;padding:8px;cursor:pointer;position:relative;max-width:max-content}
+  .card:hover{border-color:var(--accent)}
+  .card.selected{outline:2px solid var(--accent);outline-offset:2px}
+  .thumb-stage{background:var(--inspect-bg);border:1px solid #3a4355;border-radius:7px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .thumb-stage img{display:block;max-width:none;max-height:none}
+  .meta{font-size:11px;color:#b8c1d0;line-height:1.35;margin-top:6px;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .meta .name{color:#e9eefc;font-weight:600}
+  .badge{display:inline-block;border:1px solid #596377;border-radius:999px;padding:1px 6px;font-size:10px;color:#cdd6e6;margin-right:4px;background:#202635}
+  .badge.apng{border-color:#5789ff;color:#9ec0ff}
+  .badge.warn{border-color:#a9822d;color:#ffd37a;background:#372b18}
+  .badge.bad{border-color:#a04747;color:#ffa0a0;background:#3a2020}
+  .pager{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .count{color:#aeb8c8;font-size:12px}
+  .kbd{font-family:ui-monospace,Menlo,Consolas,monospace;background:#101722;border:1px solid #30394a;border-radius:5px;padding:0 5px;color:#c7d4e8}
+  .warn-text{color:var(--warn)}
+  .bad-text{color:var(--danger)}
+  .footer-note{font-size:11px;color:#8894a8;line-height:1.5;margin-top:auto}
+  @media (max-width:1100px){.app{grid-template-columns:320px 1fr}.left{resize:none}}
+</style>
+</head>
+<body>
+<div id="dropOverlay" class="drop-overlay">放開即可匯入 PNG / APNG / ZIP / 資料夾</div>
+<div class="app">
+  <aside class="left">
+    <div class="box">
+      <h1>LINE 上架前視覺終檢台</h1>
+      <div class="note">只做上架前看圖檢查：黑／白／灰／自訂背景、40 格總覽、APNG 真播放、左欄單格放大與手動重播。不修圖、不去背、不重新輸出。</div>
+    </div>
+
+    <div class="box">
+      <h2>匯入與規格</h2>
+      <div class="row tight">
+        <button class="btn warn" id="clearBtn">清空</button>
+      </div>
+      <label class="note" for="fileInput">選 PNG / APNG / ZIP</label>
+      <input id="fileInput" class="native-file" type="file" accept=".png,.zip,image/png,application/zip,.apng" multiple>
+      <label class="note" for="folderInput">選資料夾（需先解壓縮時使用）</label>
+      <input id="folderInput" class="native-file" type="file" webkitdirectory directory multiple>
+      <div id="dropZone" class="drop">整個視窗都可拖放 PNG / APNG / ZIP / 資料夾；這裡只是提示，不是唯一投放區。</div>
+      <div id="importStatus" class="status">尚未匯入。</div>
+      <div class="row">
+        <label for="presetSelect">尺寸類型</label>
+        <select id="presetSelect" class="grow">
+          <option value="emoji">表情貼 180×180</option>
+          <option value="static">靜態貼圖 370×320</option>
+          <option value="animated">動態貼圖 320×270</option>
+          <option value="big">大貼圖 396×660</option>
+          <option value="none">不套尺寸提示</option>
+        </select>
+      </div>
+      <div class="note">尺寸只做提示；核心檢查仍是用背景切換肉眼看髒邊、殘點、白邊、黑邊、霧框。</div>
+    </div>
+
+    <div class="box">
+      <h2>檢查背景</h2>
+      <div class="row tight">
+        <button class="bg-pick active" data-bg="#000000" title="黑底" style="background:#000"></button>
+        <button class="bg-pick" data-bg="#ffffff" title="白底" style="background:#fff"></button>
+        <button class="bg-pick" data-bg="#808080" title="灰底" style="background:#808080"></button>
+        <input id="customColor" type="color" value="#1f5cff" title="自訂色">
+        <button class="btn" id="applyCustomBg">套用自訂色</button>
+      </div>
+      <div class="note">背景只改檢查台顯示，不修改檔案。</div>
+    </div>
+
+    <div class="box">
+      <h2>右欄總覽比例</h2>
+      <div class="row tight">
+        <input id="scaleRange" type="range" min="15" max="200" step="5" value="50">
+        <input id="scaleNumber" type="number" min="15" max="400" step="5" value="50" style="width:76px">%
+      </div>
+      <div class="row tight">
+        <button class="btn scalePreset" data-scale="25">25%</button>
+        <button class="btn scalePreset" data-scale="50">50%</button>
+        <button class="btn scalePreset" data-scale="75">75%</button>
+        <button class="btn scalePreset" data-scale="100">100%</button>
+      </div>
+      <div class="note">比例只改畫面顯示大小，不改原始 PNG/APNG。</div>
+    </div>
+
+    <div class="box">
+      <h2>單格放大</h2>
+      <div class="row tight">
+        <label>放大模式</label>
+        <select id="previewScale">
+          <option value="fit">適合左欄</option>
+          <option value="100">100%</option>
+          <option value="200">200%</option>
+          <option value="400">400%</option>
+        </select>
+        <button class="btn" id="replaySelectedBtn">重播此張</button>
+      </div>
+      <div id="previewWrap" class="preview-wrap"><div class="empty">點右欄任一格看單格放大</div></div>
+      <div id="selectedInfo" class="statline" style="margin-top:10px"></div>
+    </div>
+
+    <div class="footer-note">0723V2。檢查背景只鋪在圖片完整畫布內；APNG 直接用瀏覽器原生播放，可用重播按鈕重新播放；請用 Chrome / Edge 開啟本機 HTML。</div>
+  </aside>
+
+  <main class="right">
+    <div class="toolbar">
+      <div class="row" style="margin:0">
+        <strong>40 格總覽</strong>
+        <span id="assetCount" class="count">尚未載入</span>
+        <span class="grow"></span>
+        <div class="pager">
+          <button class="btn" id="replayPageBtn">本頁全部重播</button>
+          <button class="btn" id="prevPage">上一頁</button>
+          <span id="pageLabel" class="count">第 0 / 0 頁</span>
+          <button class="btn" id="nextPage">下一頁</button>
+        </div>
+      </div>
+      <div id="warnings" class="note" style="margin-top:6px"></div>
+    </div>
+    <div id="grid" class="grid"><div class="empty">載入 PNG / APNG / ZIP 後，這裡會以每頁 40 格顯示。</div></div>
+  </main>
+</div>
+<script>
+'use strict';
+
+const PRESETS = {
+  emoji: {label:'表情貼', w:180, h:180},
+  static: {label:'靜態貼圖', w:370, h:320},
+  animated: {label:'動態貼圖', w:320, h:270},
+  big: {label:'大貼圖', w:396, h:660},
+  none: null
+};
+const PAGE_SIZE = 40;
+let assets = [];
+let selectedId = null;
+let pageIndex = 0;
+let gridScale = 50;
+let currentBg = '#000000';
+let warnings = [];
+let nextId = 1;
+
+const $ = (id)=>document.getElementById(id);
+const grid = $('grid');
+const fileInput = $('fileInput');
+const folderInput = $('folderInput');
+const presetSelect = $('presetSelect');
+const scaleRange = $('scaleRange');
+const scaleNumber = $('scaleNumber');
+const previewWrap = $('previewWrap');
+const selectedInfo = $('selectedInfo');
+const warningsEl = $('warnings');
+const importStatusEl = $('importStatus');
+const assetCount = $('assetCount');
+const pageLabel = $('pageLabel');
+
+function setInspectBg(color){
+  currentBg = color;
+  document.documentElement.style.setProperty('--inspect-bg', color);
+  document.querySelectorAll('.bg-pick').forEach(b=>b.classList.toggle('active', b.dataset.bg && b.dataset.bg.toLowerCase() === color.toLowerCase()));
+}
+function addWarning(text){warnings.push(text); renderWarnings();}
+function renderWarnings(){warningsEl.innerHTML = warnings.length ? warnings.map(w=>'• '+escapeHtml(w)).join('<br>') : ''}
+function setImportStatus(text){ if(importStatusEl) importStatusEl.textContent = text; }
+function escapeHtml(s){return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function formatBytes(n){
+  if(!Number.isFinite(n)) return '-';
+  if(n < 1024) return n+' B';
+  if(n < 1024*1024) return (n/1024).toFixed(1)+' KB';
+  return (n/1024/1024).toFixed(2)+' MB';
+}
+function naturalSort(a,b){return a.name.localeCompare(b.name, 'zh-Hant', {numeric:true, sensitivity:'base'});}
+
+fileInput.addEventListener('change', async e=>{ await handleFiles([...e.target.files]); fileInput.value=''; });
+folderInput.addEventListener('change', async e=>{ await handleFiles([...e.target.files]); folderInput.value=''; });
+$('clearBtn').addEventListener('click', clearAll);
+$('applyCustomBg').addEventListener('click', ()=>setInspectBg($('customColor').value));
+document.querySelectorAll('.bg-pick').forEach(btn=>btn.addEventListener('click', ()=>setInspectBg(btn.dataset.bg)));
+presetSelect.addEventListener('change', renderAll);
+scaleRange.addEventListener('input', ()=>setGridScale(Number(scaleRange.value)));
+scaleNumber.addEventListener('change', ()=>setGridScale(Number(scaleNumber.value)));
+document.querySelectorAll('.scalePreset').forEach(btn=>btn.addEventListener('click', ()=>setGridScale(Number(btn.dataset.scale))));
+$('previewScale').addEventListener('change', renderPreview);
+$('replaySelectedBtn').addEventListener('click', replaySelected);
+$('replayPageBtn').addEventListener('click', replayCurrentPage);
+$('prevPage').addEventListener('click', ()=>{ if(pageIndex>0){pageIndex--; renderGrid();} });
+$('nextPage').addEventListener('click', ()=>{ const max=Math.max(0,Math.ceil(assets.length/PAGE_SIZE)-1); if(pageIndex<max){pageIndex++; renderGrid();} });
+
+const dropZone = $('dropZone');
+let dragDepth = 0;
+function hasFilesDrag(e){
+  const dt = e.dataTransfer;
+  if(!dt) return false;
+  const types = Array.from(dt.types || []);
+  if(types.includes('Files') || types.includes('application/x-moz-file')) return true;
+  if(dt.items && Array.from(dt.items).some(item=>item.kind === 'file')) return true;
+  if(dt.files && dt.files.length > 0) return true;
+  return false;
+}
+function setDragActive(active){
+  document.body.classList.toggle('drag-active', !!active);
+  dropZone.classList.toggle('drag', !!active);
+}
+async function filesFromEntry(entry, pathPrefix=''){
+  if(!entry) return [];
+  if(entry.isFile){
+    return new Promise(resolve=>{
+      entry.file(file=>{
+        try{ Object.defineProperty(file, 'relativePath', {value:pathPrefix + file.name}); }catch(_){}
+        resolve([file]);
+      }, ()=>resolve([]));
+    });
+  }
+  if(entry.isDirectory){
+    const reader = entry.createReader();
+    const out = [];
+    async function readBatch(){
+      const entries = await new Promise(resolve=>reader.readEntries(resolve, ()=>resolve([])));
+      if(!entries.length) return;
+      for(const child of entries){
+        out.push(...await filesFromEntry(child, pathPrefix + entry.name + '/'));
+      }
+      await readBatch();
+    }
+    await readBatch();
+    return out;
+  }
+  return [];
+}
+async function collectDropFiles(e){
+  const dt = e.dataTransfer;
+  const items = Array.from((dt && dt.items) || []);
+  // Snapshot File objects before the first await; browsers may clear DataTransfer afterwards.
+  const directFiles = Array.from((dt && dt.files) || []).filter(file=>!!file);
+  const itemFiles = items.map(item=>item.kind === 'file' && item.getAsFile ? item.getAsFile() : null).filter(file=>!!file);
+  if(items.length && items.some(item=>item.webkitGetAsEntry)){
+    const out = [];
+    for(const item of items){
+      if(item.kind !== 'file') continue;
+      const entry = item.webkitGetAsEntry && item.webkitGetAsEntry();
+      if(entry) out.push(...await filesFromEntry(entry));
+    }
+    if(out.length) return out;
+  }
+  if(directFiles.length) return directFiles;
+  return itemFiles;
+}
+window.addEventListener('dragenter', e=>{
+  if(!hasFilesDrag(e)) return;
+  e.preventDefault();
+  dragDepth++;
+  setDragActive(true);
+}, true);
+window.addEventListener('dragover', e=>{
+  if(!hasFilesDrag(e)) return;
+  e.preventDefault();
+  dragDepth = Math.max(dragDepth, 1);
+  setDragActive(true);
+  if(e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+}, true);
+window.addEventListener('dragleave', e=>{
+  e.preventDefault();
+  dragDepth = Math.max(0, dragDepth - 1);
+  if(!e.relatedTarget) dragDepth = 0;
+  if(dragDepth === 0) setDragActive(false);
+}, true);
+window.addEventListener('drop', async e=>{
+  e.preventDefault();
+  dragDepth = 0;
+  setDragActive(false);
+  const files = await collectDropFiles(e);
+  await handleFiles(files);
+}, true);
+
+function setGridScale(v){
+  v = Math.max(15, Math.min(400, Number(v)||50));
+  gridScale = v;
+  scaleRange.value = Math.min(200, v);
+  scaleNumber.value = v;
+  renderGrid();
+}
+
+function clearAll(){
+  assets.forEach(a=>{
+    if(a.url) URL.revokeObjectURL(a.url);
+    if(a.previewReplayUrl) URL.revokeObjectURL(a.previewReplayUrl);
+    if(a.gridReplayUrl) URL.revokeObjectURL(a.gridReplayUrl);
+  });
+  assets=[]; selectedId=null; pageIndex=0; warnings=[];
+  renderAll();
+  previewWrap.innerHTML='<div class="empty">點右欄任一格看單格放大</div>';
+  selectedInfo.innerHTML='';
+  setImportStatus('已清空。');
+}
+
+function resetReplayUrl(asset, kind){
+  if(!asset || !asset.blob) return;
+  const key = kind === 'grid' ? 'gridReplayUrl' : 'previewReplayUrl';
+  if(asset[key]) URL.revokeObjectURL(asset[key]);
+  asset[key] = URL.createObjectURL(asset.blob.slice(0, asset.blob.size, asset.blob.type || 'image/png'));
+}
+
+function replaySelected(){
+  const a = assets.find(x=>x.id===selectedId);
+  if(!a) return;
+  resetReplayUrl(a, 'preview');
+  resetReplayUrl(a, 'grid');
+  renderGrid();
+  renderPreview();
+}
+
+function replayCurrentPage(){
+  if(!assets.length) return;
+  const start = pageIndex * PAGE_SIZE;
+  const pageItems = assets.slice(start, start + PAGE_SIZE);
+  pageItems.forEach(a=>resetReplayUrl(a, 'grid'));
+  renderGrid();
+}
+
+async function handleFiles(files){
+  files = Array.from(files || []);
+  if(!files.length){ setImportStatus('沒有收到檔案。'); return; }
+  warnings=[];
+  setImportStatus(`收到 ${files.length} 個項目，正在篩選 PNG / APNG / ZIP...`);
+  const before = assets.length;
+  const zipFiles = [];
+  const pngFiles = [];
+  for(const file of files){
+    const name = file.name || '';
+    const path = file.webkitRelativePath || file.relativePath || name;
+    if(/\.zip$/i.test(name)) zipFiles.push(file);
+    else if(/\.(png|apng)$/i.test(name) || file.type === 'image/png') pngFiles.push(file);
+  }
+  if(!zipFiles.length && !pngFiles.length){
+    addWarning('沒有找到 PNG / APNG / ZIP。若你拖的是資料夾，請確認裡面有 .png；若你選的是壓縮檔，副檔名必須是 .zip。');
+    setImportStatus(`收到 ${files.length} 個項目，但可匯入數量為 0。`);
+    return;
+  }
+  setImportStatus(`準備匯入：PNG/APNG ${pngFiles.length} 個，ZIP ${zipFiles.length} 個。`);
+  for(const f of pngFiles){
+    try{ await addPngBlob(f, f.name, f.webkitRelativePath || f.relativePath || f.name, 'file'); }
+    catch(err){ addWarning(`${f.name} 載入失敗：${err.message || err}`); }
+  }
+  for(const z of zipFiles){
+    try{ await addZip(z); }
+    catch(err){ addWarning(`${z.name} ZIP 載入失敗：${err.message || err}`); }
+  }
+  assets.sort(naturalSort);
+  if(selectedId == null && assets.length) selectedId = assets[0].id;
+  pageIndex = Math.min(pageIndex, Math.max(0, Math.ceil(assets.length/PAGE_SIZE)-1));
+  renderAll();
+  const added = assets.length - before;
+  setImportStatus(`匯入完成：新增 ${added} 張，目前共 ${assets.length} 張。${warnings.length ? ' 有警告，請看右欄上方。' : ''}`);
+}
+
+async function addZip(file){
+  if(window.JSZip){
+    const zip = await JSZip.loadAsync(file);
+    const entries = [];
+    zip.forEach((relativePath, entry)=>{
+      if(!entry.dir && /\.(png|apng)$/i.test(relativePath)) entries.push(entry);
+    });
+    entries.sort((a,b)=>a.name.localeCompare(b.name, 'zh-Hant', {numeric:true, sensitivity:'base'}));
+    if(!entries.length){ addWarning(`${file.name} 內沒有 PNG / APNG。`); return; }
+    setImportStatus(`正在解壓 ${file.name}：找到 ${entries.length} 張 PNG/APNG...`);
+    for(const entry of entries){
+      try{
+        const blob = await entry.async('blob');
+        const base = entry.name.split(/[\/]/).pop();
+        await addPngBlob(blob, base, entry.name, `zip:${file.name}`);
+      }catch(err){ addWarning(`${file.name} / ${entry.name} 載入失敗：${err.message || err}`); }
+    }
+    return;
+  }
+  const buffer = await file.arrayBuffer();
+  const entries = await readZipPngEntries(buffer);
+  if(!entries.length){ addWarning(`${file.name} 內沒有 PNG / APNG。`); return; }
+  for(const ent of entries){
+    try{
+      const blob = new Blob([ent.bytes], {type:'image/png'});
+      await addPngBlob(blob, ent.name.split('/').pop(), ent.name, `zip:${file.name}`);
+    }catch(err){ addWarning(`${file.name} / ${ent.name} 載入失敗：${err.message || err}`); }
+  }
+}
+
+async function addPngBlob(blob, name, path, source){
+  const buffer = await blob.arrayBuffer();
+  const meta = parsePngMeta(buffer);
+  const url = URL.createObjectURL(blob);
+  assets.push({
+    id: nextId++, name, path, source, url, size: blob.size, blob,
+    width: meta.width, height: meta.height,
+    isApng: meta.isApng, frameCount: meta.frameCount,
+    totalMs: meta.totalMs, hasAlpha: meta.hasAlpha,
+    colorType: meta.colorType, plays: meta.plays, previewReplayUrl: '', gridReplayUrl: ''
+  });
+}
+
+function parsePngMeta(buffer){
+  const u8 = new Uint8Array(buffer);
+  const sig = [137,80,78,71,13,10,26,10];
+  for(let i=0;i<8;i++) if(u8[i] !== sig[i]) throw new Error('不是有效 PNG');
+  const view = new DataView(buffer);
+  let pos = 8, width=0, height=0, colorType=null, hasTRNS=false, isApng=false, frameCount=0, plays=0, totalMs=0;
+  while(pos + 8 <= u8.length){
+    const len = view.getUint32(pos); pos += 4;
+    const type = String.fromCharCode(u8[pos],u8[pos+1],u8[pos+2],u8[pos+3]); pos += 4;
+    if(pos + len + 4 > u8.length) break;
+    if(type === 'IHDR'){
+      width = view.getUint32(pos); height = view.getUint32(pos+4); colorType = u8[pos+9];
+    }else if(type === 'tRNS'){
+      hasTRNS = true;
+    }else if(type === 'acTL'){
+      isApng = true; frameCount = view.getUint32(pos); plays = view.getUint32(pos+4);
+    }else if(type === 'fcTL'){
+      if(len >= 26){
+        const delayNum = view.getUint16(pos+20);
+        let delayDen = view.getUint16(pos+22);
+        if(delayDen === 0) delayDen = 100;
+        totalMs += Math.round((delayNum / delayDen) * 1000);
+      }
+    }
+    pos += len + 4;
+  }
+  const hasAlpha = colorType === 4 || colorType === 6 || hasTRNS;
+  return {width,height,colorType,hasAlpha,isApng,frameCount,totalMs,plays};
+}
+
+function renderAll(){ renderWarnings(); renderGrid(); renderPreview(); }
+function renderGrid(){
+  const totalPages = Math.max(1, Math.ceil(assets.length / PAGE_SIZE));
+  if(pageIndex >= totalPages) pageIndex = totalPages - 1;
+  const start = pageIndex * PAGE_SIZE;
+  const pageItems = assets.slice(start, start + PAGE_SIZE);
+  assetCount.textContent = assets.length ? `共 ${assets.length} 張｜每頁 40 格｜總覽 ${gridScale}%` : '尚未載入';
+  pageLabel.textContent = assets.length ? `第 ${pageIndex+1} / ${totalPages} 頁` : '第 0 / 0 頁';
+  if(!assets.length){
+    grid.innerHTML = '<div class="empty">載入 PNG / APNG / ZIP 後，這裡會以每頁 40 格顯示。</div>';
+    return;
+  }
+  const frag = document.createDocumentFragment();
+  for(const a of pageItems){
+    const card = document.createElement('div');
+    card.className = 'card' + (a.id === selectedId ? ' selected' : '');
+    card.addEventListener('click', ()=>{selectedId=a.id; renderAll();});
+    const stage = document.createElement('div');
+    stage.className = 'thumb-stage';
+    const dw = Math.max(1, Math.round((a.width || 180) * gridScale / 100));
+    const dh = Math.max(1, Math.round((a.height || 180) * gridScale / 100));
+    stage.style.width = dw + 'px';
+    stage.style.height = dh + 'px';
+    const img = document.createElement('img');
+    img.src = a.gridReplayUrl || a.url;
+    img.alt = a.name;
+    img.style.width = dw + 'px';
+    img.style.height = dh + 'px';
+    stage.appendChild(img);
+    const meta = document.createElement('div');
+    meta.className='meta';
+    const badges = [];
+    badges.push(`<span class="badge${a.isApng?' apng':''}">${a.isApng?'APNG':'PNG'}</span>`);
+    if(sizeMismatch(a)) badges.push('<span class="badge warn">尺寸不同</span>');
+    if(!a.hasAlpha) badges.push('<span class="badge bad">無透明資訊</span>');
+    meta.innerHTML = `${badges.join('')}<div class="name" title="${escapeHtml(a.path)}">${escapeHtml(a.name)}</div><div>${a.width}×${a.height}${a.isApng ? `｜${a.frameCount || '?'} 幀` : ''}</div>`;
+    card.appendChild(stage);
+    card.appendChild(meta);
+    frag.appendChild(card);
+  }
+  grid.innerHTML='';
+  grid.appendChild(frag);
+}
+
+function sizeMismatch(a){
+  const p = PRESETS[presetSelect.value];
+  if(!p || !a.width || !a.height) return false;
+  return a.width !== p.w || a.height !== p.h;
+}
+function renderPreview(){
+  const a = assets.find(x=>x.id===selectedId);
+  if(!a){
+    previewWrap.innerHTML='<div class="empty">點右欄任一格看單格放大</div>';
+    selectedInfo.innerHTML='';
+    return;
+  }
+  previewWrap.innerHTML='';
+  const img=document.createElement('img');
+  img.src=a.previewReplayUrl || a.url;
+  img.alt=a.name;
+  const mode=$('previewScale').value;
+  let s;
+  if(mode==='fit'){
+    const maxW = Math.max(1, previewWrap.clientWidth - 34);
+    const maxH = Math.max(1, Math.floor(window.innerHeight * 0.54) - 34);
+    s = Math.min(maxW / Math.max(1, a.width), maxH / Math.max(1, a.height), 1);
+  }else{
+    s=Number(mode)/100;
+  }
+  const stage=document.createElement('div');
+  stage.className='preview-canvas-stage';
+  const previewWidth = Math.max(1, Math.round(a.width*s));
+  const previewHeight = Math.max(1, Math.round(a.height*s));
+  stage.style.width = previewWidth + 'px';
+  stage.style.height = previewHeight + 'px';
+  stage.title='此色塊等於圖片完整畫布，不是整個左欄預覽框。';
+  img.style.width = previewWidth + 'px';
+  img.style.height = previewHeight + 'px';
+  stage.appendChild(img);
+  previewWrap.appendChild(stage);
+  const p = PRESETS[presetSelect.value];
+  const alphaText = a.hasAlpha ? '有' : '無';
+  selectedInfo.innerHTML = [
+    ['檔名', escapeHtml(a.name)],
+    ['尺寸', `${a.width}×${a.height}${sizeMismatch(a) && p ? ` <span class="warn-text">（目前選 ${p.label} ${p.w}×${p.h}）</span>` : ''}`],
+    ['格式', `${a.isApng ? 'APNG' : 'PNG'}${a.isApng ? `｜${a.frameCount || '?'} 幀${a.totalMs ? `｜約 ${(a.totalMs/1000).toFixed(2)} 秒` : ''}` : ''}`],
+    ['透明資訊', `${alphaText}${a.hasAlpha ? '' : ' <span class="bad-text">（黑/白底檢查時要特別注意是否為實底圖）</span>'}`],
+    ['檔案大小', formatBytes(a.size)],
+    ['來源', escapeHtml(a.source || '-')]
+  ].map(pair=>`<span>${pair[0]}</span><span>${pair[1]}</span>`).join('');
+}
+
+async function readZipPngEntries(buffer){
+  const view = new DataView(buffer);
+  const u8 = new Uint8Array(buffer);
+  const eocd = findEndOfCentralDirectory(view);
+  if(eocd < 0) throw new Error('找不到 ZIP 目錄');
+  const totalEntries = view.getUint16(eocd + 10, true);
+  const cdOffset = view.getUint32(eocd + 16, true);
+  let pos = cdOffset;
+  const out = [];
+  for(let i=0;i<totalEntries && pos + 46 <= u8.length;i++){
+    if(view.getUint32(pos, true) !== 0x02014b50) break;
+    const flags = view.getUint16(pos + 8, true);
+    const method = view.getUint16(pos + 10, true);
+    const compSize = view.getUint32(pos + 20, true);
+    const uncompSize = view.getUint32(pos + 24, true);
+    const nameLen = view.getUint16(pos + 28, true);
+    const extraLen = view.getUint16(pos + 30, true);
+    const commentLen = view.getUint16(pos + 32, true);
+    const localOffset = view.getUint32(pos + 42, true);
+    const nameBytes = u8.slice(pos + 46, pos + 46 + nameLen);
+    const name = decodeZipName(nameBytes, !!(flags & 0x0800));
+    pos += 46 + nameLen + extraLen + commentLen;
+    if(!/\.png$/i.test(name) || name.endsWith('/')) continue;
+    if(localOffset + 30 > u8.length || view.getUint32(localOffset, true) !== 0x04034b50){
+      addWarning(`${name} ZIP local header 異常，已跳過。`); continue;
+    }
+    const lfNameLen = view.getUint16(localOffset + 26, true);
+    const lfExtraLen = view.getUint16(localOffset + 28, true);
+    const dataStart = localOffset + 30 + lfNameLen + lfExtraLen;
+    const comp = u8.slice(dataStart, dataStart + compSize);
+    let bytes;
+    if(method === 0){
+      bytes = comp;
+    }else if(method === 8){
+      bytes = await inflateZipBytes(comp);
+    }else{
+      addWarning(`${name} 使用 ZIP 壓縮方式 ${method}，瀏覽器版暫不解。`); continue;
+    }
+    if(uncompSize && bytes.length !== uncompSize){
+      // 不中止；有些 ZIP64 或瀏覽器解壓仍可正確讀圖。
+    }
+    out.push({name, bytes});
+  }
+  out.sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant',{numeric:true,sensitivity:'base'}));
+  return out;
+}
+function findEndOfCentralDirectory(view){
+  const maxBack = Math.min(view.byteLength, 22 + 65535);
+  for(let p=view.byteLength-22; p>=view.byteLength-maxBack; p--){
+    if(view.getUint32(p, true) === 0x06054b50) return p;
+  }
+  return -1;
+}
+function decodeZipName(bytes, utf8Flag){
+  try{return new TextDecoder(utf8Flag ? 'utf-8' : 'utf-8', {fatal:false}).decode(bytes);}
+  catch(e){return Array.from(bytes).map(b=>String.fromCharCode(b)).join('');}
+}
+async function inflateZipBytes(bytes){
+  if(typeof DecompressionStream === 'undefined') throw new Error('這個瀏覽器不支援 ZIP deflate 解壓，請用 Chrome / Edge 新版。');
+  const input = new Blob([bytes]);
+  let stream;
+  try{ stream = input.stream().pipeThrough(new DecompressionStream('deflate-raw')); }
+  catch(e){ stream = input.stream().pipeThrough(new DecompressionStream('deflate')); }
+  const ab = await new Response(stream).arrayBuffer();
+  return new Uint8Array(ab);
+}
+
+// 內部自檢用：URL 加 ?selftest=1 時載入瀏覽器生成樣本，不影響正常使用。
+async function selfTestLoad(){
+  const list=[];
+  for(let i=1;i<=42;i++){
+    const canvas=document.createElement('canvas'); canvas.width=180; canvas.height=180;
+    const c=canvas.getContext('2d');
+    c.clearRect(0,0,180,180);
+    c.fillStyle = i%3===0 ? 'rgba(255,255,255,.92)' : (i%3===1 ? 'rgba(255,90,90,.92)' : 'rgba(90,160,255,.92)');
+    c.beginPath(); c.arc(90,90,54,0,Math.PI*2); c.fill();
+    if(i%5===0){ c.fillStyle='rgba(255,255,255,.6)'; c.fillRect(0,0,180,3); }
+    c.fillStyle='#111'; c.font='bold 36px Arial'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(String(i).padStart(2,'0'),90,92);
+    const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));
+    list.push(new File([blob], String(i).padStart(3,'0')+'.png', {type:'image/png'}));
+  }
+  await handleFiles(list);
+}
+if(new URLSearchParams(location.search).get('selftest')==='1') selfTestLoad();
+
+setInspectBg('#000000');
+</script>
+</body>
+</html>

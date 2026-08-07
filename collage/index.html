@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>素材拼板工具_0805V3</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="work-sidebar" aria-label="工作欄">
+      <div class="tool-brand">
+        <h1>素材拼板工具 <span class="version">0805V3</span></h1>
+        <p>等比縮放、不裁切，匯出一張 PNG。</p>
+      </div>
+
+      <div class="sidebar-scroll">
+        <section class="control-card">
+          <h2>1. 匯入與版面</h2>
+          <div class="button-stack">
+            <label class="file-btn primary-file">
+              批次匯入圖片
+              <input type="file" id="fileInput" accept="image/png,image/webp,image/jpeg" multiple hidden>
+            </label>
+            <button id="assetPanelToggle" type="button">展開素材區</button>
+            <button id="fillEmptyBtn" type="button">依序填入空格</button>
+          </div>
+
+          <div class="field-stack">
+            <label>版型
+              <select id="layoutPreset">
+                <option value="4x3" selected>4 × 3</option>
+                <option value="4x4">4 × 4</option>
+                <option value="5x4">5 × 4</option>
+                <option value="custom">自訂</option>
+              </select>
+            </label>
+            <div class="field-grid two-cols">
+              <label>欄數
+                <input id="colsInput" type="number" min="1" max="12" value="4">
+              </label>
+              <label>列數
+                <input id="rowsInput" type="number" min="1" max="12" value="3">
+              </label>
+            </div>
+            <label>空格處理
+              <select id="emptyMode">
+                <option value="blank" selected>保留背景色</option>
+                <option value="clone-last">匯出前複製最後一格補滿</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="button-grid two-cols compact-actions">
+            <button id="clearBoardBtn" type="button">清空版面</button>
+            <button id="clearAssetsBtn" type="button" class="ghost">清空素材</button>
+          </div>
+        </section>
+
+        <section class="control-card">
+          <h2>2. 畫布與背景</h2>
+          <div class="field-stack">
+            <label>影片比例
+              <select id="ratioPreset">
+                <option value="16:9" selected>16:9</option>
+                <option value="9:16">9:16</option>
+                <option value="1:1">1:1</option>
+                <option value="4:5">4:5</option>
+                <option value="4:3">4:3</option>
+                <option value="3:2">3:2</option>
+                <option value="custom">自訂</option>
+              </select>
+            </label>
+            <div id="customRatioFields" class="field-grid two-cols hidden">
+              <label>比例寬
+                <input id="ratioW" type="number" min="1" value="16">
+              </label>
+              <label>比例高
+                <input id="ratioH" type="number" min="1" value="9">
+              </label>
+            </div>
+            <label>輸出倍率
+              <select id="scalePreset">
+                <option value="1">1.0 ×</option>
+                <option value="1.5" selected>1.5 ×</option>
+                <option value="2">2.0 ×</option>
+                <option value="custom">自訂</option>
+              </select>
+            </label>
+            <div id="customScaleField" class="hidden">
+              <label>自訂倍率
+                <input id="scaleCustom" type="number" min="0.1" step="0.1" value="1.5">
+              </label>
+            </div>
+            <div class="background-row">
+              <label class="color-field">背景色
+                <input id="bgColor" type="color" value="#666666">
+              </label>
+              <label class="hex-field">色碼
+                <input id="bgColorText" type="text" value="#666666" spellcheck="false">
+              </label>
+            </div>
+          </div>
+          <div class="size-box">
+            <span>輸出尺寸</span>
+            <strong id="computedSize">2560 × 1440</strong>
+          </div>
+        </section>
+
+        <section class="control-card">
+          <h2>3. 單格操作與匯出</h2>
+          <div class="button-stack">
+            <label class="file-btn alt">
+              更換目前格
+              <input type="file" id="replaceInput" accept="image/png,image/webp,image/jpeg" hidden>
+            </label>
+            <div class="button-grid two-cols">
+              <button id="removeCellBtn" type="button">清空目前格</button>
+              <button id="cloneFillBtn" type="button">複製補滿</button>
+            </div>
+          </div>
+
+          <div class="field-stack scale-control-block">
+            <div class="subsection-title">格內圖片比例</div>
+            <div class="field-grid two-cols">
+              <label>單格比例（%）
+                <input id="cellScaleInput" type="number" min="10" max="100" step="1" value="100">
+              </label>
+              <label>共同比例（%）
+                <input id="allCellScaleInput" type="number" min="10" max="100" step="1" value="100">
+              </label>
+            </div>
+          </div>
+
+          <button id="exportBtn" type="button" class="primary export-button">匯出 PNG</button>
+          <div class="status-block">
+            <div>目前格：<strong id="activeCellLabel">未選取</strong></div>
+            <div>已放入：<strong id="filledCountLabel">0 / 12</strong></div>
+          </div>
+          <p class="sidebar-help">點主圖板格子，再點素材即可單點更換；未選格時會填入下一個空格。格內圖片比例只改圖片大小，不改畫布或格子。</p>
+        </section>
+      </div>
+    </aside>
+
+    <main class="workspace">
+      <section class="preview-panel">
+        <div class="preview-toolbar">
+          <div>
+            <strong>主圖板</strong>
+            <span class="hint">點格子指定更換位置</span>
+          </div>
+          <div class="preview-meta" id="previewMeta">4 × 3 ｜16:9 ｜2560 × 1440</div>
+        </div>
+        <div class="preview-wrap" id="previewWrap">
+          <canvas id="previewCanvas" width="2560" height="1440"></canvas>
+          <div id="cellOverlay" class="cell-overlay"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <aside id="assetPanel" class="asset-panel hidden">
+    <div id="assetPanelHeader" class="asset-panel-header">
+      <div>
+        <strong>素材區</strong>
+        <span id="assetCountLabel">0 張</span>
+      </div>
+      <div class="asset-panel-actions">
+        <button id="collapseAssetBtn" type="button">收合</button>
+      </div>
+    </div>
+    <div id="assetPanelBody" class="asset-panel-body">
+      <div class="asset-panel-note">點素材填入目前格；未選格時依序填入空格。拖曳標題列可移動面板。</div>
+      <div id="assetList" class="asset-list"></div>
+    </div>
+  </aside>
+
+  <template id="assetItemTemplate">
+    <button class="asset-item" type="button">
+      <img alt="素材縮圖">
+      <span class="asset-name"></span>
+      <span class="asset-meta"></span>
+    </button>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
