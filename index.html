@@ -578,7 +578,7 @@ footer{padding:14px 0 16px}
         </a>
         <div class="portal-card portal-count" title="首頁累積瀏覽次數">
           <span class="portal-icon">#</span>
-          <span class="portal-copy"><b>累積瀏覽次數</b><small id="visit-count-note">首頁開啟累計</small></span>
+          <span class="portal-copy"><b>累積瀏覽次數</b><small id="visit-count-note">統計載入中</small></span>
           <span class="portal-count-value" id="visit-count" aria-live="polite">—</span>
         </div>
       </aside>
@@ -753,47 +753,10 @@ function startShowcase(){
 function restartShowcase(){ startShowcase(); }
 
 
-// 0808V6｜首頁累積瀏覽次數（CounterAPI V1）
-const VISIT_COUNTER_URL = 'https://api.counterapi.dev/v1/a8631071-blip-fanzo-sticker/homepage-views/up';
-
-async function updateVisitCount(){
-  const valueEl = document.getElementById('visit-count');
-  const noteEl = document.getElementById('visit-count-note');
-  if(!valueEl) return;
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 7000);
-
-  try{
-    const response = await fetch(VISIT_COUNTER_URL, {
-      method: 'GET',
-      cache: 'no-store',
-      signal: controller.signal
-    });
-    if(!response.ok) throw new Error(`HTTP ${response.status}`);
-
-    const data = await response.json();
-    const rawCount = data?.count ?? data?.value ?? data?.data?.count ?? data?.data?.up_count;
-    const count = Number(rawCount);
-    if(!Number.isFinite(count) || count < 0) throw new Error('Invalid counter response');
-
-    valueEl.textContent = count.toLocaleString('zh-TW');
-    valueEl.title = `${count.toLocaleString('zh-TW')} 次`;
-    if(noteEl) noteEl.textContent = '首頁開啟累計';
-  }catch(error){
-    valueEl.textContent = '—';
-    valueEl.title = '目前無法取得統計數字';
-    if(noteEl) noteEl.textContent = '統計暫時無法讀取';
-    console.warn('Visit counter unavailable:', error);
-  }finally{
-    clearTimeout(timeout);
-  }
-}
 
 
 renderShowcase();
 startShowcase();
-updateVisitCount();
 
 document.getElementById("showcaseViewport").addEventListener("mouseenter",()=>clearInterval(showcaseTimer));
 document.getElementById("showcaseViewport").addEventListener("mouseleave",startShowcase);
@@ -802,5 +765,40 @@ window.addEventListener("resize",()=>{
   window.__showcaseResize=setTimeout(renderShowcase,120);
 });
 </script>
+
+<script type="module">
+(async () => {
+  const valueEl = document.getElementById('visit-count');
+  const noteEl = document.getElementById('visit-count-note');
+  if (!valueEl) return;
+
+  try {
+    const { Counter } = await import('https://cdn.jsdelivr.net/npm/counterapi/dist/counter.esm.min.js');
+
+    const counter = new Counter({
+      version: 'v1',
+      namespace: 'a8631071-blip-fanzo-sticker',
+      timeout: 8000
+    });
+
+    const result = await counter.up('homepage-views');
+    const count = Number(result.value);
+
+    if (!Number.isFinite(count) || count < 0) {
+      throw new Error('Invalid counter value');
+    }
+
+    valueEl.textContent = count.toLocaleString('zh-TW');
+    valueEl.title = `${count.toLocaleString('zh-TW')} 次`;
+    if (noteEl) noteEl.textContent = '首頁開啟累計';
+  } catch (error) {
+    valueEl.textContent = '—';
+    valueEl.title = '目前無法取得統計數字';
+    if (noteEl) noteEl.textContent = '統計暫時無法讀取';
+    console.warn('Visit counter unavailable:', error);
+  }
+})();
+</script>
+
 </body>
 </html>
