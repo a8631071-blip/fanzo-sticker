@@ -17,6 +17,10 @@ A free browser-based toolkit for LINE sticker and emoji creators. It brings comm
 
 No desktop installation is required. Open the website and use the tools directly in your browser.
 
+如果不想透過公開網站使用，也可以把整套專案下載回電腦，直接在本機瀏覽器執行。核心圖片處理在本機完成，不需要把貼圖素材上傳到本專案的伺服器。
+
+If you prefer not to use the public website, you can download the full project and run it locally in your browser. Core image processing is performed on your device, and sticker assets do not need to be uploaded to this project's server.
+
 ---
 
 ## 專案目的｜Why This Project Exists
@@ -78,6 +82,7 @@ This tool is intended as a final pre-publish review step and does not replace LI
 ## 專案特色｜Key Features
 
 - **免費使用｜Free to use** — 公開網站可直接使用，不需要安裝專用程式。
+- **本機使用｜Run locally** — 可下載整套專案後直接用本機瀏覽器執行，核心圖片處理不需要把素材上傳到本專案的伺服器。
 - **開放原始碼｜Open source** — 專案原始碼公開於 GitHub。
 - **MIT License** — 允許使用、修改、再散布與商業使用，但須保留原授權聲明。
 - **瀏覽器工作流程｜Browser workflow** — 核心工具以 HTML / CSS / JavaScript 為主，可直接透過 GitHub Pages 使用。
@@ -89,9 +94,9 @@ This tool is intended as a final pre-publish review step and does not replace LI
 
 ## 隱私與資料處理｜Privacy & Data Processing
 
-核心圖片處理流程主要在使用者瀏覽器中執行，因此多數圖片操作不需要先上傳到自建後端伺服器。
+核心圖片處理流程主要在使用者瀏覽器中執行，因此多數圖片操作不需要先上傳到自建後端伺服器。若將專案下載到電腦後以本機瀏覽器執行，核心圖片素材同樣在本機處理，不需要上傳到本專案的伺服器。
 
-Core image-processing workflows are primarily executed in the user's browser, so most image operations do not require uploading files to a custom backend server first.
+Core image-processing workflows are primarily executed in the user's browser, so most image operations do not require uploading files to a custom backend server first. When the project is downloaded and run locally in a browser, core image assets are likewise processed on the user's device and do not need to be uploaded to this project's server.
 
 但本網站仍可能載入第三方資源，例如 JavaScript 函式庫、字型、訪客統計服務或 LINE 圖片資源。這些第三方服務各自適用其服務與隱私條款。
 
