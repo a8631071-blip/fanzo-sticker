@@ -492,6 +492,9 @@ a.portal-card:hover{transform:translateY(-2px);box-shadow:0 10px 20px rgba(67,54
   width:auto;
   max-width:88px;
 }
+.portal-oss .portal-icon{background:#f4ead7;color:#8b6d3f;font-size:10px;letter-spacing:-.08em}
+.visitor-count{display:flex;justify-content:flex-end;align-items:center;margin-top:7px;min-height:18px}
+.visitor-count img{display:block;height:18px;width:auto;max-width:110px}
 
 .section{padding:13px 0}
 .section-head{margin-bottom:9px;align-items:center}
@@ -537,6 +540,7 @@ footer{padding:14px 0 16px}
   .portal-copy b{font-size:10.5px}
   .portal-copy small{font-size:9px}
   .portal-count-value{font-size:16px}
+  .visitor-count{justify-content:center;margin-top:8px}
   .section-head h2{font-size:24px}
   .section-head p{display:none}
 }
@@ -591,13 +595,11 @@ footer{padding:14px 0 16px}
           <span class="portal-copy"><b>MP4 圖文影片合成器</b><small>Google Play 免費下載</small></span>
           <span class="portal-arrow">↗</span>
         </a>
-        <div class="portal-card portal-count" title="首頁累積瀏覽次數">
-          <span class="portal-icon">#</span>
-          <span class="portal-copy"><b>累積瀏覽次數</b><small>每次開啟累計</small></span>
-          <span class="portal-count-value">
-            <img src="https://api.visitorbadge.io/api/visitors?path=a8631071-blip.fanzo-sticker.home&label=%E7%80%8F%E8%A6%BD&labelColor=%23f4ead7&countColor=%23ead8b9&style=flat&labelStyle=lower" alt="瀏覽次數" referrerpolicy="no-referrer">
-          </span>
-        </div>
+        <a class="portal-card portal-oss" href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener">
+          <span class="portal-icon">&lt;/&gt;</span>
+          <span class="portal-copy"><b>免費・開放原始碼</b><small>GitHub｜MIT License</small></span>
+          <span class="portal-arrow">↗</span>
+        </a>
       </aside>
     </div>
   </section>
@@ -686,6 +688,9 @@ footer{padding:14px 0 16px}
       <a href="https://store.line.me/search/sticker/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看全部 LINE 貼圖</a>
       <a href="https://store.line.me/search/emoji/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看 LINE 表情貼</a>
       <a href="https://store.line.me/search/theme/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看 LINE 主題</a>
+    </div>
+    <div class="visitor-count" title="首頁累積瀏覽次數">
+      <img src="https://api.visitorbadge.io/api/visitors?path=a8631071-blip.fanzo-sticker.home&label=%E7%B4%AF%E7%A9%8D%E7%80%8F%E8%A6%BD&labelColor=%23f4ead7&countColor=%23ead8b9&style=flat&labelStyle=lower" alt="累積瀏覽次數" referrerpolicy="no-referrer">
     </div>
   </section>
 </main>
