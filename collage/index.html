@@ -3,64 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>素材拼板工具_0805V3</title>
+  <title>素材拼板 2.0</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="app-shell">
     <aside class="work-sidebar" aria-label="工作欄">
       <div class="tool-brand">
-        <h1>素材拼板工具 <span class="version">0805V3</span></h1>
-        <p>等比縮放、不裁切，匯出一張 PNG。</p>
+        <h1>素材拼板 <span class="version">2.0</span></h1>
+        <p>制式格快速拼板，也可切換自由排列；匯出一張 PNG。</p>
       </div>
 
       <div class="sidebar-scroll">
         <section class="control-card">
-          <h2>1. 匯入與版面</h2>
+          <h2>1. 匯入與排列</h2>
           <div class="button-stack">
             <label class="file-btn primary-file">
               批次匯入圖片
               <input type="file" id="fileInput" accept="image/png,image/webp,image/jpeg" multiple hidden>
             </label>
             <button id="assetPanelToggle" type="button">展開素材區</button>
-            <button id="fillEmptyBtn" type="button">依序填入空格</button>
           </div>
 
           <div class="field-stack">
-            <label>版型
-              <select id="layoutPreset">
-                <option value="4x3" selected>4 × 3</option>
-                <option value="4x4">4 × 4</option>
-                <option value="5x4">5 × 4</option>
-                <option value="custom">自訂</option>
-              </select>
-            </label>
-            <div class="field-grid two-cols">
-              <label>欄數
-                <input id="colsInput" type="number" min="1" max="12" value="4">
-              </label>
-              <label>列數
-                <input id="rowsInput" type="number" min="1" max="12" value="3">
-              </label>
-            </div>
-            <label>空格處理
-              <select id="emptyMode">
-                <option value="blank" selected>保留背景色</option>
-                <option value="clone-last">匯出前複製最後一格補滿</option>
+            <label>排列方式
+              <select id="layoutMode">
+                <option value="grid" selected>制式格排列</option>
+                <option value="free">自由排列</option>
               </select>
             </label>
           </div>
 
-          <div class="button-grid two-cols compact-actions">
-            <button id="clearBoardBtn" type="button">清空版面</button>
-            <button id="clearAssetsBtn" type="button" class="ghost">清空素材</button>
+          <div id="gridLayoutControls" class="mode-section">
+            <div class="button-stack mode-top-gap">
+              <button id="fillEmptyBtn" type="button">依序填入空格</button>
+            </div>
+            <div class="field-stack">
+              <label>版型
+                <select id="layoutPreset">
+                  <option value="4x3" selected>4 × 3</option>
+                  <option value="4x4">4 × 4</option>
+                  <option value="5x4">5 × 4</option>
+                  <option value="custom">自訂</option>
+                </select>
+              </label>
+              <div class="field-grid two-cols">
+                <label>欄數
+                  <input id="colsInput" type="number" min="1" max="12" value="4">
+                </label>
+                <label>列數
+                  <input id="rowsInput" type="number" min="1" max="12" value="3">
+                </label>
+              </div>
+              <label>空格處理
+                <select id="emptyMode">
+                  <option value="blank" selected>保留背景色</option>
+                  <option value="clone-last">匯出前複製最後一格補滿</option>
+                </select>
+              </label>
+            </div>
+            <div class="button-grid two-cols compact-actions">
+              <button id="clearBoardBtn" type="button">清空版面</button>
+              <button id="clearAssetsBtn" type="button" class="ghost">清空素材</button>
+            </div>
+          </div>
+
+          <div id="freeLayoutControls" class="mode-section hidden">
+            <div class="button-stack mode-top-gap">
+              <button id="addTextBtn" type="button">新增文字</button>
+              <button id="clearFreeBtn" type="button">清空版面</button>
+            </div>
+            <button id="clearAssetsFreeBtn" type="button" class="ghost full-button">清空素材</button>
+            <p class="sidebar-help">點素材會加入畫布；素材與文字可直接拖曳，控制點可縮放與旋轉。</p>
           </div>
         </section>
 
         <section class="control-card">
           <h2>2. 畫布與背景</h2>
           <div class="field-stack">
-            <label>影片比例
+            <label>畫布比例
               <select id="ratioPreset">
                 <option value="16:9" selected>16:9</option>
                 <option value="9:16">9:16</option>
@@ -108,36 +129,88 @@
         </section>
 
         <section class="control-card">
-          <h2>3. 單格操作與匯出</h2>
-          <div class="button-stack">
-            <label class="file-btn alt">
-              更換目前格
-              <input type="file" id="replaceInput" accept="image/png,image/webp,image/jpeg" hidden>
-            </label>
-            <div class="button-grid two-cols">
-              <button id="removeCellBtn" type="button">清空目前格</button>
-              <button id="cloneFillBtn" type="button">複製補滿</button>
+          <h2>3. 操作與匯出</h2>
+
+          <div id="gridObjectControls" class="mode-section">
+            <div class="button-stack">
+              <label class="file-btn alt">
+                更換目前格
+                <input type="file" id="replaceInput" accept="image/png,image/webp,image/jpeg" hidden>
+              </label>
+              <div class="button-grid two-cols">
+                <button id="removeCellBtn" type="button">清空目前格</button>
+                <button id="cloneFillBtn" type="button">複製補滿</button>
+              </div>
             </div>
+
+            <div class="field-stack scale-control-block">
+              <div class="subsection-title">格內圖片比例</div>
+              <div class="field-grid two-cols">
+                <label>單格比例（%）
+                  <input id="cellScaleInput" type="number" min="10" max="100" step="1" value="100">
+                </label>
+                <label>共同比例（%）
+                  <input id="allCellScaleInput" type="number" min="10" max="100" step="1" value="100">
+                </label>
+              </div>
+            </div>
+
+            <div class="status-block">
+              <div>目前格：<strong id="activeCellLabel">未選取</strong></div>
+              <div>已放入：<strong id="filledCountLabel">0 / 12</strong></div>
+            </div>
+            <p class="sidebar-help">點主圖板格子，再點素材即可單點更換；未選格時會填入下一個空格。</p>
           </div>
 
-          <div class="field-stack scale-control-block">
-            <div class="subsection-title">格內圖片比例</div>
-            <div class="field-grid two-cols">
-              <label>單格比例（%）
-                <input id="cellScaleInput" type="number" min="10" max="100" step="1" value="100">
+          <div id="freeObjectControls" class="mode-section hidden">
+            <div id="freeNoSelection" class="status-block">
+              <div>目前物件：<strong>未選取</strong></div>
+              <div>自由版面：<strong id="freeObjectCountLabel">0 個物件</strong></div>
+            </div>
+
+            <div id="freeSelectionControls" class="hidden">
+              <div class="status-block object-status">
+                <div>目前物件：<strong id="activeObjectLabel">未選取</strong></div>
+              </div>
+
+              <div id="textControls" class="field-stack hidden">
+                <label>文字內容
+                  <textarea id="textContent" rows="3" spellcheck="false"></textarea>
+                </label>
+                <div class="field-grid two-cols">
+                  <label>字型
+                    <select id="textFont">
+                      <option value="sans" selected>黑體</option>
+                      <option value="serif">明體</option>
+                      <option value="mono">等寬</option>
+                    </select>
+                  </label>
+                  <label>大小（%）
+                    <input id="textSizeInput" type="number" min="2" max="25" step="1" value="6">
+                  </label>
+                </div>
+                <div class="field-grid two-cols">
+                  <label>文字顏色
+                    <input id="textColor" type="color" value="#FFFFFF">
+                  </label>
+                  <label class="check-field">粗體
+                    <input id="textBold" type="checkbox" checked>
+                  </label>
+                </div>
+              </div>
+
+              <label>旋轉角度
+                <input id="objectRotationInput" type="number" min="-180" max="180" step="1" value="0">
               </label>
-              <label>共同比例（%）
-                <input id="allCellScaleInput" type="number" min="10" max="100" step="1" value="100">
-              </label>
+              <div class="button-grid two-cols compact-actions">
+                <button id="bringFrontBtn" type="button">置頂</button>
+                <button id="sendBackBtn" type="button">置底</button>
+              </div>
+              <button id="deleteObjectBtn" type="button" class="danger-button full-button">刪除選取</button>
             </div>
           </div>
 
           <button id="exportBtn" type="button" class="primary export-button">匯出 PNG</button>
-          <div class="status-block">
-            <div>目前格：<strong id="activeCellLabel">未選取</strong></div>
-            <div>已放入：<strong id="filledCountLabel">0 / 12</strong></div>
-          </div>
-          <p class="sidebar-help">點主圖板格子，再點素材即可單點更換；未選格時會填入下一個空格。格內圖片比例只改圖片大小，不改畫布或格子。</p>
         </section>
       </div>
     </aside>
@@ -146,14 +219,15 @@
       <section class="preview-panel">
         <div class="preview-toolbar">
           <div>
-            <strong>主圖板</strong>
-            <span class="hint">點格子指定更換位置</span>
+            <strong id="previewTitle">主圖板</strong>
+            <span class="hint" id="previewHint">點格子指定更換位置</span>
           </div>
           <div class="preview-meta" id="previewMeta">4 × 3 ｜16:9 ｜2560 × 1440</div>
         </div>
         <div class="preview-wrap" id="previewWrap">
           <canvas id="previewCanvas" width="2560" height="1440"></canvas>
           <div id="cellOverlay" class="cell-overlay"></div>
+          <div id="freeObjectOverlay" class="free-object-overlay hidden"></div>
         </div>
       </section>
     </main>
@@ -170,7 +244,7 @@
       </div>
     </div>
     <div id="assetPanelBody" class="asset-panel-body">
-      <div class="asset-panel-note">點素材填入目前格；未選格時依序填入空格。拖曳標題列可移動面板。</div>
+      <div id="assetPanelNote" class="asset-panel-note">點素材填入目前格；未選格時依序填入空格。拖曳標題列可移動面板。</div>
       <div id="assetList" class="asset-list"></div>
     </div>
   </aside>
