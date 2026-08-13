@@ -19,7 +19,7 @@ body {
   background: var(--bg);
 }
 
-button, input, select { font: inherit; }
+button, input, select, textarea { font: inherit; }
 button, .file-btn {
   min-height: 38px;
   border: 1px solid var(--line);
@@ -105,6 +105,8 @@ button.ghost { background: transparent; }
 }
 .two-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .compact-actions { margin-top: 9px; }
+.mode-top-gap { margin-top: 9px; }
+.full-button { width: 100%; margin-top: 8px; }
 
 label {
   display: flex;
@@ -126,16 +128,17 @@ label {
   font-weight: 700;
 }
 .file-btn.alt { background: #293042; }
-input[type="number"], input[type="text"], select {
+input[type="number"], input[type="text"], select, textarea {
   width: 100%;
   min-width: 0;
-  height: 38px;
+  min-height: 38px;
   padding: 7px 9px;
   border: 1px solid var(--line);
   border-radius: 9px;
   background: #11151c;
   color: var(--text);
 }
+textarea { resize: vertical; line-height: 1.45; }
 .background-row {
   display: grid;
   grid-template-columns: 62px minmax(0, 1fr);
@@ -149,6 +152,15 @@ input[type="color"] {
   border: 1px solid var(--line);
   border-radius: 9px;
   background: transparent;
+}
+.check-field {
+  justify-content: end;
+  gap: 8px;
+}
+.check-field input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
 }
 .size-box {
   display: flex;
@@ -175,6 +187,7 @@ input[type="color"] {
   font-size: 12px;
 }
 .status-block strong { color: var(--text); }
+.object-status { margin-bottom: 9px; }
 .sidebar-help {
   margin: 8px 1px 0;
   color: var(--muted);
@@ -195,7 +208,8 @@ input:disabled {
   cursor: not-allowed;
 }
 
-.export-button { width: 100%; min-height: 42px; }
+.export-button { width: 100%; min-height: 42px; margin-top: 10px; }
+.danger-button { border-color: #6f3a43; background: #3a2026; }
 
 .workspace {
   min-width: 0;
@@ -250,11 +264,13 @@ input:disabled {
   max-height: 100%;
   background: #666;
 }
-.cell-overlay {
+.cell-overlay,
+.free-object-overlay {
   position: absolute;
   inset: 0;
-  pointer-events: auto;
 }
+.cell-overlay { pointer-events: auto; }
+.free-object-overlay { pointer-events: none; }
 .overlay-cell {
   position: absolute;
   padding: 0;
@@ -281,6 +297,54 @@ input:disabled {
 }
 .overlay-cell .cell-badge { top: 6px; left: 6px; }
 .overlay-cell .cell-state { right: 6px; bottom: 6px; color: var(--muted); }
+
+.free-object-box {
+  position: absolute;
+  min-width: 24px;
+  min-height: 24px;
+  border: 1px dashed transparent;
+  transform-origin: center center;
+  cursor: move;
+  pointer-events: auto;
+  touch-action: none;
+}
+.free-object-box:hover { border-color: rgba(255,255,255,0.62); }
+.free-object-box.active {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.45);
+}
+.free-handle {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  min-height: 0;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 1px 5px rgba(0,0,0,.5);
+  touch-action: none;
+}
+.resize-handle {
+  right: -9px;
+  bottom: -9px;
+  cursor: nwse-resize;
+}
+.rotate-handle {
+  left: 50%;
+  top: -29px;
+  transform: translateX(-50%);
+  cursor: grab;
+}
+.rotate-handle::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 13px;
+  width: 1px;
+  height: 14px;
+  background: var(--accent);
+}
 
 .asset-panel {
   position: fixed;
