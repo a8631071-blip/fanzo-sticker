@@ -1,13 +1,15 @@
 # 煩躁胖子・LINE 創作者免費開源工具
 # Fanzo Sticker — Free Open-Source Tools for LINE Creators
 
-一套為 LINE 貼圖／表情貼創作者整理的免費瀏覽器工具組，將常見的圖片前處理、上架前檢查、QR Code 產生與素材拼板集中在同一個公開網站中。
+一套為 LINE 貼圖／表情貼創作者整理的免費瀏覽器工具組，將常見的圖片前處理、上架前檢查、QR Code 產生，以及素材拼板與自由排列集中在同一個公開網站中。
 
-A free browser-based toolkit for LINE sticker and emoji creators. It brings common image-preparation, pre-publish checking, QR-code generation, and collage-board workflows together in one public website.
+A free browser-based toolkit for LINE sticker and emoji creators. It brings common image preparation, pre-publish checking, QR-code generation, and collage/free-layout workflows together in one public website.
 
 **免費使用｜Free to use**  
 **開放原始碼｜Open source**  
 **MIT License**
+
+> **素材拼板 2.0**：保留制式格快速拼板，新增自由排列、圖片拖曳／縮放／旋轉與基礎文字功能。
 
 ## 線上使用｜Live Demo
 
@@ -27,11 +29,11 @@ If you prefer not to use the public website, you can download the full project a
 
 這個專案不是為了做一套大型影像編輯器，而是把 LINE 創作者工作流程中經常重複的步驟拆成簡單、直接的工具。
 
-實際製作貼圖時，常需要在不同軟體之間切換：去背、切格、整理檔名、檢查尺寸與數量、製作 QR Code、重新排列素材。這個專案的目標，就是把這些高頻工作集中到一個容易使用的瀏覽器工作站。
+實際製作貼圖時，常需要在不同軟體之間切換：去背、切格、整理檔名、檢查尺寸與數量、製作 QR Code、重新排列素材與製作簡單宣傳圖。這個專案的目標，就是把這些高頻工作集中到一個容易使用的瀏覽器工作站。
 
 This project is not intended to become a full-scale image editor. Its purpose is to turn repetitive steps in a LINE creator workflow into small, direct tools.
 
-Sticker production often requires switching between multiple applications for background removal, slicing, file naming, size/count checks, QR-code creation, and asset rearrangement. This project brings those high-frequency tasks into one lightweight browser workspace.
+Sticker production often requires switching between multiple applications for background removal, slicing, file naming, size/count checks, QR-code creation, asset rearrangement, and simple promotional layouts. This project brings those high-frequency tasks into one lightweight browser workspace.
 
 ---
 
@@ -69,13 +71,13 @@ This tool is intended as a final pre-publish review step and does not replace LI
 
 **Use case:** Convert URLs into QR codes and create QR graphics that can be used in promotional materials.
 
-### 04. 素材重組・圖板拼貼｜Asset Collage & Board Builder
+### 04. 素材拼板 2.0｜Asset Collage 2.0
 
 路徑 / Path: `/collage/`
 
-**用途：** 將多張圖片重新排列成指定欄列的圖板，並調整比例、背景與素材位置。
+**用途：** 可選擇制式格排列或自由排列。制式格適合快速批次拼板；自由排列可拖曳、等比縮放、旋轉圖片，加入基礎文字，並調整畫布比例與背景後匯出 PNG。
 
-**Use case:** Rearrange multiple images into fixed-row/column boards with adjustable proportions, backgrounds, and asset placement.
+**Use case:** Choose between fixed-grid and free-layout workflows. Fixed grids are suited to fast batch boards, while free layout supports image dragging, proportional scaling, rotation, basic text, canvas ratio/background adjustments, and PNG export.
 
 ---
 
@@ -112,7 +114,7 @@ The site may still load third-party resources such as JavaScript libraries, font
 ├─ sticker/            # 去背與切割 / Background removal & slicing
 ├─ line-check/         # LINE 上架前檢查 / Pre-publish checking
 ├─ qr/                 # QR Code 產生器 / QR Code generator
-├─ collage/            # 素材拼板 / Asset collage builder
+├─ collage/            # 素材拼板 2.0 / Asset Collage 2.0
 ├─ assets/             # 首頁與共用素材 / Shared homepage assets
 ├─ LICENSE             # MIT License
 └─ README.md
