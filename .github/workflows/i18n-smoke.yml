@@ -75,6 +75,51 @@ jobs:
           check_page 'qr/index.html' 'URL QR Code Generator' qr
           check_page 'collage/index.html' '1. Import &amp; Layout' collage
 
+      - name: Audit residual Traditional Chinese in English UI
+        shell: python
+        run: |
+          import re
+          from html.parser import HTMLParser
+          from pathlib import Path
+          CJK = re.compile(r'[\u3400-\u9fff]')
+          IGNORE_TAGS = {'script','style','pre','code','textarea'}
+          IGNORE_CLASSES = {'featured-title','featured-desc','asset-name','devlog-panel'}
+          class AuditParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.stack = []
+                  self.residual = set()
+              def handle_starttag(self, tag, attrs):
+                  data = dict(attrs)
+                  classes = set(data.get('class','').split())
+                  inherited = self.stack[-1] if self.stack else False
+                  ignored = inherited or tag in IGNORE_TAGS or bool(classes & IGNORE_CLASSES) or data.get('id') == 'devlog-v91' or 'data-i18n-ignore' in data
+                  self.stack.append(ignored)
+                  if not ignored:
+                      for key in ('title','aria-label','placeholder','alt','content'):
+                          value = data.get(key,'') or ''
+                          if CJK.search(value): self.residual.add(f'@{key}: {value.strip()}')
+              def handle_startendtag(self, tag, attrs):
+                  self.handle_starttag(tag, attrs)
+                  self.handle_endtag(tag)
+              def handle_endtag(self, tag):
+                  if self.stack: self.stack.pop()
+              def handle_data(self, data):
+                  if self.stack and self.stack[-1]: return
+                  text = ' '.join(data.split())
+                  if text and CJK.search(text): self.residual.add(text)
+          failed = False
+          for file in sorted(Path('/tmp/i18n-smoke').glob('*.html')):
+              parser = AuditParser()
+              parser.feed(file.read_text(encoding='utf-8', errors='replace'))
+              if parser.residual:
+                  failed = True
+                  print(f'{file.stem}: residual CJK ({len(parser.residual)})')
+                  for item in sorted(parser.residual): print('  -', item)
+              else:
+                  print(f'{file.stem}: residual CJK audit PASS')
+          if failed: raise SystemExit(1)
+
       - name: Static integrity check
         run: |
           node --check assets/i18n.js
