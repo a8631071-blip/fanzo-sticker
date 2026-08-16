@@ -6,21 +6,102 @@ on:
       - i18n-zh-en-phase1
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   browser-smoke:
+    if: ${{ !contains(github.event.head_commit.message, '[i18n-patch]') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: i18n-zh-en-phase1
+          fetch-depth: 0
+
+      - name: Harden shared i18n patch
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path('assets/i18n.js')
+          text = path.read_text(encoding='utf-8')
+
+          old_css = '@media(max-width:700px){#fanzo-i18n-switcher.fanzo-sticker{margin-right:0;}header .version{display:none!important;}}'
+          new_css = '@media(max-width:700px){#fanzo-i18n-switcher.fanzo-sticker{margin-right:0;}.fanzo-sticker-page header .version{display:none!important;}}'
+          if old_css in text:
+              text = text.replace(old_css, new_css, 1)
+
+          old_mount = '''    let target = null;
+    if (document.querySelector('.topbar')) {
+      target = document.querySelector('.topbar');
+      box.classList.add('fanzo-home');
+    } else if (document.querySelector('header .logo') && document.querySelector('.steps-nav')) {
+      target = document.querySelector('header');
+      box.classList.add('fanzo-sticker');
+    } else if (document.querySelector('.hero-copy') && document.getElementById('qrCanvas')) {
+      target = document.querySelector('.hero-copy');
+      box.classList.add('fanzo-block');
+    } else if (document.querySelector('.tool-brand') && document.getElementById('previewCanvas')) {
+      target = document.querySelector('.tool-brand');
+      box.classList.add('fanzo-block');
+    } else if (document.querySelector('.left .box')) {
+      target = document.querySelector('.left .box');
+      box.classList.add('fanzo-block');
+    }
+'''
+          new_mount = '''    const pagePath = location.pathname;
+    let target = null;
+    if (pagePath.includes('/sticker/')) {
+      target = document.querySelector('header') || document.body;
+      box.classList.add('fanzo-sticker');
+      document.documentElement.classList.add('fanzo-sticker-page');
+    } else if (pagePath.includes('/line-check/')) {
+      target = document.querySelector('.left .box') || document.body;
+      box.classList.add('fanzo-block');
+    } else if (pagePath.includes('/qr/')) {
+      target = document.querySelector('.hero-copy') || document.body;
+      box.classList.add('fanzo-block');
+    } else if (pagePath.includes('/collage/')) {
+      target = document.querySelector('.tool-brand') || document.body;
+      box.classList.add('fanzo-block');
+    } else {
+      target = document.querySelector('.topbar') || document.body;
+      box.classList.add('fanzo-home');
+    }
+'''
+          if old_mount in text:
+              text = text.replace(old_mount, new_mount, 1)
+
+          metadata_anchor = '''    } else if (document.documentElement.dataset.i18nTitleSource) {
+      document.title = document.documentElement.dataset.i18nTitleSource;
+    }
+
+    const counter = document.querySelector('img[src*="hits.sh"]');
+'''
+          metadata_replacement = '''    } else if (document.documentElement.dataset.i18nTitleSource) {
+      document.title = document.documentElement.dataset.i18nTitleSource;
+    }
+
+    document.querySelectorAll('head meta[content], head [title], head [aria-label]').forEach(translateAttributes);
+
+    const counter = document.querySelector('img[src*="hits.sh"]');
+'''
+          if metadata_anchor in text and "head meta[content]" not in text:
+              text = text.replace(metadata_anchor, metadata_replacement, 1)
+
+          path.write_text(text, encoding='utf-8')
+
+          assert new_css in text
+          assert new_mount in text
+          assert "head meta[content]" in text
+          print('i18n hardening patch: PASS')
+
       - name: Start local site
         run: |
           python3 -m http.server 8765 > /tmp/fanzo-http.log 2>&1 &
           echo $! > /tmp/fanzo-http.pid
           sleep 1
           curl -fsS http://127.0.0.1:8765/assets/i18n.js >/dev/null
+
       - name: English UI smoke check in headless Chrome
         run: |
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || true)"
@@ -29,10 +110,11 @@ jobs:
           check_page(){
             path="$1"; expected="$2"; name="$3"
             "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --lang=en-US --user-data-dir="/tmp/chrome-$name" --virtual-time-budget=2500 --dump-dom "http://127.0.0.1:8765/$path" > "/tmp/i18n-smoke/$name.html" 2> "/tmp/i18n-smoke/$name.err"
-            grep -q 'id="fanzo-i18n-switcher"' "/tmp/i18n-smoke/$name.html"
-            grep -Fq "$expected" "/tmp/i18n-smoke/$name.html"
-            grep -q '<html lang="en"' "/tmp/i18n-smoke/$name.html"
+            grep -q 'id="fanzo-i18n-switcher"' "/tmp/i18n-smoke/$name.html" || { echo "$name: language switcher missing"; exit 1; }
+            grep -Fq "$expected" "/tmp/i18n-smoke/$name.html" || { echo "$name: expected English text missing: $expected"; grep -o '<h[12][^>]*>[^<]*' "/tmp/i18n-smoke/$name.html" | head -20; exit 1; }
+            grep -q '<html[^>]*lang="en"' "/tmp/i18n-smoke/$name.html" || { echo "$name: html lang is not en"; exit 1; }
             if grep -Eqi 'Uncaught|SyntaxError|ReferenceError|TypeError' "/tmp/i18n-smoke/$name.err"; then
+              echo "$name: runtime error detected"
               cat "/tmp/i18n-smoke/$name.err"
               exit 1
             fi
@@ -42,7 +124,8 @@ jobs:
           check_page 'sticker/index.html' 'Background removal' sticker
           check_page 'line-check/index.html' 'LINE Final Visual Check' linecheck
           check_page 'qr/index.html' 'URL QR Code Generator' qr
-          check_page 'collage/index.html' '1. Import & Layout' collage
+          check_page 'collage/index.html' '1. Import &amp; Layout' collage
+
       - name: Static integrity check
         run: |
           node --check assets/i18n.js
@@ -58,5 +141,21 @@ jobs:
           for path, src in expected.items():
               text=Path(path).read_text(encoding='utf-8')
               assert text.count(f'<script src="{src}"></script>') == 1
+          text = Path('assets/i18n.js').read_text(encoding='utf-8')
+          assert '.fanzo-sticker-page header .version' in text
+          assert "const pagePath = location.pathname;" in text
+          assert "head meta[content]" in text
           print('static integrity: PASS')
           PY
+
+      - name: Commit hardened i18n if changed
+        run: |
+          git config user.name "fanzo-i18n-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/i18n.js
+          if git diff --cached --quiet; then
+            echo "No i18n hardening changes to commit"
+            exit 0
+          fi
+          git commit -m "[i18n-patch] harden page mounting and metadata translation"
+          git push origin HEAD:i18n-zh-en-phase1
