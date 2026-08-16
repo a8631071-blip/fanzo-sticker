@@ -1,0 +1,92 @@
+name: i18n-toggle-verify
+
+on:
+  push:
+    branches:
+      - i18n-zh-en-phase1
+
+permissions:
+  contents: read
+
+jobs:
+  toggle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: i18n-zh-en-phase1
+      - name: Start local site
+        run: |
+          python3 -m http.server 8765 >/tmp/fanzo-http.log 2>&1 &
+          sleep 1
+          curl -fsS http://127.0.0.1:8765/assets/i18n.js >/dev/null
+      - name: Verify English ↔ Traditional Chinese and persistence
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable)"
+          "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-toggle http://127.0.0.1:8765/index.html >/tmp/chrome-toggle.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:9222/json >/tmp/targets.json 2>/dev/null; then break; fi
+            sleep 0.25
+          done
+          cat > /tmp/toggle-test.mjs <<'NODE'
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const targets = await (await fetch('http://127.0.0.1:9222/json')).json();
+          const target = targets.find(t => t.type === 'page' && t.url.includes('127.0.0.1:8765'));
+          if (!target) throw new Error('No site page target: ' + JSON.stringify(targets.map(t => ({type:t.type,url:t.url}))));
+          const ws = new WebSocket(target.webSocketDebuggerUrl);
+          await new Promise((resolve, reject) => {
+            ws.addEventListener('open', resolve, {once:true});
+            ws.addEventListener('error', reject, {once:true});
+          });
+          let id = 0;
+          const pending = new Map();
+          ws.addEventListener('message', event => {
+            const msg = JSON.parse(event.data);
+            if (!msg.id || !pending.has(msg.id)) return;
+            const p = pending.get(msg.id); pending.delete(msg.id);
+            msg.error ? p.reject(new Error(msg.error.message)) : p.resolve(msg.result);
+          });
+          const send = (method, params={}) => new Promise((resolve,reject) => {
+            const n=++id; pending.set(n,{resolve,reject}); ws.send(JSON.stringify({id:n,method,params}));
+          });
+          async function evalValue(expression){
+            const out = await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});
+            if(out.exceptionDetails) throw new Error(out.exceptionDetails.text || 'evaluate failed');
+            return out.result.value;
+          }
+          async function waitReady(expectedPath){
+            for(let i=0;i<80;i++){
+              await sleep(100);
+              const ready = await evalValue(`location.pathname.endsWith(${JSON.stringify(expectedPath)}) && document.readyState==='complete' && !!window.FanzoI18n && !!document.getElementById('fanzo-language-select')`);
+              if(ready) return;
+            }
+            throw new Error('Page not i18n-ready: '+expectedPath+' current='+await evalValue('location.href'));
+          }
+          async function navigate(path){
+            await send('Page.navigate',{url:'http://127.0.0.1:8765/'+path});
+            await waitReady('/'+path);
+          }
+          await send('Page.enable');
+          await send('Runtime.enable');
+          const pages=[
+            ['index.html','四個免費工具','Four Free Tools'],
+            ['sticker/index.html','上傳','Upload'],
+            ['line-check/index.html','匯入與規格','Import & Specs'],
+            ['qr/index.html','控制區','Controls'],
+            ['collage/index.html','1. 匯入與排列','1. Import & Layout']
+          ];
+          for(const [path,zh,en] of pages){
+            await navigate(path);
+            const z=await evalValue(`(()=>{FanzoI18n.setLanguage('zh-TW');return {lang:document.documentElement.lang,stored:localStorage.getItem('fanzo-language'),select:document.getElementById('fanzo-language-select').value,text:document.body.innerText.includes(${JSON.stringify(zh)})}})()`);
+            if(!(z.lang==='zh-Hant-TW'&&z.stored==='zh-TW'&&z.select==='zh-TW'&&z.text)) throw new Error(path+' zh-TW failed '+JSON.stringify(z));
+            const e=await evalValue(`(()=>{FanzoI18n.setLanguage('en');return {lang:document.documentElement.lang,stored:localStorage.getItem('fanzo-language'),select:document.getElementById('fanzo-language-select').value,text:document.body.innerText.includes(${JSON.stringify(en)})}})()`);
+            if(!(e.lang==='en'&&e.stored==='en'&&e.select==='en'&&e.text)) throw new Error(path+' en failed '+JSON.stringify(e));
+            await send('Page.reload',{ignoreCache:true});
+            await waitReady('/'+path);
+            const p=await evalValue(`({lang:document.documentElement.lang,stored:localStorage.getItem('fanzo-language'),select:document.getElementById('fanzo-language-select').value,text:document.body.innerText.includes(${JSON.stringify(en)})})`);
+            if(!(p.lang==='en'&&p.stored==='en'&&p.select==='en'&&p.text)) throw new Error(path+' persistence failed '+JSON.stringify(p));
+            console.log(path+': two-way + persistence PASS');
+          }
+          ws.close();
+          NODE
+          node /tmp/toggle-test.mjs
