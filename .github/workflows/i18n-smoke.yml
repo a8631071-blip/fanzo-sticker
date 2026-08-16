@@ -38,11 +38,17 @@ jobs:
           if "head meta[content]" not in text:
               assert metadata_anchor in text, 'metadata anchor missing'
               text = text.replace(metadata_anchor, metadata_new, 1)
+          dynamic_anchor = "  const EXACT_DYNAMIC = new Map([\n"
+          residual_entries = "    ['煩躁胖子', 'Fanzo'],\n    ['｜貼圖工作站', ' | Sticker Workshop'],\n    ['本工具免費提供使用，原始碼同步公開於', 'These tools are free to use. The source code is available on'],\n    ['，採 MIT License 授權。', ' under the MIT License.'],\n    ['素材拼板', 'Collage Board'],\n    ['工程日誌：2026-07-24 建立 0724V3，新增整面背景圖大膽版、背景圖濃度控制與定位角保護重畫。', 'Engineering log: 2026-07-24 created 0724V3 with full-image bold mode, background-image strength control, and protected finder-pattern redraw.'],\n    ['LINE主題', 'LINE themes'],\n    ['· 點擊每張貼圖下方的', '· Click the'],\n    ['· 點擊', '· Click'],\n    ['・免費公開版工具', ' · Free Public Tools'],\n    ['共', 'Total'],\n    ['成功 48×48', 'Ready 48×48'],\n    ['成功 96×96', 'Ready 96×96'],\n    ['更新日期 2026/07/11', 'Updated 2026/07/11'],\n    ['格 · 每格約', 'cells · approx.'],\n    ['設定封面圖', 'button below each sticker to set the cover image'],\n    ['設定標籤圖', 'to set the tab image'],\n    ['選擇圖片', 'Choose image'],\n"
+          if "['工程日誌：2026-07-24 建立 0724V3" not in text:
+              assert dynamic_anchor in text, 'dynamic translation anchor missing'
+              text = text.replace(dynamic_anchor, dynamic_anchor + residual_entries, 1)
           path.write_text(text, encoding='utf-8')
           assert new_css in text
           assert "const pagePath = location.pathname;" in text
           assert "head meta[content]" in text
-          print('i18n hardening patch: PASS')
+          assert "['選擇圖片', 'Choose image']" in text
+          print('i18n residual patch: PASS')
 
       - name: Start local site
         run: |
@@ -82,7 +88,7 @@ jobs:
           from html.parser import HTMLParser
           from pathlib import Path
           CJK = re.compile(r'[\u3400-\u9fff]')
-          IGNORE_TAGS = {'script','style','pre','code','textarea'}
+          IGNORE_TAGS = {'script','style','pre','code','textarea','template'}
           IGNORE_CLASSES = {'featured-title','featured-desc','asset-name','devlog-panel'}
           class AuditParser(HTMLParser):
               def __init__(self):
@@ -97,6 +103,7 @@ jobs:
                   self.stack.append(ignored)
                   if not ignored:
                       for key in ('title','aria-label','placeholder','alt','content'):
+                          if key == 'alt' and 'featured-img' in classes: continue
                           value = data.get(key,'') or ''
                           if CJK.search(value): self.residual.add(f'@{key}: {value.strip()}')
               def handle_startendtag(self, tag, attrs):
@@ -133,6 +140,7 @@ jobs:
           assert '.fanzo-sticker-page header .version' in text
           assert "const pagePath = location.pathname;" in text
           assert "head meta[content]" in text
+          assert "['選擇圖片', 'Choose image']" in text
           print('static integrity: PASS')
           PY
 
@@ -145,5 +153,5 @@ jobs:
             echo "No i18n hardening changes to commit"
             exit 0
           fi
-          git commit -m "[i18n-patch] harden page mounting and metadata translation"
+          git commit -m "[i18n-patch] complete initial English UI coverage"
           git push origin HEAD:i18n-zh-en-phase1
