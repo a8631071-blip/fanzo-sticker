@@ -493,7 +493,7 @@ function addTextObject() {
   const object = {
     id: `obj-${state.nextObjectId++}`,
     type: 'text',
-    text: '輸入文字',
+    text: window.FanzoI18n ? window.FanzoI18n.t('collage.defaultText') : '輸入文字',
     x: 0.5,
     y: 0.5,
     font: 'sans',
