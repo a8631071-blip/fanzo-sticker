@@ -1,0 +1,62 @@
+name: i18n-smoke
+
+on:
+  push:
+    branches:
+      - i18n-zh-en-phase1
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: i18n-zh-en-phase1
+      - name: Start local site
+        run: |
+          python3 -m http.server 8765 > /tmp/fanzo-http.log 2>&1 &
+          echo $! > /tmp/fanzo-http.pid
+          sleep 1
+          curl -fsS http://127.0.0.1:8765/assets/i18n.js >/dev/null
+      - name: English UI smoke check in headless Chrome
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || true)"
+          test -n "$CHROME"
+          mkdir -p /tmp/i18n-smoke
+          check_page(){
+            path="$1"; expected="$2"; name="$3"
+            "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --lang=en-US --user-data-dir="/tmp/chrome-$name" --virtual-time-budget=2500 --dump-dom "http://127.0.0.1:8765/$path" > "/tmp/i18n-smoke/$name.html" 2> "/tmp/i18n-smoke/$name.err"
+            grep -q 'id="fanzo-i18n-switcher"' "/tmp/i18n-smoke/$name.html"
+            grep -Fq "$expected" "/tmp/i18n-smoke/$name.html"
+            grep -q '<html lang="en"' "/tmp/i18n-smoke/$name.html"
+            if grep -Eqi 'Uncaught|SyntaxError|ReferenceError|TypeError' "/tmp/i18n-smoke/$name.err"; then
+              cat "/tmp/i18n-smoke/$name.err"
+              exit 1
+            fi
+            echo "$name: PASS"
+          }
+          check_page 'index.html' 'Four Free Tools' home
+          check_page 'sticker/index.html' 'Background removal' sticker
+          check_page 'line-check/index.html' 'LINE Final Visual Check' linecheck
+          check_page 'qr/index.html' 'URL QR Code Generator' qr
+          check_page 'collage/index.html' '1. Import & Layout' collage
+      - name: Static integrity check
+        run: |
+          node --check assets/i18n.js
+          python3 - <<'PY'
+          from pathlib import Path
+          expected = {
+              'index.html':'assets/i18n.js',
+              'sticker/index.html':'../assets/i18n.js',
+              'line-check/index.html':'../assets/i18n.js',
+              'qr/index.html':'../assets/i18n.js',
+              'collage/index.html':'../assets/i18n.js',
+          }
+          for path, src in expected.items():
+              text=Path(path).read_text(encoding='utf-8')
+              assert text.count(f'<script src="{src}"></script>') == 1
+          print('static integrity: PASS')
+          PY
