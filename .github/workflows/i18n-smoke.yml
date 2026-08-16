@@ -66,7 +66,7 @@ jobs:
             path="$1"; expected="$2"; name="$3"
             "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --lang=en-US --user-data-dir="/tmp/chrome-$name" --virtual-time-budget=2500 --dump-dom "http://127.0.0.1:8765/$path" > "/tmp/i18n-smoke/$name.html" 2> "/tmp/i18n-smoke/$name.err"
             grep -q 'id="fanzo-i18n-switcher"' "/tmp/i18n-smoke/$name.html" || { echo "$name switcher missing"; exit 1; }
-            grep -Fq "$expected" "/tmp/i18n-smoke/$name.html" || { echo "$name expected English text missing"; grep -o '<h[12][^>]*>[^<]*' "/tmp/i18n-smoke/$name.html" | head -20; exit 1; }
+            grep -Fq "$expected" "/tmp/i18n-smoke/$name.html" || { echo "$name expected English text missing"; exit 1; }
             grep -q '<html[^>]*lang="en"' "/tmp/i18n-smoke/$name.html" || { echo "$name html lang not en"; exit 1; }
             if grep -Eqi 'Uncaught|SyntaxError|ReferenceError|TypeError' "/tmp/i18n-smoke/$name.err"; then
               echo "$name runtime error"
@@ -80,6 +80,71 @@ jobs:
           check_page 'line-check/index.html' 'LINE Final Visual Check' linecheck
           check_page 'qr/index.html' 'URL QR Code Generator' qr
           check_page 'collage/index.html' '1. Import &amp; Layout' collage
+
+      - name: Verify two-way switching and persistence
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || true)"
+          "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-toggle about:blank >/tmp/chrome-toggle.log 2>&1 &
+          for i in $(seq 1 40); do curl -fsS http://127.0.0.1:9222/json >/dev/null && break; sleep 0.25; done
+          node -e "if(typeof WebSocket!=='function') process.exit(2)"
+          cat > /tmp/toggle-test.mjs <<'NODE'
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const targets = await (await fetch('http://127.0.0.1:9222/json')).json();
+          if (!targets.length) throw new Error('No Chrome CDP target');
+          const ws = new WebSocket(targets[0].webSocketDebuggerUrl);
+          await new Promise((resolve, reject) => { ws.addEventListener('open', resolve, {once:true}); ws.addEventListener('error', reject, {once:true}); });
+          let nextId = 1;
+          const pending = new Map();
+          ws.addEventListener('message', event => {
+            const data = JSON.parse(event.data);
+            if (!data.id || !pending.has(data.id)) return;
+            const {resolve, reject} = pending.get(data.id);
+            pending.delete(data.id);
+            if (data.error) reject(new Error(data.error.message)); else resolve(data.result);
+          });
+          function send(method, params={}) {
+            const id = nextId++;
+            return new Promise((resolve, reject) => { pending.set(id, {resolve, reject}); ws.send(JSON.stringify({id, method, params})); });
+          }
+          async function evaluate(expression) {
+            const result = await send('Runtime.evaluate', {expression, returnByValue:true, awaitPromise:true});
+            if (result.exceptionDetails) throw new Error(result.exceptionDetails.text || 'Runtime evaluate failed');
+            return result.result.value;
+          }
+          async function navigate(url) {
+            await send('Page.navigate', {url});
+            for (let i=0; i<40; i++) {
+              await sleep(150);
+              const ready = await evaluate("document.readyState === 'complete' && !!window.FanzoI18n && !!document.getElementById('fanzo-language-select')");
+              if (ready) return;
+            }
+            throw new Error('Page did not become i18n-ready: ' + url);
+          }
+          await send('Page.enable');
+          await send('Runtime.enable');
+          const pages = [
+            ['index.html','四個免費工具','Four Free Tools'],
+            ['sticker/index.html','上傳','Upload'],
+            ['line-check/index.html','匯入與規格','Import & Specs'],
+            ['qr/index.html','控制區','Controls'],
+            ['collage/index.html','1. 匯入與排列','1. Import & Layout']
+          ];
+          for (const [path, zh, en] of pages) {
+            const url = 'http://127.0.0.1:8765/' + path;
+            await navigate(url);
+            const zhState = await evaluate(`(()=>{FanzoI18n.setLanguage('zh-TW');return {lang:document.documentElement.lang,stored:localStorage.getItem('fanzo-language'),select:document.getElementById('fanzo-language-select').value,text:document.body.innerText.includes(${JSON.stringify(zh)})}})()`);
+            if (!(zhState.lang === 'zh-Hant-TW' && zhState.stored === 'zh-TW' && zhState.select === 'zh-TW' && zhState.text)) throw new Error(path + ' zh-TW switch failed: ' + JSON.stringify(zhState));
+            const enState = await evaluate(`(()=>{FanzoI18n.setLanguage('en');return {lang:document.documentElement.lang,stored:localStorage.getItem('fanzo-language'),select:document.getElementById('fanzo-language-select').value,text:document.body.innerText.includes(${JSON.stringify(en)})}})()`);
+            if (!(enState.lang === 'en' && enState.stored === 'en' && enState.select === 'en' && enState.text)) throw new Error(path + ' en switch failed: ' + JSON.stringify(enState));
+            await send('Page.reload', {ignoreCache:true});
+            await sleep(700);
+            const persisted = await evaluate(`({stored:localStorage.getItem('fanzo-language'),select:document.getElementById('fanzo-language-select')?.value,text:document.body.innerText.includes(${JSON.stringify(en)})})`);
+            if (!(persisted.stored === 'en' && persisted.select === 'en' && persisted.text)) throw new Error(path + ' persistence failed: ' + JSON.stringify(persisted));
+            console.log(path + ': two-way + persistence PASS');
+          }
+          ws.close();
+          NODE
+          node /tmp/toggle-test.mjs
 
       - name: Audit residual Traditional Chinese in English UI
         shell: python
@@ -150,7 +215,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add assets/i18n.js
           if git diff --cached --quiet; then
-            echo "No i18n hardening changes to commit"
+            echo "No i18n changes to commit"
             exit 0
           fi
           git commit -m "[i18n-patch] complete initial English UI coverage"
