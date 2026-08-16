@@ -583,6 +583,8 @@
       document.title = document.documentElement.dataset.i18nTitleSource;
     }
 
+    document.querySelectorAll('head meta[content], head [title], head [aria-label]').forEach(translateAttributes);
+
     const counter = document.querySelector('img[src*="hits.sh"]');
     if (counter) {
       if (!counter.dataset.i18nSrc) counter.dataset.i18nSrc = counter.getAttribute('src') || '';
@@ -609,26 +611,28 @@
       #fanzo-i18n-switcher.fanzo-home{margin-left:auto;}
       #fanzo-i18n-switcher.fanzo-sticker{margin-left:auto;margin-right:120px;}
       #fanzo-i18n-switcher.fanzo-block{margin-top:10px;}
-      @media(max-width:700px){#fanzo-i18n-switcher.fanzo-sticker{margin-right:0;}header .version{display:none!important;}}
+      @media(max-width:700px){#fanzo-i18n-switcher.fanzo-sticker{margin-right:0;}.fanzo-sticker-page header .version{display:none!important;}}
     `;
     document.head.appendChild(style);
 
+    const pagePath = location.pathname;
     let target = null;
-    if (document.querySelector('.topbar')) {
-      target = document.querySelector('.topbar');
-      box.classList.add('fanzo-home');
-    } else if (document.querySelector('header .logo') && document.querySelector('.steps-nav')) {
-      target = document.querySelector('header');
+    if (pagePath.includes('/sticker/')) {
+      target = document.querySelector('header') || document.body;
       box.classList.add('fanzo-sticker');
-    } else if (document.querySelector('.hero-copy') && document.getElementById('qrCanvas')) {
-      target = document.querySelector('.hero-copy');
+      document.documentElement.classList.add('fanzo-sticker-page');
+    } else if (pagePath.includes('/line-check/')) {
+      target = document.querySelector('.left .box') || document.body;
       box.classList.add('fanzo-block');
-    } else if (document.querySelector('.tool-brand') && document.getElementById('previewCanvas')) {
-      target = document.querySelector('.tool-brand');
+    } else if (pagePath.includes('/qr/')) {
+      target = document.querySelector('.hero-copy') || document.body;
       box.classList.add('fanzo-block');
-    } else if (document.querySelector('.left .box')) {
-      target = document.querySelector('.left .box');
+    } else if (pagePath.includes('/collage/')) {
+      target = document.querySelector('.tool-brand') || document.body;
       box.classList.add('fanzo-block');
+    } else {
+      target = document.querySelector('.topbar') || document.body;
+      box.classList.add('fanzo-home');
     }
     (target || document.body).appendChild(box);
     const select = box.querySelector('select');
