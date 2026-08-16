@@ -1,0 +1,86 @@
+name: i18n-stage
+
+on:
+  push:
+    branches:
+      - i18n-zh-en-phase1
+
+permissions:
+  contents: write
+
+jobs:
+  patch-pages:
+    if: ${{ !contains(github.event.head_commit.message, '[i18n-patch]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: i18n-zh-en-phase1
+          fetch-depth: 0
+
+      - name: Wire shared i18n into public pages
+        shell: python
+        run: |
+          from pathlib import Path
+
+          files = {
+              'index.html': 'assets/i18n.js',
+              'sticker/index.html': '../assets/i18n.js',
+              'line-check/index.html': '../assets/i18n.js',
+              'qr/index.html': '../assets/i18n.js',
+              'collage/index.html': '../assets/i18n.js',
+          }
+
+          for filename, src in files.items():
+              path = Path(filename)
+              text = path.read_text(encoding='utf-8')
+              marker = f'<script src="{src}"></script>'
+              if marker not in text:
+                  if '</body>' not in text:
+                      raise RuntimeError(f'{filename}: missing </body>')
+                  text = text.replace('</body>', marker + '\n</body>', 1)
+                  path.write_text(text, encoding='utf-8')
+
+          app = Path('collage/app.js')
+          text = app.read_text(encoding='utf-8')
+          old = "text: '輸入文字'"
+          new = "text: window.FanzoI18n ? window.FanzoI18n.t('collage.defaultText') : '輸入文字'"
+          if old in text and new not in text:
+              text = text.replace(old, new, 1)
+              app.write_text(text, encoding='utf-8')
+
+          log = Path('.ai_patch/0817_I18N_ZH_EN.md')
+          log.write_text('''# 0817｜公開版繁中／英文 i18n 第一階段\n\n## 基底\n- main 於 2026-08-17 的公開版。\n- 保留首頁、去背切割、LINE 上架檢查、QR、素材拼板 2.0 既有功能與資料流。\n\n## 修改\n- 新增 `assets/i18n.js` 共用語言核心。\n- 首頁與四套工具接上同一套 `zh-TW / en` 切換。\n- 語言選擇寫入 localStorage；首次依瀏覽器語言判定，中文瀏覽器用繁中，其餘先回英文。\n- 靜態 UI、aria/title/placeholder、主要動態狀態、alert/confirm 共用翻譯。\n- LINE 商品正式名稱與商品說明視為作品內容，保留原文，不因 UI 語言切換改名。\n- 素材拼板新增文字的預設內容會依目前語言顯示「輸入文字 / Enter text」。\n\n## 未修改\n- 不改去 Gemini 浮水印、傳統去背、魔術棒、切割、Main/Tab、ZIP 核心。\n- 不改 LINE 上架檢查 PNG/APNG/ZIP 解析核心。\n- 不改 QR 編碼／繪製核心。\n- 不改素材拼板拖曳、縮放、旋轉、匯出核心。\n- 本階段不加入日文、泰文。\n\n## 風險與防護\n- 不採四份 HTML，避免未來功能版本不同步。\n- 語言切換器不使用全站固定右上浮層，避免遮住 sticker 更新日期與 line-check 工具列；由共用核心掛到各頁既有標頭／資訊區。\n- i18n 內建 `?i18nAudit=1` 可列出英文模式仍殘留的未翻譯 UI；工程日誌、作品名稱／說明、素材檔名不列入 UI 漏翻判定。\n''', encoding='utf-8')
+
+      - name: Static self-check
+        run: |
+          node --check assets/i18n.js
+          python - <<'PY'
+          from pathlib import Path
+          checks = {
+              'index.html': 'assets/i18n.js',
+              'sticker/index.html': '../assets/i18n.js',
+              'line-check/index.html': '../assets/i18n.js',
+              'qr/index.html': '../assets/i18n.js',
+              'collage/index.html': '../assets/i18n.js',
+          }
+          for filename, src in checks.items():
+              text = Path(filename).read_text(encoding='utf-8')
+              marker = f'<script src="{src}"></script>'
+              assert text.count(marker) == 1, (filename, text.count(marker))
+              assert '</body>' in text
+          assert Path('.ai_patch/0817_I18N_ZH_EN.md').exists()
+          print('i18n static wiring checks: PASS')
+          PY
+
+      - name: Commit staged patch
+        run: |
+          git config user.name "fanzo-i18n-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sticker/index.html line-check/index.html qr/index.html collage/index.html collage/app.js .ai_patch/0817_I18N_ZH_EN.md
+          if git diff --cached --quiet; then
+            echo "No page changes to commit"
+            exit 0
+          fi
+          git commit -m "[i18n-patch] wire zh-TW/en across public tools"
+          git push origin HEAD:i18n-zh-en-phase1
