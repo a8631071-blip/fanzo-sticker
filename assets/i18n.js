@@ -140,7 +140,7 @@
     'qr.bold': ['整面背景圖大膽版', 'Full-image bold'],
     'qr.modeHelp': ['大膽版會把整個碼區鋪上圖，再重畫定位角與深色模組。視覺最強，但掃碼風險也最高。', 'Full-image bold mode places the image across the QR area, then redraws finder patterns and dark modules. It is the most visual but also carries the highest scanning risk.'],
     'qr.logoSize': ['中心圖案大小', 'Center image size'],
-    'qr.logoHelp': ['建議先落在 12% 到 18%。太大會明顯增加掃碼風險。', 'Start around 12%–18%. Larger images noticeably increase scanning risk.'],
+    'qr.logoHelp': ['建議先落在 12% 到 18%。太大會明顯增加掃碼風險。', 'Start around 12%–18%. Larger images noticeably increase scan risk.'],
     'qr.strength': ['背景圖濃度', 'Background image strength'],
     'qr.strengthHelp': ['只影響整面背景圖大膽版。濃度越高，圖越明顯，但也越容易壓低辨識度。', 'Only affects full-image bold mode. Higher strength makes the image more visible but can reduce scan reliability.'],
     'qr.logo': ['中心圖案', 'Center image'],
@@ -744,4 +744,340 @@
       else console.info('[Fanzo i18n] UI audit passed.');
     }, 400);
   }
+})();
+
+// ===== 0820V23｜Sticker ZIP in-app browser compatibility patch =====
+(function () {
+  'use strict';
+
+  if (!String(location.pathname || '').includes('/sticker/')) return;
+  const downloadButton = document.getElementById('btn-download');
+  if (!downloadButton) return;
+
+  const ZIP_FILENAME = 'stickers.zip';
+  const PATCH_VERSION = '0820V23';
+  let preparedZipBlob = null;
+  let preparedZipSignature = '';
+  let zipBuildPromise = null;
+  let zipBuildPromiseSignature = '';
+
+  function isEnglish() {
+    return window.FanzoI18n?.getLanguage?.() === 'en';
+  }
+
+  function text(zh, en) {
+    return isEnglish() ? en : zh;
+  }
+
+  function ensureStatusBox() {
+    let box = document.getElementById('zip-download-status');
+    if (box) return box;
+    box = document.createElement('div');
+    box.id = 'zip-download-status';
+    box.className = 'info-box';
+    box.setAttribute('data-i18n-ignore', '');
+    box.style.display = 'none';
+    box.style.width = '100%';
+    box.style.margin = '0';
+    box.style.textAlign = 'left';
+    downloadButton.insertAdjacentElement('afterend', box);
+    return box;
+  }
+
+  function setStatus(message, level = 'info') {
+    const box = ensureStatusBox();
+    box.style.display = 'block';
+    box.textContent = message;
+    box.style.color = level === 'error'
+      ? '#ff8a8a'
+      : (level === 'ok' ? 'var(--accent3)' : 'var(--accent2)');
+  }
+
+  function isInAppBrowser(ua = navigator.userAgent || '') {
+    return /Threads|Instagram|FBAN|FBAV|FB_IAB|Line\/|MicroMessenger|;\s*wv\)|\bwv\b/i.test(String(ua));
+  }
+
+  function currentZipSignature() {
+    const startNum = parseInt(document.getElementById('start-num')?.value || '1', 10) || 1;
+    return [
+      startNum,
+      outputDigits,
+      mainId || 0,
+      tabId || 0,
+      finalImages.length,
+      finalImages.map(img => `${img.id}:${String(img.dataUrl || '').length}`).join(',')
+    ].join('|');
+  }
+
+  function invalidatePreparedZip() {
+    preparedZipBlob = null;
+    preparedZipSignature = '';
+    zipBuildPromise = null;
+    zipBuildPromiseSignature = '';
+  }
+
+  async function buildStickerZipBlob() {
+    if (typeof JSZip !== 'function') {
+      throw new Error(text('ZIP 元件尚未載入', 'ZIP library is not loaded'));
+    }
+    if (!Array.isArray(finalImages) || !finalImages.length) {
+      throw new Error(text('沒有可打包的圖片', 'No images are ready to package'));
+    }
+
+    const startNum = parseInt(document.getElementById('start-num')?.value || '1', 10) || 1;
+    const zip = new JSZip();
+
+    finalImages.forEach(img => {
+      const dataUrl = String(img.dataUrl || '');
+      const comma = dataUrl.indexOf(',');
+      if (comma < 0) throw new Error(text(`格 ${img.id} 沒有可輸出的 PNG 資料`, `Cell ${img.id} has no PNG data to export`));
+      zip.file(
+        `${(startNum + img.id - 1).toString().padStart(outputDigits, '0')}.png`,
+        dataUrl.slice(comma + 1),
+        { base64: true }
+      );
+    });
+
+    if (mainId) {
+      const main = finalImages.find(item => item.id === mainId);
+      if (main) zip.file('main.png', await resizeImg(main.dataUrl, 240, 240), { base64: true });
+    }
+    if (tabId) {
+      const tab = finalImages.find(item => item.id === tabId);
+      if (tab) zip.file('tab.png', await resizeImg(tab.dataUrl, 96, 74), { base64: true });
+    }
+
+    return zip.generateAsync({ type: 'blob' });
+  }
+
+  function prepareStickerZip() {
+    if (!Array.isArray(finalImages) || !finalImages.length) return Promise.resolve(null);
+    const signature = currentZipSignature();
+
+    if (preparedZipBlob && preparedZipSignature === signature) {
+      return Promise.resolve(preparedZipBlob);
+    }
+    if (zipBuildPromise && zipBuildPromiseSignature === signature) {
+      return zipBuildPromise;
+    }
+
+    zipBuildPromiseSignature = signature;
+    zipBuildPromise = buildStickerZipBlob()
+      .then(blob => {
+        if (currentZipSignature() === signature) {
+          preparedZipBlob = blob;
+          preparedZipSignature = signature;
+        }
+        return blob;
+      })
+      .catch(err => {
+        console.error(`[${PATCH_VERSION}] ZIP build failed`, err);
+        if (currentZipSignature() === signature) {
+          setStatus(
+            text(`ZIP 建立失敗：${err?.message || err}`, `ZIP build failed: ${err?.message || err}`),
+            'error'
+          );
+        }
+        throw err;
+      })
+      .finally(() => {
+        if (zipBuildPromiseSignature === signature) {
+          zipBuildPromise = null;
+          zipBuildPromiseSignature = '';
+        }
+      });
+
+    return zipBuildPromise;
+  }
+
+  function nativeBlobDownload(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.rel = 'noopener';
+    anchor.style.display = 'none';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+  }
+
+  function fallbackDownload(blob, inApp) {
+    try {
+      if (typeof saveAs === 'function') saveAs(blob, ZIP_FILENAME);
+      else nativeBlobDownload(blob, ZIP_FILENAME);
+
+      setStatus(
+        inApp
+          ? text(
+              '已送出 ZIP 下載要求。若沒有出現檔案，請用右上角選單「在瀏覽器中開啟」後再按下載。',
+              'ZIP download was requested. If no file appears, use the app menu to open this page in your browser and try again.'
+            )
+          : text('ZIP 下載已送出。', 'ZIP download started.'),
+        inApp ? 'info' : 'ok'
+      );
+    } catch (err) {
+      console.error(`[${PATCH_VERSION}] ZIP download failed`, err);
+      setStatus(
+        text(
+          '目前瀏覽器無法儲存 ZIP。請用右上角選單「在瀏覽器中開啟」，再重新按下載 ZIP。',
+          'This browser cannot save the ZIP. Open this page in your browser from the app menu, then press Download ZIP again.'
+        ),
+        'error'
+      );
+    }
+  }
+
+  function deliverPreparedZip(blob) {
+    const inApp = isInAppBrowser();
+    let file = null;
+
+    if (inApp && typeof File === 'function') {
+      try {
+        file = new File([blob], ZIP_FILENAME, { type: 'application/zip' });
+      } catch (err) {
+        console.warn(`[${PATCH_VERSION}] File API unavailable`, err);
+      }
+    }
+
+    let canShareFile = false;
+    if (inApp && file && typeof navigator.share === 'function' && typeof navigator.canShare === 'function') {
+      try {
+        canShareFile = navigator.canShare({ files: [file] });
+      } catch (_) {
+        canShareFile = false;
+      }
+    }
+
+    if (!canShareFile) {
+      fallbackDownload(blob, inApp);
+      return;
+    }
+
+    setStatus(text('正在開啟系統分享…', 'Opening the system share sheet…'));
+    try {
+      Promise.resolve(navigator.share({ files: [file], title: ZIP_FILENAME }))
+        .then(() => {
+          setStatus(text('ZIP 已交給系統分享。', 'ZIP sent to the system share sheet.'), 'ok');
+        })
+        .catch(err => {
+          if (err?.name === 'AbortError') {
+            setStatus(text('已取消分享。ZIP 仍保留，可再按一次下載。', 'Share cancelled. The ZIP is still ready; press Download ZIP again.'));
+            return;
+          }
+          console.warn(`[${PATCH_VERSION}] Web Share failed, using download fallback`, err);
+          fallbackDownload(blob, true);
+        });
+    } catch (err) {
+      console.warn(`[${PATCH_VERSION}] Web Share could not start, using download fallback`, err);
+      fallbackDownload(blob, true);
+    }
+  }
+
+  const originalDownloadZip = window.downloadZip;
+  window.downloadZip = function () {
+    if (!Array.isArray(finalImages) || !finalImages.length) {
+      setStatus(text('請先完成「開始切割＋打包」。', 'Run “Slice + package” first.'), 'error');
+      return;
+    }
+
+    const signature = currentZipSignature();
+    if (preparedZipBlob && preparedZipSignature === signature) {
+      deliverPreparedZip(preparedZipBlob);
+      return;
+    }
+
+    setStatus(text('正在建立 ZIP…', 'Building ZIP…'));
+    prepareStickerZip()
+      .then(() => {
+        if (!preparedZipBlob || preparedZipSignature !== currentZipSignature()) {
+          setStatus(
+            text(
+              '設定剛剛有變更，ZIP 正在重新建立，請稍後再按一次下載。',
+              'Settings changed while the ZIP was being built. It is rebuilding; press Download ZIP again shortly.'
+            )
+          );
+          return;
+        }
+        setStatus(
+          isInAppBrowser()
+            ? text(
+                'ZIP 已準備完成。請再按一次「下載 ZIP」，工具會優先開啟系統分享。',
+                'ZIP is ready. Press “Download ZIP” again; the tool will prefer the system share sheet.'
+              )
+            : text('ZIP 已準備完成。請再按一次「下載 ZIP」。', 'ZIP is ready. Press “Download ZIP” again.'),
+          'ok'
+        );
+      })
+      .catch(() => {});
+  };
+
+  function wrapPrepareAfter(name) {
+    const original = window[name];
+    if (typeof original !== 'function') return;
+    window[name] = function (...args) {
+      const result = original.apply(this, args);
+      invalidatePreparedZip();
+      if (Array.isArray(finalImages) && finalImages.length) prepareStickerZip().catch(() => {});
+      return result;
+    };
+  }
+
+  function wrapInvalidateBefore(name) {
+    const original = window[name];
+    if (typeof original !== 'function') return;
+    window[name] = function (...args) {
+      invalidatePreparedZip();
+      return original.apply(this, args);
+    };
+  }
+
+  wrapPrepareAfter('onProcessDone');
+  wrapPrepareAfter('selMain');
+  wrapPrepareAfter('selTab');
+  wrapPrepareAfter('selectDigits');
+  wrapInvalidateBefore('invalidateFinalOutput');
+  wrapInvalidateBefore('resetToUpload');
+
+  function syncPublicVersion() {
+    const tag = document.getElementById('ver-tag');
+    if (!tag) return;
+    tag.setAttribute('data-i18n-ignore', '');
+    tag.textContent = text('更新日期 2026/08/20', 'Updated 2026/08/20');
+  }
+
+  syncPublicVersion();
+  ensureStatusBox();
+
+  if (isInAppBrowser()) {
+    setStatus(
+      text(
+        '偵測到社群 App 內建瀏覽器。ZIP 準備完成後會優先開啟系統分享；若不支援，請用右上角選單「在瀏覽器中開啟」。',
+        'An in-app browser was detected. When the ZIP is ready, the tool will prefer the system share sheet; if unsupported, open this page in your browser from the app menu.'
+      )
+    );
+  }
+
+  document.addEventListener('fanzo:languagechange', () => {
+    syncPublicVersion();
+    if (isInAppBrowser()) {
+      setStatus(
+        text(
+          '偵測到社群 App 內建瀏覽器。ZIP 準備完成後會優先開啟系統分享；若不支援，請用右上角選單「在瀏覽器中開啟」。',
+          'An in-app browser was detected. When the ZIP is ready, the tool will prefer the system share sheet; if unsupported, open this page in your browser from the app menu.'
+        )
+      );
+    }
+  });
+
+  if (Array.isArray(finalImages) && finalImages.length) prepareStickerZip().catch(() => {});
+
+  window.__fanzoZipCompat = {
+    version: PATCH_VERSION,
+    isInAppBrowser,
+    invalidate: invalidatePreparedZip,
+    prepare: prepareStickerZip,
+    originalDownloadZip
+  };
 })();
