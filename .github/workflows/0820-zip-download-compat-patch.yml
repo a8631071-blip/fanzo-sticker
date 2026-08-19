@@ -1,0 +1,570 @@
+name: 0820-zip-download-compat-patch
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/0820-zip-download-compat-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch-test-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch public sticker ZIP download flow
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          html_path = Path('sticker/index.html')
+          readme_path = Path('README.md')
+          log_path = Path('.ai_patch/0820_ZIP_DOWNLOAD_COMPAT.md')
+          html = html_path.read_text(encoding='utf-8')
+          readme = readme_path.read_text(encoding='utf-8')
+
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly 1 match, got {count}')
+              return text.replace(old, new, 1)
+
+          # Public update date only; no engineering version is exposed in the header.
+          if html.count('更新日期 2026/07/11') != 2:
+              raise SystemExit('update date: expected exactly 2 old date matches')
+          html = html.replace('更新日期 2026/07/11', '更新日期 2026/08/20')
+
+          old_button = '''        <button class="btn-main btn-green" style="width:100%;justify-content:center;" id="btn-download" onclick="downloadZip()" disabled>⬇️ 下載 ZIP</button>'''
+          new_button = old_button + '''
+        <div id="zip-download-status" class="info-box" style="display:none;width:100%;margin:0;text-align:left;"></div>'''
+          html = replace_once(html, old_button, new_button, 'ZIP status UI')
+
+          old_log = '''  <pre>
+0711V22｜2026-07-11｜三頁獨立輪播＋成品排版'''
+          new_log = '''  <pre>
+0820V23｜2026-08-20｜行動內建瀏覽器 ZIP 下載相容修正
+- 修正 Threads／Instagram／Facebook 等內建瀏覽器對 Blob ZIP 下載不穩定：切割完成後背景預先建立 ZIP；下載時若支援檔案分享，優先開啟系統分享，否則回退既有 FileSaver／原生下載。
+- 下載流程新增明確狀態與錯誤提示；內建瀏覽器沒有可用檔案分享時，提示改用右上角「在瀏覽器中開啟」。
+- ZIP 快取會在切割設定失效、檔名碼數、起始編號、Main／Tab 選取變更時同步失效並重建，避免下載舊內容。
+- 保留去 Gemini 浮水印、傳統去背、魔術棒、手拉切線、切割、成品排版、檔名、Main／Tab 與 ZIP 內容結構不變。
+
+0711V22｜2026-07-11｜三頁獨立輪播＋成品排版'''
+          html = replace_once(html, old_log, new_log, 'hidden engineering log')
+
+          helper_anchor = '''// ===== 輸出尺寸設定 =====
+let outputW = 370, outputH = 320;
+let outputDigits = 2;'''
+          helper_code = r'''// ===== 0820V23｜ZIP 下載相容層 =====
+let preparedStickerZipBlob = null;
+let preparedStickerZipSignature = '';
+let preparedStickerZipPromise = null;
+let preparedStickerZipPromiseSignature = '';
+
+function zipCompatText(zh, en) {
+  return String(document.documentElement.lang || '').toLowerCase().startsWith('en') ? en : zh;
+}
+
+function setZipDownloadStatus(message, level = 'info') {
+  const el = document.getElementById('zip-download-status');
+  if (!el) return;
+  el.style.display = 'block';
+  el.textContent = message;
+  el.style.color = level === 'error' ? '#ff8a8a' : (level === 'ok' ? 'var(--accent3)' : 'var(--accent2)');
+}
+
+function isInAppBrowser(ua = navigator.userAgent || '') {
+  return /Threads|Instagram|FBAN|FBAV|FB_IAB|Line\/|MicroMessenger|;\s*wv\)|\bwv\b/i.test(String(ua));
+}
+
+function getStickerZipSignature() {
+  const startNum = parseInt(document.getElementById('start-num')?.value || '1') || 1;
+  return [
+    startNum,
+    outputDigits,
+    mainId || 0,
+    tabId || 0,
+    finalImages.length,
+    finalImages.map(img => `${img.id}:${String(img.dataUrl || '').length}`).join(',')
+  ].join('|');
+}
+
+function invalidatePreparedStickerZip() {
+  preparedStickerZipBlob = null;
+  preparedStickerZipSignature = '';
+  preparedStickerZipPromise = null;
+  preparedStickerZipPromiseSignature = '';
+}
+
+async function buildStickerZipBlob() {
+  if (typeof JSZip !== 'function') throw new Error('JSZip 尚未載入');
+  const startNum = parseInt(document.getElementById('start-num')?.value || '1') || 1;
+  const zip = new JSZip();
+  finalImages.forEach(img => {
+    const base64 = String(img.dataUrl || '').split(',')[1];
+    if (!base64) throw new Error(`格 ${img.id} 沒有可輸出的 PNG 資料`);
+    zip.file(`${(startNum + img.id - 1).toString().padStart(outputDigits, '0')}.png`, base64, { base64: true });
+  });
+  if (mainId) {
+    const m = finalImages.find(i => i.id === mainId);
+    if (m) zip.file('main.png', await resizeImg(m.dataUrl, 240, 240), { base64: true });
+  }
+  if (tabId) {
+    const t = finalImages.find(i => i.id === tabId);
+    if (t) zip.file('tab.png', await resizeImg(t.dataUrl, 96, 74), { base64: true });
+  }
+  return zip.generateAsync({ type: 'blob' });
+}
+
+function prepareStickerZipInBackground() {
+  if (!finalImages.length) return Promise.resolve(null);
+  const signature = getStickerZipSignature();
+  if (preparedStickerZipBlob && preparedStickerZipSignature === signature) {
+    return Promise.resolve(preparedStickerZipBlob);
+  }
+  if (preparedStickerZipPromise && preparedStickerZipPromiseSignature === signature) {
+    return preparedStickerZipPromise;
+  }
+  preparedStickerZipPromiseSignature = signature;
+  preparedStickerZipPromise = buildStickerZipBlob()
+    .then(blob => {
+      if (getStickerZipSignature() === signature) {
+        preparedStickerZipBlob = blob;
+        preparedStickerZipSignature = signature;
+      }
+      return blob;
+    })
+    .catch(err => {
+      console.error('ZIP 預先建立失敗', err);
+      if (getStickerZipSignature() === signature) {
+        setZipDownloadStatus(zipCompatText(
+          `ZIP 建立失敗：${err?.message || err}`,
+          `ZIP build failed: ${err?.message || err}`
+        ), 'error');
+      }
+      throw err;
+    })
+    .finally(() => {
+      if (preparedStickerZipPromiseSignature === signature) {
+        preparedStickerZipPromise = null;
+        preparedStickerZipPromiseSignature = '';
+      }
+    });
+  return preparedStickerZipPromise;
+}
+
+function triggerNativeBlobDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+
+function fallbackStickerZipDownload(blob, filename, inApp) {
+  try {
+    if (typeof saveAs === 'function') saveAs(blob, filename);
+    else triggerNativeBlobDownload(blob, filename);
+    setZipDownloadStatus(
+      inApp
+        ? zipCompatText(
+            '已嘗試下載 ZIP。若內建瀏覽器沒有出現檔案，請用右上角選單「在瀏覽器中開啟」後再按下載。',
+            'ZIP download was requested. If no file appears in the in-app browser, use its menu to open this page in your browser and download again.'
+          )
+        : zipCompatText('ZIP 下載已送出。', 'ZIP download started.'),
+      inApp ? 'info' : 'ok'
+    );
+  } catch (err) {
+    console.error('ZIP 下載失敗', err);
+    setZipDownloadStatus(zipCompatText(
+      '目前瀏覽器無法儲存 ZIP。請用右上角選單「在瀏覽器中開啟」，再重新按下載 ZIP。',
+      'This browser cannot save the ZIP. Open this page in your browser from the app menu, then download the ZIP again.'
+    ), 'error');
+  }
+}
+
+function deliverPreparedStickerZip(blob) {
+  const filename = 'stickers.zip';
+  const inApp = isInAppBrowser();
+  let file = null;
+  try {
+    file = new File([blob], filename, { type: 'application/zip' });
+  } catch (err) {
+    console.warn('File API unavailable', err);
+  }
+
+  let canShareFiles = false;
+  try {
+    canShareFiles = !!(inApp && file && navigator.share && navigator.canShare && navigator.canShare({ files: [file] }));
+  } catch (err) {
+    canShareFiles = false;
+  }
+
+  if (canShareFiles) {
+    setZipDownloadStatus(zipCompatText('正在開啟系統分享…', 'Opening the system share sheet…'));
+    try {
+      const sharePromise = navigator.share({
+        files: [file],
+        title: filename
+      });
+      Promise.resolve(sharePromise)
+        .then(() => setZipDownloadStatus(zipCompatText('ZIP 已交給系統分享。', 'ZIP sent to the system share sheet.'), 'ok'))
+        .catch(err => {
+          if (err?.name === 'AbortError') {
+            setZipDownloadStatus(zipCompatText('已取消分享。ZIP 仍保留，可再按一次下載。', 'Share cancelled. The ZIP is still ready; press Download ZIP again.'));
+            return;
+          }
+          console.warn('系統分享失敗，改用下載 fallback', err);
+          fallbackStickerZipDownload(blob, filename, true);
+        });
+      return;
+    } catch (err) {
+      console.warn('系統分享啟動失敗，改用下載 fallback', err);
+    }
+  }
+
+  fallbackStickerZipDownload(blob, filename, inApp);
+}
+
+window.addEventListener('load', () => {
+  if (isInAppBrowser()) {
+    setZipDownloadStatus(zipCompatText(
+      '偵測到社群 App 內建瀏覽器。ZIP 準備完成後，下載時會優先開啟系統分享；若未支援，請用右上角選單「在瀏覽器中開啟」。',
+      'An in-app browser was detected. When the ZIP is ready, Download ZIP will prefer the system share sheet; if unsupported, open this page in your browser from the app menu.'
+    ));
+  }
+});
+
+// ===== 輸出尺寸設定 =====
+let outputW = 370, outputH = 320;
+let outputDigits = 2;'''
+          html = replace_once(html, helper_anchor, helper_code, 'ZIP compatibility helper')
+
+          old_digits = '''function selectDigits(d, btn) {
+  outputDigits = d;
+  document.querySelectorAll('#digits-btn-2,#digits-btn-3').forEach(b => b.className = 'preset-btn');
+  btn.classList.add('active-size');
+}'''
+          new_digits = '''function selectDigits(d, btn) {
+  outputDigits = d;
+  document.querySelectorAll('#digits-btn-2,#digits-btn-3').forEach(b => b.className = 'preset-btn');
+  btn.classList.add('active-size');
+  invalidatePreparedStickerZip();
+  if (finalImages.length) onProcessDone();
+}'''
+          html = replace_once(html, old_digits, new_digits, 'filename digit cache invalidation')
+
+          old_invalidate = '''function invalidateFinalOutput(reason) {
+  if (finalImages.length || document.getElementById('btn-download')?.disabled === false) {'''
+          new_invalidate = '''function invalidateFinalOutput(reason) {
+  invalidatePreparedStickerZip();
+  if (finalImages.length || document.getElementById('btn-download')?.disabled === false) {'''
+          html = replace_once(html, old_invalidate, new_invalidate, 'output cache invalidation')
+
+          old_done = '''  // Also populate pack grid
+  renderPackGrid();
+}'''
+          new_done = '''  // Also populate pack grid
+  renderPackGrid();
+  invalidatePreparedStickerZip();
+  prepareStickerZipInBackground();
+}'''
+          html = replace_once(html, old_done, new_done, 'background ZIP preparation')
+
+          old_main = '''function selMain(id) {
+  if (mainId) document.getElementById('main-'+mainId)?.classList.remove('sel-main');
+  mainId = id;
+  document.getElementById('main-'+id)?.classList.add('sel-main');
+  renderPackGrid();
+}'''
+          new_main = '''function selMain(id) {
+  if (mainId) document.getElementById('main-'+mainId)?.classList.remove('sel-main');
+  mainId = id;
+  document.getElementById('main-'+id)?.classList.add('sel-main');
+  renderPackGrid();
+  invalidatePreparedStickerZip();
+  prepareStickerZipInBackground();
+}'''
+          html = replace_once(html, old_main, new_main, 'Main ZIP cache rebuild')
+
+          old_tab = '''function selTab(id) {
+  if (tabId) document.getElementById('tab-'+tabId)?.classList.remove('sel-tab');
+  tabId = id;
+  document.getElementById('tab-'+id)?.classList.add('sel-tab');
+  renderPackGrid();
+}'''
+          new_tab = '''function selTab(id) {
+  if (tabId) document.getElementById('tab-'+tabId)?.classList.remove('sel-tab');
+  tabId = id;
+  document.getElementById('tab-'+id)?.classList.add('sel-tab');
+  renderPackGrid();
+  invalidatePreparedStickerZip();
+  prepareStickerZipInBackground();
+}'''
+          html = replace_once(html, old_tab, new_tab, 'Tab ZIP cache rebuild')
+
+          old_download = '''async function downloadZip() {
+  const startNum = parseInt(document.getElementById('start-num').value) || 1;
+  const zip = new JSZip();
+  finalImages.forEach((img, idx) => {
+    const base64 = img.dataUrl.split(',')[1];
+    zip.file(`${(startNum+img.id-1).toString().padStart(outputDigits,'0')}.png`, base64, { base64: true });
+  });
+  if (mainId) {
+    const m = finalImages.find(i => i.id === mainId);
+    if (m) zip.file('main.png', await resizeImg(m.dataUrl, 240, 240), { base64: true });
+  }
+  if (tabId) {
+    const t = finalImages.find(i => i.id === tabId);
+    if (t) zip.file('tab.png', await resizeImg(t.dataUrl, 96, 74), { base64: true });
+  }
+  zip.generateAsync({ type: 'blob' }).then(c => saveAs(c, 'stickers.zip'));
+}'''
+          new_download = '''function downloadZip() {
+  if (!finalImages.length) {
+    setZipDownloadStatus(zipCompatText('請先完成「開始切割＋打包」。', 'Run “Slice + Package” first.'), 'error');
+    return;
+  }
+  const signature = getStickerZipSignature();
+  if (preparedStickerZipBlob && preparedStickerZipSignature === signature) {
+    deliverPreparedStickerZip(preparedStickerZipBlob);
+    return;
+  }
+
+  setZipDownloadStatus(zipCompatText('正在建立 ZIP…', 'Building ZIP…'));
+  prepareStickerZipInBackground()
+    .then(() => {
+      if (!preparedStickerZipBlob || preparedStickerZipSignature !== getStickerZipSignature()) {
+        setZipDownloadStatus(zipCompatText('設定剛剛有變更，ZIP 正在重新建立，請稍後再按一次下載。', 'Settings changed while building the ZIP. It is rebuilding; press Download ZIP again shortly.'));
+        return;
+      }
+      setZipDownloadStatus(
+        isInAppBrowser()
+          ? zipCompatText('ZIP 已準備完成。請再按一次「下載 ZIP」，工具會優先開啟系統分享。', 'ZIP is ready. Press “Download ZIP” again; the tool will prefer the system share sheet.')
+          : zipCompatText('ZIP 已準備完成。請再按一次「下載 ZIP」。', 'ZIP is ready. Press “Download ZIP” again.'),
+        'ok'
+      );
+    })
+    .catch(err => {
+      console.error(err);
+      setZipDownloadStatus(zipCompatText(
+        `ZIP 建立失敗：${err?.message || err}`,
+        `ZIP build failed: ${err?.message || err}`
+      ), 'error');
+    });
+}'''
+          html = replace_once(html, old_download, new_download, 'downloadZip replacement')
+
+          readme_anchor = '''Designed for creators who need to process multiple assets and reduce repetitive manual work.
+
+### 02. LINE 上架檔案檢查｜LINE Pre-Publish File Check'''
+          readme_new = '''Designed for creators who need to process multiple assets and reduce repetitive manual work.
+
+**行動瀏覽器相容性：** Threads／Instagram／Facebook 等 App 內建瀏覽器可能限制 Blob ZIP 下載。公開版在 ZIP 預先建立完成後，若瀏覽器支援檔案分享會優先開啟系統分享；不支援時會提供明確提示，建議改用 App 選單的「在瀏覽器中開啟」後下載。
+
+**Mobile browser compatibility:** In-app browsers such as Threads, Instagram, and Facebook may restrict Blob ZIP downloads. After the ZIP is prepared, the public tool prefers the system file-share sheet when supported; otherwise it shows a clear fallback message and recommends opening the page in the device browser.
+
+### 02. LINE 上架檔案檢查｜LINE Pre-Publish File Check'''
+          readme = replace_once(readme, readme_anchor, readme_new, 'README mobile ZIP note')
+
+          log_text = '''# 0820 ZIP 下載相容修正｜0820V23
+
+## 基底版本
+- `sticker/index.html`：0711V22 公開版。
+- 公開網站部署：GitHub Pages / `main`。
+
+## 修改項目
+- 修正 Threads／Instagram／Facebook 等內建瀏覽器對 Blob ZIP 下載不穩定的出口。
+- 切割完成後背景預先建立 `stickers.zip`，讓真正的下載按鈕點擊能在仍有使用者手勢時直接呼叫系統檔案分享。
+- 內建瀏覽器若支援 Web Share + files，優先開啟系統分享；否則保留 FileSaver／原生 `<a download>` fallback，並顯示外部瀏覽器提示。
+- 檔名碼數、起始編號、Main／Tab 或切割內容變動時，ZIP 快取同步失效並重建，避免送出舊 ZIP。
+- `README.md` 補行動內建瀏覽器相容說明。
+- 公開顯示更新日期改為 2026/08/20；隱藏工程日誌新增 0820V23。
+
+## 未修改
+- 不修改去 Gemini 浮水印核心。
+- 不修改傳統去背／魔術棒去背。
+- 不修改切割、手拉切線、成品排版、輸出尺寸與檔名規則。
+- 不修改 Main／Tab 尺寸與 ZIP 內檔案結構。
+- 不修改 MIT License。
+- 不重寫整份工具。
+
+## 風險點
+- 部分 App WebView 可能同時不支援 Web Share 檔案與 `<a download>`；此情況無法由純前端強制繞過，工具會明確提示改用系統瀏覽器。
+- JSZip 與 FileSaver 仍沿用既有 CDN；本次不做第三方套件本地化，避免把下載相容修正擴成供應鏈／授權檔案調整。
+
+## 驗收
+- Workflow 會執行 HTML inline JavaScript 語法檢查。
+- Headless Chrome 實際載入 `/sticker/`，檢查既有核心函式仍存在。
+- 以測試 PNG 實際建立 ZIP，驗證 `01.png`。
+- 變更起始編號後重建 ZIP，驗證 `05.png`。
+- 改成 3 碼後重建 ZIP，驗證 `005.png`。
+- 模擬 Threads UA + Web Share files，驗證會走系統分享分支。
+- `git diff --check` 與 README 相容說明檢查。
+'''
+          log_path.write_text(log_text, encoding='utf-8')
+          html_path.write_text(html, encoding='utf-8')
+          readme_path.write_text(readme, encoding='utf-8')
+          PY
+
+      - name: Static syntax and patch assertions
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re, subprocess, tempfile
+          html = Path('sticker/index.html').read_text(encoding='utf-8')
+          required = [
+            '0820V23｜2026-08-20｜行動內建瀏覽器 ZIP 下載相容修正',
+            'function isInAppBrowser',
+            'function prepareStickerZipInBackground',
+            'function deliverPreparedStickerZip',
+            'id="zip-download-status"',
+            "tag.textContent = '更新日期 2026/08/20'"
+          ]
+          for item in required:
+            if item not in html:
+              raise SystemExit('missing patch marker: ' + item)
+          if 'zip.generateAsync({ type: \'blob\' }).then(c => saveAs(c, \'stickers.zip\'))' in html:
+            raise SystemExit('old direct ZIP save path still present')
+          scripts = re.findall(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>', html, flags=re.I|re.S)
+          if not scripts:
+            raise SystemExit('no inline scripts found')
+          for idx, script in enumerate(scripts, 1):
+            p = Path(tempfile.gettempdir()) / f'fanzo-inline-{idx}.js'
+            p.write_text(script, encoding='utf-8')
+            subprocess.run(['node', '--check', str(p)], check=True)
+          print(f'inline scripts syntax PASS: {len(scripts)} blocks')
+          PY
+          grep -Fq 'Threads／Instagram／Facebook 等 App 內建瀏覽器可能限制 Blob ZIP 下載' README.md
+          grep -Fq '不修改 MIT License' .ai_patch/0820_ZIP_DOWNLOAD_COMPAT.md
+          git diff --check
+
+      - name: Start local site
+        shell: bash
+        run: |
+          python3 -m http.server 8765 >/tmp/fanzo-http.log 2>&1 &
+          echo $! >/tmp/fanzo-http.pid
+          sleep 1
+          curl -fsS http://127.0.0.1:8765/sticker/index.html >/dev/null
+
+      - name: Headless Chrome functional regression
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser)"
+          test -n "$CHROME"
+          "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-zip http://127.0.0.1:8765/sticker/index.html >/tmp/chrome-zip.log 2>&1 &
+          for i in $(seq 1 80); do
+            if curl -fsS http://127.0.0.1:9222/json >/tmp/targets.json 2>/dev/null; then break; fi
+            sleep 0.25
+          done
+          cat > /tmp/zip-test.mjs <<'NODE'
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
+          const targets = await (await fetch('http://127.0.0.1:9222/json')).json();
+          const target = targets.find(t => t.type === 'page' && t.url.includes('127.0.0.1:8765/sticker/index.html'));
+          if (!target) throw new Error('site page target missing');
+          const ws = new WebSocket(target.webSocketDebuggerUrl);
+          await new Promise((resolve, reject) => { ws.addEventListener('open', resolve, {once:true}); ws.addEventListener('error', reject, {once:true}); });
+          let id = 0;
+          const pending = new Map();
+          ws.addEventListener('message', event => {
+            const msg = JSON.parse(event.data);
+            if (!msg.id || !pending.has(msg.id)) return;
+            const p = pending.get(msg.id); pending.delete(msg.id);
+            msg.error ? p.reject(new Error(msg.error.message)) : p.resolve(msg.result);
+          });
+          const send = (method, params={}) => new Promise((resolve,reject) => { const n=++id; pending.set(n,{resolve,reject}); ws.send(JSON.stringify({id:n,method,params})); });
+          async function evalValue(expression){
+            const out = await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});
+            if(out.exceptionDetails) throw new Error(out.exceptionDetails.text || JSON.stringify(out.exceptionDetails));
+            return out.result.value;
+          }
+          for(let i=0;i<120;i++){
+            const ready = await evalValue("document.readyState==='complete' && typeof JSZip==='function' && typeof downloadZip==='function' && typeof prepareStickerZipInBackground==='function'");
+            if(ready) break;
+            await sleep(100);
+            if(i===119) throw new Error('page/JSZip not ready');
+          }
+          const core = await evalValue(`({
+            start:typeof startProcess,
+            download:typeof downloadZip,
+            preview:typeof runPreview,
+            starBatch:typeof starProcessBatch,
+            main:typeof selMain,
+            tab:typeof selTab,
+            inAppThreads:isInAppBrowser('Mozilla/5.0 Threads'),
+            inAppChrome:isInAppBrowser('Mozilla/5.0 Chrome/140.0 Safari/537.36')
+          })`);
+          if (!(core.start==='function' && core.download==='function' && core.preview==='function' && core.starBatch==='function' && core.main==='function' && core.tab==='function' && core.inAppThreads===true && core.inAppChrome===false)) {
+            throw new Error('core regression: '+JSON.stringify(core));
+          }
+          const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+XyO7WQAAAABJRU5ErkJggg==';
+          await evalValue(`(()=>{
+            finalImages=[{id:1,dataUrl:${JSON.stringify('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+XyO7WQAAAABJRU5ErkJggg==')}}];
+            mainId=null;tabId=null;outputDigits=2;
+            document.getElementById('start-num').value='1';
+            onProcessDone();
+            return true;
+          })()`);
+          for(let i=0;i<100;i++){
+            if(await evalValue("!!preparedStickerZipBlob && preparedStickerZipBlob.size>0 && preparedStickerZipSignature===getStickerZipSignature()")) break;
+            await sleep(50);
+            if(i===99) throw new Error('initial ZIP prebuild timeout');
+          }
+          const files1 = await evalValue(`(async()=>Object.keys((await JSZip.loadAsync(preparedStickerZipBlob)).files))()`);
+          if(!files1.includes('01.png')) throw new Error('01.png missing: '+JSON.stringify(files1));
+
+          await evalValue(`(()=>{const el=document.getElementById('start-num');el.value='5';el.dispatchEvent(new Event('input',{bubbles:true}));return true;})()`);
+          for(let i=0;i<100;i++){
+            if(await evalValue("!!preparedStickerZipBlob && preparedStickerZipSignature===getStickerZipSignature() && preparedStickerZipSignature.startsWith('5|')")) break;
+            await sleep(50);
+            if(i===99) throw new Error('start number ZIP rebuild timeout');
+          }
+          const files2 = await evalValue(`(async()=>Object.keys((await JSZip.loadAsync(preparedStickerZipBlob)).files))()`);
+          if(!files2.includes('05.png')) throw new Error('05.png missing: '+JSON.stringify(files2));
+
+          await evalValue(`(()=>{selectDigits(3,document.getElementById('digits-btn-3'));return true;})()`);
+          for(let i=0;i<100;i++){
+            if(await evalValue("!!preparedStickerZipBlob && preparedStickerZipSignature===getStickerZipSignature() && preparedStickerZipSignature.startsWith('5|3|')")) break;
+            await sleep(50);
+            if(i===99) throw new Error('3-digit ZIP rebuild timeout');
+          }
+          const files3 = await evalValue(`(async()=>Object.keys((await JSZip.loadAsync(preparedStickerZipBlob)).files))()`);
+          if(!files3.includes('005.png')) throw new Error('005.png missing: '+JSON.stringify(files3));
+
+          const shareBranch = await evalValue(`(async()=>{
+            let called=0;
+            Object.defineProperty(navigator,'userAgent',{configurable:true,value:'Mozilla/5.0 Threads'});
+            Object.defineProperty(navigator,'canShare',{configurable:true,value:()=>true});
+            Object.defineProperty(navigator,'share',{configurable:true,value:()=>{called++;return Promise.resolve();}});
+            deliverPreparedStickerZip(preparedStickerZipBlob);
+            await new Promise(r=>setTimeout(r,20));
+            return {called,status:document.getElementById('zip-download-status').textContent};
+          })()`);
+          if(shareBranch.called!==1) throw new Error('Web Share branch not used: '+JSON.stringify(shareBranch));
+          console.log('ZIP compatibility regression PASS', {files1,files2,files3,shareBranch});
+          ws.close();
+          NODE
+          node /tmp/zip-test.mjs
+
+      - name: Commit validated patch and remove temporary workflow
+        shell: bash
+        run: |
+          rm -f .github/workflows/0820-zip-download-compat-patch.yml
+          git config user.name "a8631071-blip"
+          git config user.email "278635278+a8631071-blip@users.noreply.github.com"
+          git add sticker/index.html README.md .ai_patch/0820_ZIP_DOWNLOAD_COMPAT.md .github/workflows/0820-zip-download-compat-patch.yml
+          git diff --cached --check
+          git commit -m "fix: support ZIP download in in-app browsers [skip ci]"
+          git push origin HEAD:main
