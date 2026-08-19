@@ -51,6 +51,10 @@ Sticker production often requires switching between multiple applications for ba
 
 Designed for creators who need to process multiple assets and reduce repetitive manual work.
 
+**行動瀏覽器相容性：** Threads／Instagram／Facebook 等 App 內建瀏覽器可能限制 Blob ZIP 下載。第 4 步「分割＋打包」會預先建立 ZIP，支援檔案分享時優先開啟系統分享；若內建瀏覽器仍禁止檔案輸出，頁面會提示改用 App 選單的「在瀏覽器中開啟」後下載。
+
+**Mobile browser compatibility:** In-app browsers such as Threads, Instagram, and Facebook may restrict Blob ZIP downloads. Step 4 pre-builds the ZIP and prefers the system file-share sheet when supported. If the in-app browser still blocks file output, the page prompts the user to open it in the device browser and download there.
+
 ### 02. LINE 上架檔案檢查｜LINE Pre-Publish File Check
 
 路徑 / Path: `/line-check/`
