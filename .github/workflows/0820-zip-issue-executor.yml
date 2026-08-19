@@ -1,0 +1,70 @@
+name: 0820-zip-issue-executor
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+
+jobs:
+  execute-validated-patch:
+    if: github.event.issue.title == '[internal] run 0820 ZIP compatibility patch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Execute staged patch and validation blocks
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import subprocess
+
+          workflow = Path('.github/workflows/0820-zip-download-compat-patch.yml')
+          lines = workflow.read_text(encoding='utf-8').splitlines()
+          blocks = []
+          i = 0
+          while i < len(lines):
+              if lines[i] == '        run: |':
+                  i += 1
+                  block = []
+                  while i < len(lines):
+                      line = lines[i]
+                      if line.startswith('          '):
+                          block.append(line[10:])
+                          i += 1
+                          continue
+                      if line.strip() == '':
+                          block.append('')
+                          i += 1
+                          continue
+                      break
+                  blocks.append('\n'.join(block).rstrip() + '\n')
+                  continue
+              i += 1
+
+          if len(blocks) < 5:
+              raise SystemExit(f'Expected at least 5 run blocks, got {len(blocks)}')
+          for idx, script in enumerate(blocks[:4], 1):
+              path = Path(f'/tmp/0820-block-{idx}.sh')
+              path.write_text(script, encoding='utf-8')
+              subprocess.run(['bash', '-euxo', 'pipefail', str(path)], check=True)
+          PY
+
+      - name: Commit only validated public changes
+        shell: bash
+        run: |
+          rm -f .github/workflows/0820-zip-download-compat-patch.yml
+          rm -f .github/workflows/0820-zip-executor.yml
+          rm -f .github/workflows/0820-zip-issue-executor.yml
+          rm -f .ai_patch/0820_TRIGGER
+          git config user.name "a8631071-blip"
+          git config user.email "278635278+a8631071-blip@users.noreply.github.com"
+          git add sticker/index.html README.md .ai_patch/0820_ZIP_DOWNLOAD_COMPAT.md
+          git add -u .github/workflows/0820-zip-download-compat-patch.yml .github/workflows/0820-zip-executor.yml .github/workflows/0820-zip-issue-executor.yml .ai_patch/0820_TRIGGER
+          git diff --cached --check
+          git commit -m "fix: support ZIP download in in-app browsers [skip ci]"
+          git push origin HEAD:main
