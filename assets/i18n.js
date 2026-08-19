@@ -122,7 +122,7 @@
     'qr.positioning': ['本版定位', 'Purpose'],
     'qr.positioningDesc': ['純網址、透明 PNG、單頁本機開啟，新增整面背景圖大膽模式，不含模板框架與海報合成。', 'URL-only, transparent PNG, single-page local tool with a bold full-image mode. No template frames or poster compositing.'],
     'qr.future': ['後續可擴充', 'Possible extensions'],
-    'qr.futureDesc': ['框架模板、SVG 輸出、Wi-Fi / vCard 類型、批次生成、海報互動式模板、角色承載 QR。', 'Frame templates, SVG output, Wi-Fi / vCard types, batch generation, poster interactive templates, and character-held QR designs.'],
+    'qr.futureDesc': ['框架模板、SVG 輸出、Wi-Fi / vCard 類型、批次生成、海報互動式模板、角色承載 QR。', 'Frame templates, SVG export, Wi-Fi / vCard types, batch generation, interactive poster templates, and character-based QR designs.'],
     'qr.controls': ['控制區', 'Controls'],
     'qr.controlNote': ['背景固定透明。這版多了整面背景圖模式，但仍建議保留純 QR 版本作為保底，再視情況用大膽版上稿。', 'The background stays transparent. Full-image mode is available, but keep a plain QR as a safe fallback and use the bold version only when appropriate.'],
     'qr.url': ['連結網址', 'URL'],
