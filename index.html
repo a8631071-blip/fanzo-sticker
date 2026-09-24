@@ -78,6 +78,13 @@ header{padding:22px 0 8px}
 .section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px}
 .section-head h2{font-size:clamp(25px,4vw,36px);margin:0;letter-spacing:-.02em}
 .section-head p{margin:0;color:var(--muted);font-size:13px;line-height:1.7}
+.home-update{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin:0 0 12px;padding:10px 14px;border-radius:15px;
+  background:rgba(255,250,242,.82);border:1px solid rgba(222,213,199,.95);
+  color:var(--muted);font-size:11px;line-height:1.55
+}
+.home-update b{color:var(--ink);font-size:11px}
 .tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .tool{
   min-height:250px;border-radius:28px;padding:26px;text-decoration:none;
@@ -610,6 +617,11 @@ footer{padding:14px 0 16px}
       <p>需要哪個就直接點，會在新分頁開啟。</p>
     </div>
 
+    <div class="home-update" role="note">
+        <b>最新更新｜去背・切割工具</b>
+        <span>修改去背切割方式：新增切割模式 1／2、單格補切與橡皮擦，遇到相鄰內容或切線不理想時，可以直接人工調整。</span>
+      </div>
+
     <div class="tools">
       <a class="tool" href="./sticker/" target="_blank" rel="noopener">
         <div class="tool-number">01</div>
@@ -620,7 +632,7 @@ footer{padding:14px 0 16px}
           </svg>
         </div>
         <h3>去背・切割一站搞定</h3>
-        <p>去浮水印、去背、切格、上架檔名整理、ZIP 打包，一站完成。</p>
+        <p>去浮水印、去背、切格與 ZIP 打包；新版修改去背切割方式，加入切割模式 1／2、單格補切與橡皮擦。</p>
         <div class="tool-go">開始使用 <span>→</span></div>
       </a>
 
