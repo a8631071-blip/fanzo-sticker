@@ -890,6 +890,14 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
   .product-link-btn { flex:1 1 calc(50% - 8px); text-align:center; }
 }
 
+
+/* ===== 公開版 V26｜V92 切割工作區移植 ===== */
+.slice-v26-toolbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0;padding:8px;border:1px solid var(--border);border-radius:10px;background:var(--bg2)}
+.slice-v26-toolbar button{min-height:30px}.slice-v26-toolbar button.active{outline:2px solid var(--accent);font-weight:900}.slice-v26-status{flex:1;min-width:240px;font-size:11px;color:var(--text2)}
+.slice-v26-repair{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}.slice-v26-repair input{width:76px}.slice-v26-repair button:disabled,.slice-v26-toolbar button:disabled{opacity:.45;cursor:not-allowed}
+.slice-repair-btn{margin-top:6px;width:100%;font-size:11px;padding:5px 7px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer}.slice-repair-btn.adjusted{background:#166534;color:#fff;font-weight:800}
+#grid-canvas.v26-eraser{cursor:crosshair!important}#grid-canvas.v26-repair{cursor:default!important}
+
 </style>
 </head>
 <body>
@@ -989,8 +997,7 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
         <div class="card-title">📂 圖片來源</div>
         <div class="star-note">Step 1 上傳的母圖會自動帶進來；你也可以在這裡追加更多圖片做批次去 Gemini 浮水印。</div>
         <div class="upload-zone" style="margin-top:14px;">
-          <input type="file" accept="image/png,image/jpeg,image/webp" id="star-file-input" multiple onchange="starHandleFiles(this.files)">
-          <div class="icon">✨</div>
+          <input type="file" accept="image/png,image/jpeg,image/webp" id="star-file-input" multiple onchange="starHandleFiles(this.files)">          <div class="icon">✨</div>
           <p>追加 PNG / JPG / WEBP</p>
           <p style="font-size:11px;margin-top:4px;">可多張批次；目前預覽圖可匯入去背</p>
           <div class="btn-upload">追加圖片</div>
@@ -1251,8 +1258,8 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
       </div>
       <div class="card">
         <div class="card-title">📐 分割格數</div>
-        <div class="slider-group"><div class="slider-label"><span>欄數 (Columns)</span><span id="cols-val">5</span></div><input type="range" id="cols" min="1" max="8" value="5" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('cols-val').textContent=this.value;updateGridCanvas();updateSlicePreview();runPreview()"></div>
-        <div class="slider-group"><div class="slider-label"><span>列數 (Rows)</span><span id="rows-val">4</span></div><input type="range" id="rows" min="1" max="8" value="4" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('rows-val').textContent=this.value;updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>欄數 (Columns)</span><span id="cols-val">5</span></div><input type="range" id="cols" min="1" max="8" value="5" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('cols-val').textContent=this.value;resetV26EditsOnGridChange();updateGridCanvas();updateSlicePreview();runPreview()"></div>
+        <div class="slider-group"><div class="slider-label"><span>列數 (Rows)</span><span id="rows-val">4</span></div><input type="range" id="rows" min="1" max="8" value="4" oninput="invalidateFinalOutput('切割設定已變更');document.getElementById('rows-val').textContent=this.value;resetV26EditsOnGridChange();updateGridCanvas();updateSlicePreview();runPreview()"></div>
       </div>
       <div class="card">
         <div class="card-title">📋 母圖調整</div>
@@ -1302,7 +1309,27 @@ input[type=color] { width: 48px; height: 32px; border: 1px solid var(--border); 
       </div>
     </div>
     <div style="flex:1;min-width:300px;">
-      <div class="card" style="padding:12px;"><div class="card-title" style="margin-bottom:8px;">🗺️ 格線預覽 <span style="font-size:10px;font-weight:400;color:var(--text2);margin-left:6px;">可直接拖拉橘色切線</span></div><div class="grid-canvas-wrap drag-ready"><canvas id="grid-canvas" style="width:100%;border-radius:8px;display:block;cursor:crosshair;touch-action:none;"></canvas></div><div style="font-size:11px;color:var(--text2);text-align:center;margin-top:8px;font-family:'Share Tech Mono',monospace;">共 <span id="total-cells" style="color:var(--accent);font-weight:700;">20</span> 格 · 每格約 <span id="cell-size" style="color:var(--accent2);">512×416</span> px</div><div class="grid-drag-status" id="grid-drag-status">提示：進入第4步後，可拖拉橘色切線微調每格範圍。</div><div class="grid-mini-actions"><button type="button" class="grid-mini-btn" onclick="resetGridLineAdjustments()">重置切線</button></div></div>
+      <div class="card" style="padding:12px;">
+<div class="card-title" style="margin-bottom:8px;">🗺️ 切割調整</div>
+<div class="slice-v26-toolbar">
+<button type="button" class="grid-mini-btn active" id="slice-mode1-btn" onclick="setSliceCutModeV26(1)">切割模式1</button>
+<button type="button" class="grid-mini-btn" id="slice-mode2-btn" onclick="setSliceCutModeV26(2)">切割模式2</button>
+<button type="button" class="grid-mini-btn" onclick="resetGridLineAdjustments()">重置切線</button>
+<span class="slice-v26-status" id="slice-v26-status">切割線區：拉線後切割預覽會更新。</span>
+</div>
+<div class="slice-v26-repair">
+<span class="slice-v26-status" id="cell-override-status">單格補切：先在下方格子按「補切」</span>
+<button type="button" class="grid-mini-btn" id="repair-cut-btn" onclick="setRepairToolV26('cut')" disabled>切割格調整</button>
+<button type="button" class="grid-mini-btn" id="repair-eraser-btn" onclick="setRepairToolV26('eraser')" disabled>橡皮擦</button>
+<label style="font-size:11px">橡皮擦筆刷 <input id="eraser-brush-v26" type="number" min="4" max="180" value="28" onchange="setEraserBrushV26(this.value)" disabled> px</label>
+<button type="button" class="grid-mini-btn" id="repair-apply-btn" onclick="applyRepairV26()" disabled>確認</button>
+<button type="button" class="grid-mini-btn" id="repair-cancel-btn" onclick="cancelRepairV26()" disabled>取消</button>
+<button type="button" class="grid-mini-btn" id="repair-reset-btn" onclick="resetRepairToolV26()" disabled>目前工具復位</button>
+</div>
+<div class="grid-canvas-wrap drag-ready"><canvas id="grid-canvas" tabindex="0" style="width:100%;border-radius:8px;display:block;cursor:crosshair;touch-action:none;"></canvas></div>
+<div style="font-size:11px;color:var(--text2);text-align:center;margin-top:8px;font-family:'Share Tech Mono',monospace;">共 <span id="total-cells" style="color:var(--accent);font-weight:700;">20</span> 格 · 每格約 <span id="cell-size" style="color:var(--accent2);">512×416</span> px</div>
+<div class="grid-drag-status" id="grid-drag-status">提示：模式1拖整條切線；模式2拖局部共邊。方向鍵 1px，Shift＋方向鍵 10px。</div>
+</div>
       <div class="card" style="padding:12px;"><div class="card-title" style="margin-bottom:8px;">✂️ 切割預覽（目前去背結果）<span style="font-size:10px;font-weight:400;color:var(--text2);margin-left:6px;">調整設定後自動更新</span></div><div class="sticker-grid" id="slice-preview-grid"></div></div>
       <div class="card" style="padding:12px;display:none;" id="result-card"><div class="card-title" style="margin-bottom:8px;">✅ 去背結果</div><div id="progress-area" style="display:none;"><div class="status-text" id="status-text">處理中...</div><div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div></div><div class="info-box" style="margin-bottom:12px;">· 點擊每張貼圖下方的 <strong>Main</strong> 設定封面圖<br>· 點擊 <strong>Tab</strong> 設定標籤圖</div><div class="sticker-grid" id="sticker-grid"></div></div>
     </div>
@@ -1969,8 +1996,7 @@ function setOutputPosition(mode) {
 }
 
 function setOutputScale(mode) {
-  if (outputPositionMode === 'original' && mode !== 'original') return;
-  outputScaleMode = ['full','90','original'].includes(mode) ? mode : 'full';
+  if (outputPositionMode === 'original' && mode !== 'original') return;  outputScaleMode = ['full','90','original'].includes(mode) ? mode : 'full';
   updateOutputLayoutUI();
   invalidateFinalOutput('成品比例已變更');
   updateSlicePreview();
@@ -2170,6 +2196,17 @@ let advOpen = false;
 let gridLineState = { v: [], h: [], cols: 5, rows: 4, active: false };
 let gridLineDrag = null;
 
+// 公開版 V26：V92 人工 Mode 2 + 單格補切/橡皮擦。自動 Mode 2 不移植。
+let sliceCutModeV26 = 1;
+let mode2StateV26 = { v: [], h: [], cols: 0, rows: 0, active: false };
+let selectedSegmentV26 = null, segmentDragV26 = null, selectedLineV26 = null;
+let cellOverridesV26 = new Map();
+let cellEraserMasksV26 = new Map();
+let activeRepairV26 = null;
+let eraserBrushV26 = 28;
+let eraserLastV26 = null;
+
+
 function invalidateFinalOutput(reason) {
   if (finalImages.length || document.getElementById('btn-download')?.disabled === false) {
     finalImages = [];
@@ -2187,16 +2224,10 @@ function invalidateFinalOutput(reason) {
 }
 
 function resetGridLineAdjustments(skipRender = false) {
-  const cols = parseInt(document.getElementById('cols')?.value || '5');
-  const rows = parseInt(document.getElementById('rows')?.value || '4');
-  gridLineState = { v: [], h: [], cols, rows, active: false };
-  const status = document.getElementById('grid-drag-status');
-  if (status) status.textContent = '提示：進入第4步後，可拖拉橘色切線微調每格範圍。';
-  if (!skipRender) {
-    invalidateFinalOutput('切線已重置');
-    updateGridCanvas?.();
-    updateSlicePreview?.();
-  }
+  const cols=parseInt(document.getElementById('cols')?.value||'5'),rows=parseInt(document.getElementById('rows')?.value||'4');
+  if(sliceCutModeV26===2){mode2StateV26={v:[],h:[],cols:0,rows:0,active:false};selectedSegmentV26=null;const src=buildCurrentWorkSheetCanvas();if(src)ensureMode2V26(src.width,src.height);}else{gridLineState={v:[],h:[],cols,rows,active:false};}
+  const status=document.getElementById('grid-drag-status');if(status)status.textContent=sliceCutModeV26===2?'模式2線段已依模式1重新建立。':'模式1切線已重置。';
+  if(!skipRender){invalidateFinalOutput('切線已重置');updateGridCanvas?.();updateSlicePreview?.();}
 }
 
 function getGridRangesFromCanvas(workW, workH) {
@@ -2225,64 +2256,80 @@ function getGridRangesFromCanvas(workW, workH) {
   return { cols, rows, xCuts: [left, ...v, right], yCuts: [top, ...h, bottom], cropL, cropR, cropT, cropB, custom: hasCustom };
 }
 
-function initGridLineDrag() {
-  const canvas = document.getElementById('grid-canvas');
-  if (!canvas || canvas.dataset.dragReady === '1') return;
-  canvas.dataset.dragReady = '1';
-  const getPoint = (ev) => {
-    const rect = canvas.getBoundingClientRect();
-    return { x: (ev.clientX - rect.left) * canvas.width / rect.width, y: (ev.clientY - rect.top) * canvas.height / rect.height, rect };
-  };
-  canvas.addEventListener('pointerdown', (ev) => {
-    if (!originalImg || !canvas.width || !canvas.height) return;
-    const ranges = getGridRangesFromCanvas(canvas.width, canvas.height);
-    const pt = getPoint(ev);
-    const threshold = Math.max(12, 14 * canvas.width / Math.max(pt.rect.width, 1));
-    let best = null;
-    ranges.xCuts.slice(1, -1).forEach((x, i) => { const d = Math.abs(pt.x - x); if (d < threshold && (!best || d < best.d)) best = { axis: 'v', index: i, d }; });
-    ranges.yCuts.slice(1, -1).forEach((y, i) => { const d = Math.abs(pt.y - y); if (d < threshold && (!best || d < best.d)) best = { axis: 'h', index: i, d }; });
-    if (!best) return;
-    ev.preventDefault();
-    if (!gridLineState.active || gridLineState.cols !== ranges.cols || gridLineState.rows !== ranges.rows) {
-      gridLineState = { v: ranges.xCuts.slice(1, -1), h: ranges.yCuts.slice(1, -1), cols: ranges.cols, rows: ranges.rows, active: true };
-    }
-    gridLineDrag = best;
-    canvas.setPointerCapture?.(ev.pointerId);
-    const status = document.getElementById('grid-drag-status');
-    if (status) status.textContent = best.axis === 'v' ? `拖拉第 ${best.index + 1} 條直切線中...` : `拖拉第 ${best.index + 1} 條橫切線中...`;
-  });
-  canvas.addEventListener('pointermove', (ev) => {
-    if (!gridLineDrag) return;
-    ev.preventDefault();
-    const pt = getPoint(ev);
-    const ranges = getGridRangesFromCanvas(canvas.width, canvas.height);
-    const gapX = Math.max(12, (ranges.xCuts.at(-1) - ranges.xCuts[0]) / Math.max(ranges.cols, 1) * 0.12);
-    const gapY = Math.max(12, (ranges.yCuts.at(-1) - ranges.yCuts[0]) / Math.max(ranges.rows, 1) * 0.12);
-    if (gridLineDrag.axis === 'v') {
-      const i = gridLineDrag.index;
-      const min = (i === 0 ? ranges.xCuts[0] : gridLineState.v[i - 1]) + gapX;
-      const max = (i === gridLineState.v.length - 1 ? ranges.xCuts.at(-1) : gridLineState.v[i + 1]) - gapX;
-      gridLineState.v[i] = Math.max(min, Math.min(max, pt.x));
-    } else {
-      const i = gridLineDrag.index;
-      const min = (i === 0 ? ranges.yCuts[0] : gridLineState.h[i - 1]) + gapY;
-      const max = (i === gridLineState.h.length - 1 ? ranges.yCuts.at(-1) : gridLineState.h[i + 1]) - gapY;
-      gridLineState.h[i] = Math.max(min, Math.min(max, pt.y));
-    }
-    updateGridCanvas();
-  });
-  const endDrag = () => {
-    if (!gridLineDrag) return;
-    gridLineDrag = null;
-    const status = document.getElementById('grid-drag-status');
-    if (status) status.textContent = '已套用自訂切線；切割預覽與 ZIP 會依照目前切線輸出。';
-    invalidateFinalOutput('切線位置已變更');
-    updateGridCanvas();
-    updateSlicePreview();
-  };
-  canvas.addEventListener('pointerup', endDrag);
-  canvas.addEventListener('pointercancel', endDrag);
+function ensureMode2V26(workW, workH) {
+  const ranges=getGridRangesFromCanvas(workW,workH), {cols,rows}=ranges;
+  if(mode2StateV26.active&&mode2StateV26.cols===cols&&mode2StateV26.rows===rows) return;
+  mode2StateV26={cols,rows,active:true,v:[],h:[]};
+  for(let r=0;r<rows;r++) mode2StateV26.v.push(ranges.xCuts.slice(1,-1));
+  for(let r=0;r<rows-1;r++) mode2StateV26.h.push(Array.from({length:cols},()=>ranges.yCuts[r+1]));
 }
+function getCellBoxV26(index, workW, workH){
+  const ranges=getGridRangesFromCanvas(workW,workH), cols=ranges.cols, rows=ranges.rows, i=index-1, r=Math.floor(i/cols), c=i%cols;
+  if(sliceCutModeV26!==2){return [ranges.xCuts[c],ranges.yCuts[r],ranges.xCuts[c+1],ranges.yCuts[r+1]];}
+  ensureMode2V26(workW,workH);
+  const left=c===0?ranges.xCuts[0]:mode2StateV26.v[r][c-1], right=c===cols-1?ranges.xCuts.at(-1):mode2StateV26.v[r][c];
+  const top=r===0?ranges.yCuts[0]:mode2StateV26.h[r-1][c], bottom=r===rows-1?ranges.yCuts.at(-1):mode2StateV26.h[r][c];
+  return [left,top,right,bottom];
+}
+function effectiveCellBoxV26(index,w,h){return cellOverridesV26.get(index)?.slice()||getCellBoxV26(index,w,h);}
+function setSliceCutModeV26(mode){
+  if(activeRepairV26)return; sliceCutModeV26=mode===2?2:1;
+  if(sliceCutModeV26===2&&originalImg){const c=buildCurrentWorkSheetCanvas();if(c)ensureMode2V26(c.width,c.height);}
+  document.getElementById('slice-mode1-btn')?.classList.toggle('active',sliceCutModeV26===1);
+  document.getElementById('slice-mode2-btn')?.classList.toggle('active',sliceCutModeV26===2);
+  selectedSegmentV26=null; gridLineDrag=null; updateGridCanvas(); updateSlicePreview();
+}
+function setEraserBrushV26(v){eraserBrushV26=Math.max(4,Math.min(180,parseInt(v)||28));const el=document.getElementById('eraser-brush-v26');if(el)el.value=eraserBrushV26;}
+function focusViewportV26(index,w,h){
+  const ranges=getGridRangesFromCanvas(w,h), cols=ranges.cols, rows=ranges.rows, i=index-1,r=Math.floor(i/cols),c=i%cols,b=getCellBoxV26(index,w,h);
+  let [x0,y0,x1,y1]=b;
+  if(c>0){const n=getCellBoxV26(index-1,w,h);x0-=Math.max(0,n[2]-n[0])/2} if(c<cols-1){const n=getCellBoxV26(index+1,w,h);x1+=Math.max(0,n[2]-n[0])/2}
+  if(r>0){const n=getCellBoxV26(index-cols,w,h);y0-=Math.max(0,n[3]-n[1])/2} if(r<rows-1){const n=getCellBoxV26(index+cols,w,h);y1+=Math.max(0,n[3]-n[1])/2}
+  return [Math.max(0,x0),Math.max(0,y0),Math.min(w,x1),Math.min(h,y1)];
+}
+function cloneMaskV26(mask){if(!mask)return null;const c=document.createElement('canvas');c.width=mask.width;c.height=mask.height;c.getContext('2d').drawImage(mask,0,0);return c;}
+function blankMaskV26(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);return c;}
+function startRepairV26(index){
+  const src=buildCurrentWorkSheetCanvas();if(!src)return; const saved=cellOverridesV26.get(index); const rect=saved?saved.slice():getCellBoxV26(index,src.width,src.height);
+  activeRepairV26={index,rect,base:getCellBoxV26(index,src.width,src.height),viewport:focusViewportV26(index,src.width,src.height),tool:'cut',mask:cloneMaskV26(cellEraserMasksV26.get(index))||blankMaskV26(src.width,src.height),drag:null};
+  eraserLastV26=null; updateRepairControlsV26(); updateGridCanvas(); document.getElementById('grid-canvas')?.focus();
+}
+function setRepairToolV26(tool){if(!activeRepairV26)return;activeRepairV26.tool=tool==='eraser'?'eraser':'cut';eraserLastV26=null;updateRepairControlsV26();updateGridCanvas();}
+function updateRepairControlsV26(){
+ const a=!!activeRepairV26, tool=activeRepairV26?.tool;
+ ['slice-mode1-btn','slice-mode2-btn'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=a});
+ ['repair-cut-btn','repair-eraser-btn','repair-apply-btn','repair-cancel-btn','repair-reset-btn'].forEach(id=>{const e=document.getElementById(id);if(e)e.disabled=!a});
+ const b=document.getElementById('eraser-brush-v26');if(b)b.disabled=!a||tool!=='eraser';
+ document.getElementById('repair-cut-btn')?.classList.toggle('active',a&&tool==='cut');document.getElementById('repair-eraser-btn')?.classList.toggle('active',a&&tool==='eraser');
+ const st=document.getElementById('cell-override-status');if(st)st.textContent=a?`單格${tool==='eraser'?'橡皮擦':'切割格調整'}：第 ${activeRepairV26.index} 格`:'單格補切：先在下方格子按「補切」';
+ const rr=document.getElementById('repair-reset-btn');if(rr)rr.textContent=tool==='eraser'?'清除擦除':'切割框復位';
+ const cv=document.getElementById('grid-canvas');if(cv){cv.classList.toggle('v26-eraser',a&&tool==='eraser');cv.classList.toggle('v26-repair',a&&tool==='cut');}
+}
+function applyRepairV26(){if(!activeRepairV26)return;cellOverridesV26.set(activeRepairV26.index,activeRepairV26.rect.slice());cellEraserMasksV26.set(activeRepairV26.index,cloneMaskV26(activeRepairV26.mask));activeRepairV26=null;eraserLastV26=null;updateRepairControlsV26();invalidateFinalOutput('單格補切已確認');updateGridCanvas();updateSlicePreview();}
+function cancelRepairV26(){if(!activeRepairV26)return;activeRepairV26=null;eraserLastV26=null;updateRepairControlsV26();updateGridCanvas();updateSlicePreview();}
+function resetRepairToolV26(){if(!activeRepairV26)return;const src=buildCurrentWorkSheetCanvas();if(activeRepairV26.tool==='eraser')activeRepairV26.mask=blankMaskV26(src.width,src.height);else activeRepairV26.rect=activeRepairV26.base.slice();eraserLastV26=null;updateGridCanvas();}
+function resetV26EditsOnGridChange(){mode2StateV26={v:[],h:[],cols:0,rows:0,active:false};selectedSegmentV26=null;cellOverridesV26.clear();cellEraserMasksV26.clear();activeRepairV26=null;updateRepairControlsV26();}
+function hitRepairHandleV26(x,y){const a=activeRepairV26;if(!a)return null;const [x0,y0,x1,y1]=a.rect,t=Math.max(8,(x1-x0)*.04),nx=Math.abs(x-x0)<t,px=Math.abs(x-x1)<t,ny=Math.abs(y-y0)<t,py=Math.abs(y-y1)<t,ix=x>=x0-t&&x<=x1+t,iy=y>=y0-t&&y<=y1+t;if(nx&&ny)return'nw';if(px&&ny)return'ne';if(nx&&py)return'sw';if(px&&py)return'se';if(nx&&iy)return'w';if(px&&iy)return'e';if(ny&&ix)return'n';if(py&&ix)return's';if(x>=x0&&x<=x1&&y>=y0&&y<=y1)return'move';return null;}
+function dragRepairRectV26(mode,start,dx,dy){const a=activeRepairV26,[bx0,by0,bx1,by1]=a.viewport;let[x0,y0,x1,y1]=start;const minW=Math.min(Math.max(8,(bx1-bx0)*.01),bx1-bx0),minH=Math.min(Math.max(8,(by1-by0)*.01),by1-by0);if(mode==='move'){const w=x1-x0,h=y1-y0;x0=Math.max(bx0,Math.min(bx1-w,x0+dx));y0=Math.max(by0,Math.min(by1-h,y0+dy));x1=x0+w;y1=y0+h}else{if(mode.includes('w'))x0+=dx;if(mode.includes('e'))x1+=dx;if(mode.includes('n'))y0+=dy;if(mode.includes('s'))y1+=dy;x0=Math.max(bx0,Math.min(x1-minW,x0));x1=Math.min(bx1,Math.max(x0+minW,x1));y0=Math.max(by0,Math.min(y1-minH,y0));y1=Math.min(by1,Math.max(y0+minH,y1))}a.rect=[x0,y0,x1,y1];}
+function eraseAtV26(x,y){const a=activeRepairV26;if(!a||a.tool!=='eraser')return;const [x0,y0,x1,y1]=a.rect,m=10;if(x<x0-m||x>x1+m||y<y0-m||y>y1+m){eraserLastV26=null;return}const ctx=a.mask.getContext('2d');ctx.save();ctx.globalCompositeOperation='destination-out';const pts=[];if(!eraserLastV26)pts.push([x,y]);else{const dx=x-eraserLastV26[0],dy=y-eraserLastV26[1],d=Math.hypot(dx,dy),step=Math.max(1,eraserBrushV26/3),n=Math.max(1,Math.floor(d/step)+1);for(let i=1;i<=n;i++)pts.push([eraserLastV26[0]+dx*i/n,eraserLastV26[1]+dy*i/n])}for(const p of pts){ctx.beginPath();ctx.arc(p[0],p[1],eraserBrushV26/2,0,Math.PI*2);ctx.fill()}ctx.restore();eraserLastV26=[x,y];}
+function initGridLineDrag() {
+  const canvas=document.getElementById('grid-canvas');if(!canvas||canvas.dataset.dragReady==='1')return;canvas.dataset.dragReady='1';
+  const getPoint=ev=>{const rr=canvas.getBoundingClientRect();if(activeRepairV26){const v=activeRepairV26.viewport;return{x:v[0]+(ev.clientX-rr.left)/rr.width*(v[2]-v[0]),y:v[1]+(ev.clientY-rr.top)/rr.height*(v[3]-v[1]),rect:rr}}return{x:(ev.clientX-rr.left)*canvas.width/rr.width,y:(ev.clientY-rr.top)*canvas.height/rr.height,rect:rr}};
+  canvas.addEventListener('pointerdown',ev=>{if(!originalImg)return;const pt=getPoint(ev);
+    if(activeRepairV26){ev.preventDefault();if(activeRepairV26.tool==='eraser'){activeRepairV26.drag={mode:'eraser'};eraseAtV26(pt.x,pt.y);updateGridCanvas()}else{const mode=hitRepairHandleV26(pt.x,pt.y);if(mode)activeRepairV26.drag={mode,start:[pt.x,pt.y],rect:activeRepairV26.rect.slice()}}canvas.setPointerCapture?.(ev.pointerId);return}
+    const ranges=getGridRangesFromCanvas(canvas.width,canvas.height), threshold=Math.max(12,14*canvas.width/Math.max(pt.rect.width,1));let best=null;
+    if(sliceCutModeV26===1){ranges.xCuts.slice(1,-1).forEach((x,i)=>{const d=Math.abs(pt.x-x);if(d<threshold&&(!best||d<best.d))best={axis:'v',index:i,d}});ranges.yCuts.slice(1,-1).forEach((y,i)=>{const d=Math.abs(pt.y-y);if(d<threshold&&(!best||d<best.d))best={axis:'h',index:i,d}});if(!best)return;if(!gridLineState.active||gridLineState.cols!==ranges.cols||gridLineState.rows!==ranges.rows)gridLineState={v:ranges.xCuts.slice(1,-1),h:ranges.yCuts.slice(1,-1),cols:ranges.cols,rows:ranges.rows,active:true};gridLineDrag=best;selectedLineV26={axis:best.axis,index:best.index};
+    }else{ensureMode2V26(canvas.width,canvas.height);for(let r=0;r<ranges.rows;r++)for(let b=0;b<ranges.cols-1;b++){const x=mode2StateV26.v[r][b],y0=getCellBoxV26(r*ranges.cols+b+1,canvas.width,canvas.height)[1],y1=getCellBoxV26(r*ranges.cols+b+2,canvas.width,canvas.height)[3];if(pt.y>=Math.min(y0,y1)-threshold&&pt.y<=Math.max(y0,y1)+threshold){const d=Math.abs(pt.x-x);if(d<threshold&&(!best||d<best.d))best={axis:'v',first:r,second:b,d}}}for(let br=0;br<ranges.rows-1;br++)for(let c=0;c<ranges.cols;c++){const y=mode2StateV26.h[br][c],x0=getCellBoxV26(br*ranges.cols+c+1,canvas.width,canvas.height)[0],x1=getCellBoxV26((br+1)*ranges.cols+c+1,canvas.width,canvas.height)[2];if(pt.x>=Math.min(x0,x1)-threshold&&pt.x<=Math.max(x0,x1)+threshold){const d=Math.abs(pt.y-y);if(d<threshold&&(!best||d<best.d))best={axis:'h',first:br,second:c,d}}}if(!best)return;selectedSegmentV26={...best};segmentDragV26={...best,press:[ev.clientX,ev.clientY],started:false};}
+    ev.preventDefault();canvas.setPointerCapture?.(ev.pointerId);updateGridCanvas();
+  });
+  canvas.addEventListener('pointermove',ev=>{const pt=getPoint(ev);if(activeRepairV26){activeRepairV26.hover=[pt.x,pt.y];if(activeRepairV26.drag?.mode==='eraser'){eraseAtV26(pt.x,pt.y);updateGridCanvas()}else if(activeRepairV26.drag){dragRepairRectV26(activeRepairV26.drag.mode,activeRepairV26.drag.rect,pt.x-activeRepairV26.drag.start[0],pt.y-activeRepairV26.drag.start[1]);updateGridCanvas()}else updateGridCanvas();return}
+    if(gridLineDrag){const ranges=getGridRangesFromCanvas(canvas.width,canvas.height),gapX=Math.max(12,(ranges.xCuts.at(-1)-ranges.xCuts[0])/ranges.cols*.12),gapY=Math.max(12,(ranges.yCuts.at(-1)-ranges.yCuts[0])/ranges.rows*.12);if(gridLineDrag.axis==='v'){const i=gridLineDrag.index,min=(i===0?ranges.xCuts[0]:gridLineState.v[i-1])+gapX,max=(i===gridLineState.v.length-1?ranges.xCuts.at(-1):gridLineState.v[i+1])-gapX;gridLineState.v[i]=Math.max(min,Math.min(max,pt.x))}else{const i=gridLineDrag.index,min=(i===0?ranges.yCuts[0]:gridLineState.h[i-1])+gapY,max=(i===gridLineState.h.length-1?ranges.yCuts.at(-1):gridLineState.h[i+1])-gapY;gridLineState.h[i]=Math.max(min,Math.min(max,pt.y))}updateGridCanvas();return}
+    if(segmentDragV26){if(!segmentDragV26.started&&Math.max(Math.abs(ev.clientX-segmentDragV26.press[0]),Math.abs(ev.clientY-segmentDragV26.press[1]))>=3)segmentDragV26.started=true;if(segmentDragV26.started){moveSegmentV26(segmentDragV26,segmentDragV26.axis==='v'?pt.x:pt.y);updateGridCanvas()}}
+  });
+  const end=()=>{if(activeRepairV26?.drag){activeRepairV26.drag=null;eraserLastV26=null;return}if(gridLineDrag||segmentDragV26?.started){invalidateFinalOutput('切線位置已變更');updateSlicePreview()}gridLineDrag=null;segmentDragV26=null;};canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);
+  canvas.addEventListener('keydown',ev=>{const step=ev.shiftKey?10:1;if(activeRepairV26){if(ev.key==='Enter'){applyRepairV26();ev.preventDefault();return}if(ev.key==='Escape'){cancelRepairV26();ev.preventDefault();return}if(activeRepairV26.tool==='cut'&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(ev.key)){const dx=ev.key==='ArrowLeft'?-step:ev.key==='ArrowRight'?step:0,dy=ev.key==='ArrowUp'?-step:ev.key==='ArrowDown'?step:0;dragRepairRectV26('move',activeRepairV26.rect.slice(),dx,dy);updateGridCanvas();ev.preventDefault()}return}if(sliceCutModeV26===1&&selectedLineV26&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Escape'].includes(ev.key)){if(ev.key==='Escape'){selectedLineV26=null;updateGridCanvas();return}const ranges=getGridRangesFromCanvas(canvas.width,canvas.height),axis=selectedLineV26.axis,i=selectedLineV26.index,d=axis==='v'?(ev.key==='ArrowLeft'?-step:ev.key==='ArrowRight'?step:0):(ev.key==='ArrowUp'?-step:ev.key==='ArrowDown'?step:0);if(d){if(!gridLineState.active)gridLineState={v:ranges.xCuts.slice(1,-1),h:ranges.yCuts.slice(1,-1),cols:ranges.cols,rows:ranges.rows,active:true};const arr=axis==='v'?gridLineState.v:gridLineState.h,cuts=axis==='v'?ranges.xCuts:ranges.yCuts,gap=Math.max(8,(cuts.at(-1)-cuts[0])/(axis==='v'?ranges.cols:ranges.rows)*.08),min=(i===0?cuts[0]:arr[i-1])+gap,max=(i===arr.length-1?cuts.at(-1):arr[i+1])-gap;arr[i]=Math.max(min,Math.min(max,arr[i]+d));invalidateFinalOutput('模式1切線已變更');updateGridCanvas();updateSlicePreview();ev.preventDefault()}return}if(sliceCutModeV26===2&&selectedSegmentV26&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Escape'].includes(ev.key)){if(ev.key==='Escape'){selectedSegmentV26=null;updateGridCanvas();return}const d=selectedSegmentV26.axis==='v'?(ev.key==='ArrowLeft'?-step:ev.key==='ArrowRight'?step:0):(ev.key==='ArrowUp'?-step:ev.key==='ArrowDown'?step:0);if(d){const cur=selectedSegmentV26.axis==='v'?mode2StateV26.v[selectedSegmentV26.first][selectedSegmentV26.second]:mode2StateV26.h[selectedSegmentV26.first][selectedSegmentV26.second];moveSegmentV26(selectedSegmentV26,cur+d);invalidateFinalOutput('Mode2線段已變更');updateGridCanvas();updateSlicePreview();ev.preventDefault()}}});
+}
+function moveSegmentV26(seg,value){const src=buildCurrentWorkSheetCanvas();if(!src)return;const ranges=getGridRangesFromCanvas(src.width,src.height),gapX=Math.max(8,(ranges.xCuts.at(-1)-ranges.xCuts[0])/ranges.cols*.08),gapY=Math.max(8,(ranges.yCuts.at(-1)-ranges.yCuts[0])/ranges.rows*.08);if(seg.axis==='v'){const r=seg.first,b=seg.second,min=(b===0?ranges.xCuts[0]:mode2StateV26.v[r][b-1])+gapX,max=(b===ranges.cols-2?ranges.xCuts.at(-1):mode2StateV26.v[r][b+1])-gapX;mode2StateV26.v[r][b]=Math.max(min,Math.min(max,value))}else{const br=seg.first,c=seg.second,min=(br===0?ranges.yCuts[0]:mode2StateV26.h[br-1][c])+gapY,max=(br===ranges.rows-2?ranges.yCuts.at(-1):mode2StateV26.h[br+1][c])-gapY;mode2StateV26.h[br][c]=Math.max(min,Math.min(max,value))}}
 
 
 function resetMagicWandStateForNewImage() {
@@ -2537,37 +2584,10 @@ function downloadCurrentWorkImage() {
 }
 
 // ===== 即時切割預覽（吃目前工作圖）=====
+function renderCellSourceV26(source,index){const b=effectiveCellBoxV26(index,source.width,source.height),sx=b[0],sy=b[1],pw=Math.max(1,b[2]-b[0]),ph=Math.max(1,b[3]-b[1]),pc=document.createElement('canvas');pc.width=Math.max(1,Math.round(pw));pc.height=Math.max(1,Math.round(ph));pc.getContext('2d').drawImage(source,sx,sy,pw,ph,0,0,pc.width,pc.height);const mask=cellEraserMasksV26.get(index);if(mask){const mc=document.createElement('canvas');mc.width=pc.width;mc.height=pc.height;mc.getContext('2d').drawImage(mask,sx,sy,pw,ph,0,0,pc.width,pc.height);const ctx=pc.getContext('2d');ctx.globalCompositeOperation='destination-in';ctx.drawImage(mc,0,0);ctx.globalCompositeOperation='source-over';}return pc;}
 function updateSlicePreview() {
-  if (!originalImg) return;
-  const canvas = buildCurrentWorkSheetCanvas();
-  if (!canvas) return;
-  const workW = canvas.width, workH = canvas.height;
-  const ranges = getGridRangesFromCanvas(workW, workH);
-  const grid = document.getElementById('slice-preview-grid');
-  grid.style.gridTemplateColumns = `repeat(${Math.min(ranges.cols, 5)}, 1fr)`;
-  grid.innerHTML = '';
-  const zoomLevel = parseFloat(document.getElementById('zoom')?.value || '1');
-
-  for (let r = 0; r < ranges.rows; r++) {
-    for (let c = 0; c < ranges.cols; c++) {
-      const sx = ranges.xCuts[c];
-      const sy = ranges.yCuts[r];
-      const pieceW = ranges.xCuts[c + 1] - ranges.xCuts[c];
-      const pieceH = ranges.yCuts[r + 1] - ranges.yCuts[r];
-      const pc = document.createElement('canvas');
-      pc.width = Math.max(1, Math.round(pieceW));
-      pc.height = Math.max(1, Math.round(pieceH));
-      pc.getContext('2d').drawImage(canvas, sx, sy, pieceW, pieceH, 0, 0, pc.width, pc.height);
-      const zoomed = makeZoomedPieceCanvas(pc, zoomLevel);
-      const rendered = renderOutputCanvas(zoomed, outputW, outputH);
-      const cell = document.createElement('div');
-      cell.className = 'sticker-cell';
-      const num = r * ranges.cols + c + 1;
-      const cutLabel = ranges.custom ? '自訂切線' : '平均切線';
-      cell.innerHTML = `<div class="checker"><img src="${rendered.toDataURL('image/png')}"></div><div class="num">格${num}｜${getOutputLayoutLabel()}｜${cutLabel}</div>`;
-      grid.appendChild(cell);
-    }
-  }
+  if(!originalImg)return;const canvas=buildCurrentWorkSheetCanvas();if(!canvas)return;const ranges=getGridRangesFromCanvas(canvas.width,canvas.height),grid=document.getElementById('slice-preview-grid');grid.style.gridTemplateColumns=`repeat(${Math.min(ranges.cols,5)}, 1fr)`;grid.innerHTML='';const zoomLevel=parseFloat(document.getElementById('zoom')?.value||'1');
+  for(let r=0;r<ranges.rows;r++)for(let c=0;c<ranges.cols;c++){const num=r*ranges.cols+c+1,pc=renderCellSourceV26(canvas,num),zoomed=makeZoomedPieceCanvas(pc,zoomLevel),rendered=renderOutputCanvas(zoomed,outputW,outputH),cell=document.createElement('div');cell.className='sticker-cell';const adjusted=cellOverridesV26.has(num)||cellEraserMasksV26.has(num);cell.innerHTML=`<div class="checker"><img src="${rendered.toDataURL('image/png')}"></div><div class="num">格${num}｜${getOutputLayoutLabel()}｜模式${sliceCutModeV26}</div><button class="slice-repair-btn ${adjusted?'adjusted':''}" onclick="startRepairV26(${num})">${adjusted?'已調整':'補切'}</button>`;grid.appendChild(cell);}
 }
 
 // ===== 去背預覽（整張母圖）=====
@@ -2975,8 +2995,7 @@ function setTraditionalEffect(m) {
 function setBgMode(m, doPreview = true) {
   bgMode = (m === 'wand' || m === 'traditional' || m === 'none') ? m : 'none';
   const none = document.getElementById('bg-mode-none');
-  const trad = document.getElementById('bg-mode-traditional');
-  const wand = document.getElementById('bg-mode-wand');
+  const trad = document.getElementById('bg-mode-traditional');  const wand = document.getElementById('bg-mode-wand');
   [none, trad, wand].forEach(btn => { if (btn) btn.className = 'mode-btn bg-mode-btn'; });
   if (bgMode === 'none' && none) none.classList.add('active-none');
   if (bgMode === 'traditional' && trad) trad.classList.add('active-traditional');
@@ -3019,65 +3038,13 @@ function updateCellInfo() {
   }
 }
 
-function updateGridCanvas() {
-  if (!originalImg) return;
-  const workCanvas = buildCurrentWorkSheetCanvas();
-  if (!workCanvas) return;
-  const workW = workCanvas.width, workH = workCanvas.height;
-  const ranges = getGridRangesFromCanvas(workW, workH);
-  const canvas = document.getElementById('grid-canvas');
-  canvas.width = workW;
-  canvas.height = workH;
-  const ctx = canvas.getContext('2d');
+function updateGridCanvas(){if(!originalImg)return;const workCanvas=buildCurrentWorkSheetCanvas();if(!workCanvas)return;const W=workCanvas.width,H=workCanvas.height,canvas=document.getElementById('grid-canvas'),ctx=canvas.getContext('2d');
+ if(activeRepairV26){const v=activeRepairV26.viewport;canvas.width=Math.max(1,Math.round(v[2]-v[0]));canvas.height=Math.max(1,Math.round(v[3]-v[1]));ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(workCanvas,v[0],v[1],v[2]-v[0],v[3]-v[1],0,0,canvas.width,canvas.height);if(activeRepairV26.mask){const vm=document.createElement('canvas');vm.width=canvas.width;vm.height=canvas.height;vm.getContext('2d').drawImage(activeRepairV26.mask,v[0],v[1],v[2]-v[0],v[3]-v[1],0,0,canvas.width,canvas.height);ctx.globalCompositeOperation='destination-in';ctx.drawImage(vm,0,0);ctx.globalCompositeOperation='source-over';}const [x0,y0,x1,y1]=activeRepairV26.rect,ox=v[0],oy=v[1];ctx.save();ctx.strokeStyle='#22c55e';ctx.lineWidth=4;ctx.strokeRect(x0-ox,y0-oy,x1-x0,y1-y0);ctx.fillStyle='#ffd700';for(const [x,y] of [[x0,y0],[x1,y0],[x0,y1],[x1,y1],[(x0+x1)/2,y0],[(x0+x1)/2,y1],[x0,(y0+y1)/2],[x1,(y0+y1)/2]])ctx.fillRect(x-ox-5,y-oy-5,10,10);ctx.fillStyle='#fff';ctx.font='bold 18px sans-serif';ctx.fillText(`補切格 ${activeRepairV26.index}`,x0-ox+8,y0-oy+24);if(activeRepairV26.tool==='eraser'&&activeRepairV26.hover){const [hx,hy]=activeRepairV26.hover;ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=2;ctx.beginPath();ctx.arc(hx-ox,hy-oy,eraserBrushV26/2,0,Math.PI*2);ctx.stroke();ctx.strokeStyle='rgba(0,0,0,.85)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(hx-ox,hy-oy,Math.max(1,eraserBrushV26/2-2),0,Math.PI*2);ctx.stroke()}ctx.restore();return;}
+ canvas.width=W;canvas.height=H;ctx.clearRect(0,0,W,H);ctx.drawImage(workCanvas,0,0);const ranges=getGridRangesFromCanvas(W,H),effW=ranges.xCuts.at(-1)-ranges.xCuts[0],effH=ranges.yCuts.at(-1)-ranges.yCuts[0];ctx.strokeStyle='rgba(255,107,53,.9)';ctx.lineWidth=6;ctx.setLineDash([24,16]);
+ if(sliceCutModeV26===1){for(let c=1;c<ranges.xCuts.length-1;c++){ctx.beginPath();ctx.moveTo(ranges.xCuts[c],ranges.yCuts[0]);ctx.lineTo(ranges.xCuts[c],ranges.yCuts.at(-1));ctx.stroke()}for(let r=1;r<ranges.yCuts.length-1;r++){ctx.beginPath();ctx.moveTo(ranges.xCuts[0],ranges.yCuts[r]);ctx.lineTo(ranges.xCuts.at(-1),ranges.yCuts[r]);ctx.stroke()}}
+ else{ensureMode2V26(W,H);for(let r=0;r<ranges.rows;r++)for(let b=0;b<ranges.cols-1;b++){const key=selectedSegmentV26?.axis==='v'&&selectedSegmentV26.first===r&&selectedSegmentV26.second===b;ctx.strokeStyle=key?'#ffd700':'rgba(255,107,53,.95)';const x=mode2StateV26.v[r][b],lb=getCellBoxV26(r*ranges.cols+b+1,W,H),rb=getCellBoxV26(r*ranges.cols+b+2,W,H);ctx.beginPath();ctx.moveTo(x,Math.max(lb[1],rb[1]));ctx.lineTo(x,Math.min(lb[3],rb[3]));ctx.stroke()}for(let br=0;br<ranges.rows-1;br++)for(let c=0;c<ranges.cols;c++){const key=selectedSegmentV26?.axis==='h'&&selectedSegmentV26.first===br&&selectedSegmentV26.second===c;ctx.strokeStyle=key?'#ffd700':'rgba(255,107,53,.95)';const y=mode2StateV26.h[br][c],tb=getCellBoxV26(br*ranges.cols+c+1,W,H),bb=getCellBoxV26((br+1)*ranges.cols+c+1,W,H);ctx.beginPath();ctx.moveTo(Math.max(tb[0],bb[0]),y);ctx.lineTo(Math.min(tb[2],bb[2]),y);ctx.stroke()}}
+ ctx.setLineDash([]);ctx.strokeStyle='rgba(255,107,53,.8)';ctx.lineWidth=8;ctx.strokeRect(ranges.xCuts[0]+4,ranges.yCuts[0]+4,effW-8,effH-8);const avg=effW/Math.max(ranges.cols,1);ctx.font=`bold ${Math.round(avg*.18)}px Share Tech Mono, monospace`;ctx.fillStyle='rgba(255,107,53,.5)';ctx.textAlign='center';ctx.textBaseline='middle';for(let r=0;r<ranges.rows;r++)for(let c=0;c<ranges.cols;c++){const n=r*ranges.cols+c+1,b=getCellBoxV26(n,W,H);ctx.fillText(n,(b[0]+b[2])/2,(b[1]+b[3])/2)}updateCellInfo();}
 
-  ctx.clearRect(0, 0, workW, workH);
-  ctx.drawImage(workCanvas, 0, 0);
-
-  const cropL = ranges.xCuts[0];
-  const cropR = workW - ranges.xCuts.at(-1);
-  const cropT = ranges.yCuts[0];
-  const cropB = workH - ranges.yCuts.at(-1);
-  const effW = ranges.xCuts.at(-1) - ranges.xCuts[0];
-  const effH = ranges.yCuts.at(-1) - ranges.yCuts[0];
-
-  ctx.fillStyle = 'rgba(0,0,0,0.45)';
-  if (cropL > 0) ctx.fillRect(0, 0, cropL, workH);
-  if (cropR > 0) ctx.fillRect(workW - cropR, 0, cropR, workH);
-  if (cropT > 0) ctx.fillRect(0, 0, workW, cropT);
-  if (cropB > 0) ctx.fillRect(0, workH - cropB, workW, cropB);
-
-  ctx.strokeStyle = ranges.custom ? 'rgba(255,209,102,0.95)' : 'rgba(255,107,53,0.85)';
-  ctx.lineWidth = 6;
-  ctx.setLineDash([24, 16]);
-  for (let c = 1; c < ranges.xCuts.length - 1; c++) {
-    const x = ranges.xCuts[c];
-    ctx.beginPath(); ctx.moveTo(x, ranges.yCuts[0]); ctx.lineTo(x, ranges.yCuts.at(-1)); ctx.stroke();
-  }
-  for (let r = 1; r < ranges.yCuts.length - 1; r++) {
-    const y = ranges.yCuts[r];
-    ctx.beginPath(); ctx.moveTo(ranges.xCuts[0], y); ctx.lineTo(ranges.xCuts.at(-1), y); ctx.stroke();
-  }
-  ctx.setLineDash([]);
-  ctx.strokeStyle = 'rgba(255,107,53,0.8)';
-  ctx.lineWidth = 8;
-  ctx.strokeRect(ranges.xCuts[0] + 4, ranges.yCuts[0] + 4, effW - 8, effH - 8);
-
-  const avgColW = effW / Math.max(ranges.cols, 1);
-  ctx.font = `bold ${Math.round(avgColW * 0.18)}px Share Tech Mono, monospace`;
-  ctx.fillStyle = 'rgba(255,107,53,0.5)';
-  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-  for (let r = 0; r < ranges.rows; r++) {
-    for (let c = 0; c < ranges.cols; c++) {
-      const num = r * ranges.cols + c + 1;
-      const cx = (ranges.xCuts[c] + ranges.xCuts[c + 1]) / 2;
-      const cy = (ranges.yCuts[r] + ranges.yCuts[r + 1]) / 2;
-      ctx.fillText(num, cx, cy);
-    }
-  }
-  const status = document.getElementById('grid-drag-status');
-  if (status && !gridLineDrag) status.textContent = ranges.custom ? '目前使用自訂切線；切割預覽與 ZIP 會依照目前切線輸出。' : '提示：可拖拉橘色切線微調每格範圍。';
-  updateCellInfo();
-}
 
 document.getElementById('start-num').addEventListener('input', () => {
   if (finalImages.length > 0) {
@@ -3140,13 +3107,7 @@ async function startProcess() {
     for (let c = 0; c < ranges.cols; c++) {
       const id = r * ranges.cols + c + 1;
       try {
-        const sx = ranges.xCuts[c], sy = ranges.yCuts[r];
-        const pieceW = ranges.xCuts[c + 1] - ranges.xCuts[c];
-        const pieceH = ranges.yCuts[r + 1] - ranges.yCuts[r];
-        const piece = document.createElement('canvas');
-        piece.width = Math.max(1, Math.round(pieceW));
-        piece.height = Math.max(1, Math.round(pieceH));
-        piece.getContext('2d').drawImage(canvas, sx, sy, pieceW, pieceH, 0, 0, piece.width, piece.height);
+        const piece = renderCellSourceV26(canvas, id);
         const zoomed = makeZoomedPieceCanvas(piece, zoomLevel);
         const rendered = renderOutputCanvas(zoomed, outputW, outputH);
         slicedPieces.push({ id, previewUrl: rendered.toDataURL('image/png') });
@@ -3277,7 +3238,7 @@ updateOutputLayoutUI();
 // ===== 公開版更新日期顯示 =====
 (function(){
   const tag = document.getElementById('ver-tag');
-  if (tag) tag.textContent = '更新日期 2026/07/11';
+  if (tag) tag.textContent = '公開版 V26｜更新日期 2026/09/24';
 })();
 
 // ===== 精選作品輪播｜0711V22 三頁獨立版 =====
@@ -3681,7 +3642,7 @@ window.addEventListener('resize',()=>{
   featuredResizeTimer=setTimeout(()=>{ Object.keys(featuredState).forEach(featuredRender); },160);
 });
 </script>
-<script src="../assets/i18n.js"></script>
+
+<!-- ENGINEERING LOG 2026-09-24 公開版 V26：以 0711V22 為唯一基底，局部移植 V92 人工切割工作區：Mode1 整線、Mode2 逐列/逐欄共邊、3px 拖曳門檻、方向鍵 1px/Shift+10px、單格補切固定局部 viewport、8 handle/整框移動、單格 eraser mask、4-180px 連續筆刷、確認/取消/工具復位。排除 V92 自動模式2。橡皮擦游標改為網頁可見 crosshair + 實際筆刷圓圈。保留 V22 去背/魔術棒/Alpha bbox/排版/Main/Tab/ZIP。 -->
 </body>
 </html>
-
