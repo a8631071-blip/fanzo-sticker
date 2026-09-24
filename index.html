@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>煩躁胖子｜貼圖工作站</title>
-<meta name="description" content="貼圖去背切割、LINE 上架檔案檢查、自製 QR Code、素材拼板 2.0 與自由排列，四套工具免費使用。">
+<meta name="description" content="煩躁胖子貼圖工作站：四套免費工具、Android APP，以及 Chrome 海報製作台。">
 <meta property="og:title" content="煩躁胖子｜貼圖工作站">
-<meta property="og:description" content="貼圖去背切割、LINE 上架檔案檢查、自製 QR Code、素材拼板 2.0 與自由排列，四套工具免費使用。">
+<meta property="og:description" content="煩躁胖子貼圖工作站：四套免費工具、Android APP，以及 Chrome 海報製作台。">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <style>
@@ -560,6 +560,18 @@ footer{padding:14px 0 16px}
   .portal-panel{grid-template-columns:1fr}
 }
 
+
+/* ===== 0925｜Android APP＋海報製作台 ===== */
+.product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.product-card{display:flex;align-items:center;gap:14px;min-height:112px;padding:16px 18px;text-decoration:none;border:1px solid rgba(222,213,199,.9);border-radius:20px;background:rgba(255,250,242,.76);box-shadow:0 10px 24px rgba(67,54,35,.07);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.product-card:hover{transform:translateY(-2px);box-shadow:0 13px 28px rgba(67,54,35,.11);border-color:#cdbfad}
+.product-icon{flex:0 0 48px;width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:#e7efe0;font-size:20px;font-weight:900}
+.product-icon.play{background:#e8e5f6;color:#544990}
+.product-copy{min-width:0;flex:1}.product-copy h3{font-size:16px;margin:0 0 4px}.product-copy b{display:block;font-size:11px;margin-bottom:4px;color:#5f584e}.product-copy p{font-size:10.5px;line-height:1.5;color:var(--muted);margin:0}.product-cta{flex:0 0 auto;font-size:10.5px;font-weight:900;white-space:nowrap}
+.poster-card{display:grid;grid-template-columns:58px minmax(0,1fr) auto;align-items:center;gap:16px;padding:17px 19px;border:1px solid rgba(222,213,199,.95);border-radius:20px;background:linear-gradient(135deg,#f6c9aa 0%,#f5d7b6 58%,#f3dda0 100%);box-shadow:0 10px 24px rgba(67,54,35,.08)}
+.poster-card .product-icon{width:54px;height:54px;background:rgba(255,255,255,.58)}.poster-card h3{font-size:18px;margin:0 0 4px}.poster-card p{font-size:10.5px;line-height:1.55;color:#5f584e;margin:0}.poster-meta{font-size:10.5px;font-weight:900;margin-top:5px}
+.poster-action{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;padding:10px 13px;border-radius:999px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);font-size:10.5px;font-weight:900;white-space:nowrap}
+@media(max-width:760px){.product-grid{grid-template-columns:1fr}.product-card{min-height:105px;padding:14px}.poster-card{grid-template-columns:48px minmax(0,1fr);gap:11px;padding:14px}.poster-card .product-icon{width:46px;height:46px}.poster-action{grid-column:1/-1;width:100%}}
 </style>
 </head>
 <body>
@@ -597,14 +609,9 @@ footer{padding:14px 0 16px}
           <span class="portal-copy"><b>Facebook 粉專</b><small>最新作品與消息</small></span>
           <span class="portal-arrow">↗</span>
         </a>
-        <a class="portal-card portal-play" href="https://play.google.com/store/apps/details?id=com.fanzaopangzi.simplemp4maker" target="_blank" rel="noopener">
-          <span class="portal-icon">▶</span>
-          <span class="portal-copy"><b>MP4 圖文影片合成器</b><small>Google Play 免費下載</small></span>
-          <span class="portal-arrow">↗</span>
-        </a>
         <a class="portal-card portal-oss" href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener">
           <span class="portal-icon">&lt;/&gt;</span>
-          <span class="portal-copy"><b>免費・開放原始碼</b><small>GitHub｜MIT License</small></span>
+          <span class="portal-copy"><b>開放原始碼專案</b><small>查看 GitHub 專案</small></span>
           <span class="portal-arrow">↗</span>
         </a>
       </aside>
@@ -617,11 +624,6 @@ footer{padding:14px 0 16px}
       <p>需要哪個就直接點，會在新分頁開啟。</p>
     </div>
 
-    <div class="home-update" role="note">
-        <b>最新更新｜去背・切割工具</b>
-        <span>修改去背切割方式：新增切割模式 1／2、單格補切與橡皮擦，遇到相鄰內容或切線不理想時，可以直接人工調整。</span>
-      </div>
-
     <div class="tools">
       <a class="tool" href="./sticker/" target="_blank" rel="noopener">
         <div class="tool-number">01</div>
@@ -632,7 +634,7 @@ footer{padding:14px 0 16px}
           </svg>
         </div>
         <h3>去背・切割一站搞定</h3>
-        <p>去浮水印、去背、切格與 ZIP 打包；新版修改去背切割方式，加入切割模式 1／2、單格補切與橡皮擦。</p>
+        <p>去背、母圖切割到 ZIP 打包一次完成。新版修改去背切割方式：可單格調整切割線，調整後再用補切割與橡皮擦修整。</p>
         <div class="tool-go">開始使用 <span>→</span></div>
       </a>
 
@@ -677,6 +679,27 @@ footer{padding:14px 0 16px}
     </div>
   </section>
 
+  <section class="section wrap" id="android-apps">
+    <div class="section-head"><div><h2>Android APP 專區</h2></div><p>Google Play 安裝，依需求直接使用。</p></div>
+    <div class="product-grid">
+      <a class="product-card" href="https://play.google.com/store/apps/details?id=com.app.strideroute" target="_blank" rel="noopener">
+        <span class="product-icon">步</span><span class="product-copy"><h3>步跡</h3><b>GPS 運動軌跡＋日常計步器</b><p>記錄步行、跑步、騎乘路線，查看距離、時間、速度、配速與步數；平常也能直接當計步器使用。</p></span><span class="product-cta">Google Play →</span>
+      </a>
+      <a class="product-card" href="https://play.google.com/store/apps/details?id=com.fanzaopangzi.simplemp4maker" target="_blank" rel="noopener">
+        <span class="product-icon play">▶</span><span class="product-copy"><h3>MP4 圖文影片合成器</h3><b>圖片、文字與音訊製作 MP4</b><p>把圖片與文字整理成圖文內容，再搭配音訊輸出 MP4，適合快速製作簡單圖文影片。</p></span><span class="product-cta">Google Play →</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section wrap" id="poster-studio">
+    <div class="section-head"><div><h2>海報製作台</h2></div><p>Chrome 擴充功能｜貼圖宣傳與一般圖文海報都能使用。</p></div>
+    <div class="poster-card">
+      <span class="product-icon">海</span>
+      <div><h3>海報製作台｜Chrome 擴充功能</h3><p>圖片、文字、背景、QR Code、圖層與版面配置集中處理，製作 LINE 貼圖宣傳海報或一般圖文海報。</p><div class="poster-meta">免費完整試用 3 天｜完整版 NT$199 一次買斷</div></div>
+      <a class="poster-action" href="https://chromewebstore.google.com/detail/%E6%B5%B7%E5%A0%B1%E8%A3%BD%E4%BD%9C%E5%8F%B0/giccbkmkanojfniioocgnfmainpafenc?utm_source=threads&utm_medium=social&utm_content=link_in_bio" target="_blank" rel="noopener">前往 Chrome 商店 →</a>
+    </div>
+  </section>
+
   <section class="section wrap" id="works">
     <div class="section-head">
       <div><h2>最近作品</h2></div>
@@ -710,18 +733,18 @@ footer{padding:14px 0 16px}
 <footer>
   <div class="wrap footer-inner">
     <span>煩躁胖子｜貼圖工作站</span>
-    <span>本工具免費提供使用，原始碼同步公開於 <a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener">GitHub</a>，採 MIT License 授權。</span>
+    <span>部分免費工具提供原始碼；各專案授權方式以 <a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener">GitHub</a> 專案說明為準。</span>
   </div>
 </footer>
 
 <script>
 const SHOWCASE_ITEMS = [
-  { id:"35607809", kind:"動態貼圖", cls:"motion", url:"https://store.line.me/stickershop/product/35607809/zh-Hant" },
-  { id:"35587366", kind:"動態貼圖", cls:"motion", url:"https://store.line.me/stickershop/product/35587366/zh-Hant" },
-  { id:"35587194", kind:"動態貼圖", cls:"motion", url:"https://store.line.me/stickershop/product/35587194/zh-Hant" },
-  { id:"35526540", kind:"靜態貼圖", cls:"static", url:"https://store.line.me/stickershop/product/35526540/zh-Hant" },
-  { id:"35565743", kind:"靜態貼圖", cls:"static", url:"https://store.line.me/stickershop/product/35565743/zh-Hant" },
-  { id:"35226826", kind:"靜態貼圖", cls:"static", url:"https://store.line.me/stickershop/product/35226826/zh-Hant" }
+  { id:"36816346", kind:"LINE 貼圖", cls:"static", url:"https://store.line.me/stickershop/product/36816346/zh-Hant" },
+  { id:"36816269", kind:"LINE 貼圖", cls:"static", url:"https://store.line.me/stickershop/product/36816269/zh-Hant" },
+  { id:"36816199", kind:"LINE 貼圖", cls:"static", url:"https://store.line.me/stickershop/product/36816199/zh-Hant" },
+  { id:"36723654", kind:"LINE 貼圖", cls:"static", url:"https://store.line.me/stickershop/product/36723654/zh-Hant" },
+  { id:"36785043", kind:"LINE 貼圖", cls:"static", url:"https://store.line.me/stickershop/product/36785043/zh-Hant" },
+  { id:"36705056", kind:"LINE 貼圖", cls:"static", url:"https://store.line.me/stickershop/product/36705056/zh-Hant" }
 ];
 
 let showcasePage = 0;
