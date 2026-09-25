@@ -573,170 +573,57 @@ footer{padding:14px 0 16px}
 .poster-action{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;padding:10px 13px;border-radius:999px;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.8);font-size:10.5px;font-weight:900;white-space:nowrap}
 @media(max-width:760px){.product-grid{grid-template-columns:1fr}.product-card{min-height:105px;padding:14px}.poster-card{grid-template-columns:48px minmax(0,1fr);gap:11px;padding:14px}.poster-card .product-icon{width:46px;height:46px}.poster-action{grid-column:1/-1;width:100%}}
 </style>
+
+<style id="professional-redesign">
+:root{--bg:#f4f5f6;--surface:#fff;--surface2:#eceff1;--ink:#191c1f;--muted:#697078;--line:#dfe3e6;--accent:#b52a2f;--accent-soft:#f5e8e8;--dark:#25292d}
+body{background:var(--bg);color:var(--ink)}
+.wrap{width:min(1180px,calc(100% - 40px))}
+header{padding:18px 0 4px}.topbar{display:flex;justify-content:space-between;align-items:center}.brand{font-size:15px}
+.new-nav{display:flex;gap:18px}.new-nav a{font-size:11px;font-weight:800;text-decoration:none;color:var(--muted)}.new-nav a:hover{color:var(--ink)}
+.hero{padding:24px 0 28px;text-align:left}.hero-shell{display:block}.hero-stage{min-height:270px;display:grid;grid-template-columns:145px minmax(0,1fr) 145px;border:1px solid var(--line);border-radius:20px;background:var(--surface);box-shadow:none;padding:28px 42px}
+.hero-stage:before,.hero-stage:after{display:none}.hero-copy h1{font-size:clamp(42px,5vw,66px);letter-spacing:-.055em}.hero-copy p{max-width:650px;font-size:14px;line-height:1.75}.hero-character{height:180px}.hero-character img{height:158px;filter:none}
+.hero-tags{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:18px}.hero-tags span{border:1px solid var(--line);background:#fafafa;border-radius:999px;padding:6px 10px;font-size:10px;font-weight:800;color:var(--muted)}
+.portal-panel{display:none!important}
+.section{padding:30px 0}.section-head{margin-bottom:15px}.section-head h2{font-size:27px}.section-head p{font-size:11px}
+.product-bento{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
+.product-bento .p-card{grid-column:span 4;min-height:180px;background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:19px;text-decoration:none;display:flex;flex-direction:column;position:relative;transition:.16s ease}
+.product-bento .p-card:hover{transform:translateY(-2px);border-color:#b9c0c5;box-shadow:0 9px 24px rgba(25,28,31,.06)}
+.product-bento .p-card.major{grid-column:span 6;min-height:210px}.p-top{display:flex;justify-content:space-between;gap:10px;align-items:start}.p-type{font-size:9px;font-weight:900;letter-spacing:.1em;color:var(--accent);background:var(--accent-soft);padding:5px 7px;border-radius:6px}.p-arrow{color:#9aa0a5}.p-card h3{font-size:19px;margin:26px 0 7px}.p-card p{font-size:11px;line-height:1.65;color:var(--muted);margin:0;max-width:430px}.p-foot{margin-top:auto;padding-top:18px;font-size:10px;font-weight:900;color:#454b50}
+.opensource-strip{display:grid;grid-template-columns:190px 1fr 1fr;gap:10px;align-items:stretch;background:var(--dark);border-radius:16px;padding:12px;color:white}.oss-title{padding:14px}.oss-title b{display:block;font-size:17px;margin-bottom:5px}.oss-title small{color:#aeb5ba;font-size:10px}.oss-card{background:#30353a;border:1px solid #41474c;border-radius:11px;padding:13px 15px;text-decoration:none;color:white;display:flex;align-items:center;justify-content:space-between}.oss-card b{font-size:12px}.oss-card small{display:block;color:#aeb5ba;font-size:9px;margin-top:3px}.oss-license{color:#d5dade;font-size:10px}
+.showcase-box{background:transparent;border:0;border-radius:0;padding:0;box-shadow:none}.work-card{background:var(--surface);border-color:var(--line);border-radius:14px;padding:8px}.work-image{border-radius:9px;background:#eceff1}.badge{background:#eceff1;color:#535a60}.store-links{justify-content:flex-start}.store-links a{background:var(--surface);border-color:var(--line)}
+.creator-note{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;border-top:1px solid var(--line);padding:24px 0 6px}.creator-note p{margin:4px 0 0;color:var(--muted);font-size:11px}.creator-links{display:flex;gap:8px}.creator-links a{font-size:10px;font-weight:900;text-decoration:none;border:1px solid var(--line);background:var(--surface);padding:8px 11px;border-radius:8px}
+footer{padding:14px 0 24px}.footer-inner{border-top:0;padding-top:0}
+@media(max-width:900px){.product-bento .p-card,.product-bento .p-card.major{grid-column:span 6}.opensource-strip{grid-template-columns:1fr 1fr}.oss-title{grid-column:1/-1}.hero-stage{grid-template-columns:105px minmax(0,1fr) 105px;padding:22px}.hero-character img{height:120px}}
+@media(max-width:650px){.wrap{width:min(100% - 22px,1180px)}.new-nav{display:none}.hero-stage{grid-template-columns:58px minmax(0,1fr) 58px;min-height:190px;padding:14px 8px}.hero-copy h1{font-size:31px}.hero-copy p{font-size:11px}.hero-character{height:85px}.hero-character img{height:72px}.product-bento .p-card,.product-bento .p-card.major{grid-column:1/-1;min-height:155px}.opensource-strip{grid-template-columns:1fr}.oss-title{grid-column:auto}.creator-note{grid-template-columns:1fr}.creator-links{flex-wrap:wrap}.section{padding:22px 0}}
+</style>
 </head>
 <body>
-
-<header>
-  <div class="wrap topbar">
-    <a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a>
-  </div>
-</header>
-
+<header><div class="wrap topbar"><a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a><nav class="new-nav"><a href="#products">工具與產品</a><a href="#open-source">開放原始碼</a><a href="#works">LINE 作品</a></nav></div></header>
 <main>
-  <section class="hero wrap">
-    <div class="hero-shell">
-      <div class="hero-stage">
-        <div class="hero-character hero-character-left" aria-hidden="true">
-          <img src="./assets/hero-left.png" alt="">
-        </div>
-        <div class="hero-copy">
-          <h1>有需要，就拿去用。</h1>
-          <p>貼圖去背切割、LINE 上架檔案檢查、自製 QR Code、素材拼板 2.0 與自由排列，四套工具免費使用。</p>
-        </div>
-        <div class="hero-character hero-character-right" aria-hidden="true">
-          <img src="./assets/hero-right.png" alt="">
-        </div>
-      </div>
+<section class="hero wrap"><div class="hero-shell"><div class="hero-stage">
+<div class="hero-character hero-character-left" aria-hidden="true"><img src="./assets/hero-left.png" alt=""></div>
+<div class="hero-copy"><h1>有需要，就拿去用。</h1><p>免費網頁工具、Android App、Chrome 擴充功能與 LINE 創作。把實際會用到的東西整理在這裡。</p><div class="hero-tags"><span>WEB TOOLS</span><span>ANDROID</span><span>CHROME</span><span>OPEN SOURCE</span><span>LINE CREATIONS</span></div></div>
+<div class="hero-character hero-character-right" aria-hidden="true"><img src="./assets/hero-right.png" alt=""></div>
+</div></div></section>
 
-      <aside class="portal-panel" aria-label="煩躁胖子外部連結">
-        <a class="portal-card portal-line" href="https://store.line.me/search/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">
-          <span class="portal-icon">L</span>
-          <span class="portal-copy"><b>煩躁胖子作品專區</b><small>LINE 貼圖・表情貼・主題</small></span>
-          <span class="portal-arrow">↗</span>
-        </a>
-        <a class="portal-card portal-fb" href="https://www.facebook.com/profile.php?id=61592913950425" target="_blank" rel="noopener">
-          <span class="portal-icon">f</span>
-          <span class="portal-copy"><b>Facebook 粉專</b><small>最新作品與消息</small></span>
-          <span class="portal-arrow">↗</span>
-        </a>
-        <a class="portal-card portal-oss" href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener">
-          <span class="portal-icon">&lt;/&gt;</span>
-          <span class="portal-copy"><b>開放原始碼專案</b><small>查看 GitHub 專案</small></span>
-          <span class="portal-arrow">↗</span>
-        </a>
-      </aside>
-    </div>
-  </section>
+<section class="section wrap" id="products"><div class="section-head"><div><h2>工具與產品</h2></div><p>網頁工具、APP 與擴充功能集中在同一層級。</p></div>
+<div class="product-bento">
+<a class="p-card major" href="./sticker/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">WEB · FREE</span><span class="p-arrow">↗</span></div><h3>去背・切割一站搞定</h3><p>去背、母圖切割、單格修整與 ZIP 打包，一套流程完成。</p><div class="p-foot">直接使用 →</div></a>
+<a class="p-card major" href="https://chromewebstore.google.com/detail/%E6%B5%B7%E5%A0%B1%E8%A3%BD%E4%BD%9C%E5%8F%B0/giccbkmkanojfniioocgnfmainpafenc?utm_source=threads&utm_medium=social&utm_content=link_in_bio" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">CHROME</span><span class="p-arrow">↗</span></div><h3>海報製作台</h3><p>圖片、文字、背景、QR Code、圖層與版面配置。LINE 宣傳海報與一般圖文海報都能製作。</p><div class="p-foot">完整試用 3 天 · NT$199 一次買斷 →</div></a>
+<a class="p-card" href="./line-check/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">WEB · FREE</span><span class="p-arrow">↗</span></div><h3>LINE 上架檔案檢查</h3><p>上傳圖片或 ZIP，上架前快速檢查尺寸、數量與檔案。</p><div class="p-foot">直接使用 →</div></a>
+<a class="p-card" href="./collage/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">WEB · FREE</span><span class="p-arrow">↗</span></div><h3>素材拼板 2.0</h3><p>制式拼板與自由排列，支援拖曳、縮放、旋轉與文字。</p><div class="p-foot">直接使用 →</div></a>
+<a class="p-card" href="./qr/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">WEB · FREE</span><span class="p-arrow">↗</span></div><h3>自製 QR Code</h3><p>網址轉 QR Code，也能搭配自製 QR 背板後下載。</p><div class="p-foot">直接使用 →</div></a>
+<a class="p-card" href="https://play.google.com/store/apps/details?id=com.app.strideroute" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">ANDROID · FREE</span><span class="p-arrow">↗</span></div><h3>步跡</h3><p>GPS 運動軌跡＋日常計步器。記錄步行、跑步、騎乘、距離、配速與步數。</p><div class="p-foot">Google Play →</div></a>
+<a class="p-card" href="https://play.google.com/store/apps/details?id=com.fanzaopangzi.simplemp4maker" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">ANDROID · FREE</span><span class="p-arrow">↗</span></div><h3>MP4 圖文影片合成器</h3><p>圖片、文字與音訊快速整理成 MP4 圖文影片。</p><div class="p-foot">Google Play →</div></a>
+</div></section>
 
-  <section class="section wrap" id="tools">
-    <div class="section-head">
-      <div><h2>四個免費工具</h2></div>
-      <p>需要哪個就直接點，會在新分頁開啟。</p>
-    </div>
+<section class="section wrap" id="open-source"><div class="opensource-strip"><div class="oss-title"><b>開放原始碼</b><small>部分工具與 APP 公開程式碼</small></div><a class="oss-card" href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><span><b>免費網頁工具</b><small>fanzo-sticker</small></span><span>↗</span></a><a class="oss-card" href="https://github.com/a8631071-blip/stride-route" target="_blank" rel="noopener"><span><b>步跡 Android APP</b><small>stride-route</small></span><span class="oss-license">MIT · ↗</span></a></div></section>
 
-    <div class="tools">
-      <a class="tool" href="./sticker/" target="_blank" rel="noopener">
-        <div class="tool-number">01</div>
-        <div class="tool-icon" aria-hidden="true">
-          <svg viewBox="0 0 40 40" fill="none" stroke-width="2.4" stroke-linecap="round">
-            <circle cx="11" cy="11" r="5"/><circle cx="29" cy="11" r="5"/>
-            <path d="M14.5 14.5L29 31M25.5 14.5L11 31"/>
-          </svg>
-        </div>
-        <h3>去背・切割一站搞定</h3>
-        <p>去背、母圖切割到 ZIP 打包一次完成。新版修改去背切割方式：可單格調整切割線，調整後再用補切割與橡皮擦修整。</p>
-        <div class="tool-go">開始使用 <span>→</span></div>
-      </a>
+<section class="section wrap" id="works"><div class="section-head"><div><h2>最近作品</h2></div><p>近期 LINE 貼圖作品，完整作品可由下方分類查看。</p></div><div class="showcase-box"><div class="showcase-viewport" id="showcaseViewport"><div class="showcase-track" id="showcaseTrack"></div></div><div class="showcase-foot"><div class="showcase-dots" id="showcaseDots"></div><div class="showcase-arrows"><button class="showcase-arrow" type="button" aria-label="上一頁" onclick="moveShowcase(-1)">‹</button><button class="showcase-arrow" type="button" aria-label="下一頁" onclick="moveShowcase(1)">›</button></div></div></div><div class="store-links"><a href="https://store.line.me/search/sticker/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">全部 LINE 貼圖</a><a href="https://store.line.me/search/emoji/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE 表情貼</a><a href="https://store.line.me/search/theme/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE 主題</a></div></section>
 
-      <a class="tool" href="./line-check/" target="_blank" rel="noopener">
-        <div class="tool-number">02</div>
-        <div class="tool-icon" aria-hidden="true">
-          <svg viewBox="0 0 40 40" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="8" y="6" width="24" height="29" rx="4"/>
-            <path d="M14 15h12M14 21h7M14 28l4 3 8-10"/>
-          </svg>
-        </div>
-        <h3>LINE 上架檔案檢查</h3>
-        <p>上傳圖片或 ZIP，上架前快速檢查尺寸、數量與檔案。</p>
-        <div class="tool-go">開始使用 <span>→</span></div>
-      </a>
-
-      <a class="tool" href="./qr/" target="_blank" rel="noopener">
-        <div class="tool-number">03</div>
-        <div class="tool-icon" aria-hidden="true">
-          <svg viewBox="0 0 40 40" fill="none" stroke-width="2.4" stroke-linejoin="round">
-            <rect x="6" y="6" width="10" height="10"/><rect x="24" y="6" width="10" height="10"/>
-            <rect x="6" y="24" width="10" height="10"/><path d="M24 24h5v5h5v5h-10v-5h-4v-5z"/>
-          </svg>
-        </div>
-        <h3>自製 QR Code 神器</h3>
-        <p>網址轉 QR Code，還能自製專屬 QR 背板，完成後直接下載。</p>
-        <div class="tool-go">開始使用 <span>→</span></div>
-      </a>
-
-      <a class="tool" href="./collage/" target="_blank" rel="noopener">
-        <div class="tool-number">04</div>
-        <div class="tool-icon" aria-hidden="true">
-          <svg viewBox="0 0 40 40" fill="none" stroke-width="2.4">
-            <rect x="5" y="5" width="13" height="13" rx="2"/><rect x="22" y="5" width="13" height="13" rx="2"/>
-            <rect x="5" y="22" width="13" height="13" rx="2"/><rect x="22" y="22" width="13" height="13" rx="2"/>
-          </svg>
-        </div>
-        <h3>素材拼板 2.0</h3>
-        <p>制式格快速拼板，也可自由拖曳、縮放、旋轉圖片與加入文字。</p>
-        <div class="tool-go">開始使用 <span>→</span></div>
-      </a>
-    </div>
-  </section>
-
-  <section class="section wrap" id="android-apps">
-    <div class="section-head"><div><h2>Android APP 專區</h2></div><p>Google Play 安裝，依需求直接使用。</p></div>
-    <div class="product-grid">
-      <div class="product-card">
-        <span class="product-icon">步</span><span class="product-copy"><h3>步跡</h3><b>GPS 運動軌跡＋日常計步器</b><p>記錄步行、跑步、騎乘路線，查看距離、時間、速度、配速與步數；平常也能直接當計步器使用。</p></span><span class="product-cta"><a href="https://play.google.com/store/apps/details?id=com.app.strideroute" target="_blank" rel="noopener">Google Play →</a><br><a href="https://github.com/a8631071-blip/stride-route" target="_blank" rel="noopener">查看原始碼 →</a></span>
-      </div>
-      <a class="product-card" href="https://play.google.com/store/apps/details?id=com.fanzaopangzi.simplemp4maker" target="_blank" rel="noopener">
-        <span class="product-icon play">▶</span><span class="product-copy"><h3>MP4 圖文影片合成器</h3><b>圖片、文字與音訊製作 MP4</b><p>把圖片與文字整理成圖文內容，再搭配音訊輸出 MP4，適合快速製作簡單圖文影片。</p></span><span class="product-cta">Google Play →</span>
-      </a>
-    </div>
-  </section>
-
-  <section class="section wrap" id="poster-studio">
-    <div class="section-head"><div><h2>海報製作台</h2></div><p>Chrome 擴充功能｜貼圖宣傳與一般圖文海報都能使用。</p></div>
-    <div class="poster-card">
-      <span class="product-icon">海</span>
-      <div><h3>海報製作台｜Chrome 擴充功能</h3><p>圖片、文字、背景、QR Code、圖層與版面配置集中處理，製作 LINE 貼圖宣傳海報或一般圖文海報。</p><div class="poster-meta">免費完整試用 3 天｜完整版 NT$199 一次買斷</div></div>
-      <a class="poster-action" href="https://chromewebstore.google.com/detail/%E6%B5%B7%E5%A0%B1%E8%A3%BD%E4%BD%9C%E5%8F%B0/giccbkmkanojfniioocgnfmainpafenc?utm_source=threads&utm_medium=social&utm_content=link_in_bio" target="_blank" rel="noopener">前往 Chrome 商店 →</a>
-    </div>
-  </section>
-
-  <section class="section wrap" id="works">
-    <div class="section-head">
-      <div><h2>最近作品</h2></div>
-      <p>動態、靜態都有，看到喜歡的就點進去看看。</p>
-    </div>
-
-    <div class="showcase-box">
-      <div class="showcase-viewport" id="showcaseViewport">
-        <div class="showcase-track" id="showcaseTrack"></div>
-      </div>
-      <div class="showcase-foot">
-        <div class="showcase-dots" id="showcaseDots"></div>
-        <div class="showcase-arrows">
-          <button class="showcase-arrow" type="button" aria-label="上一頁" onclick="moveShowcase(-1)">‹</button>
-          <button class="showcase-arrow" type="button" aria-label="下一頁" onclick="moveShowcase(1)">›</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="store-links">
-      <a href="https://store.line.me/search/sticker/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看全部 LINE 貼圖</a>
-      <a href="https://store.line.me/search/emoji/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看 LINE 表情貼</a>
-      <a href="https://store.line.me/search/theme/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">看 LINE 主題</a>
-    </div>
-    <div class="visitor-count" title="首頁累積瀏覽次數">
-      <img src="https://api.visitorbadge.io/api/visitors?path=a8631071-blip.fanzo-sticker.home&label=%E7%B4%AF%E7%A9%8D%E7%80%8F%E8%A6%BD&labelColor=%23f4ead7&countColor=%23ead8b9&style=flat&labelStyle=lower" alt="累積瀏覽次數" referrerpolicy="no-referrer">
-    </div>
-  </section>
+<section class="wrap creator-note"><div><b>煩躁胖子｜貼圖工作站</b><p>工具、APP、擴充功能與 LINE 創作的公開入口。</p></div><div class="creator-links"><a href="https://store.line.me/search/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE STORE ↗</a><a href="https://www.facebook.com/profile.php?id=61592913950425" target="_blank" rel="noopener">Facebook ↗</a><a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener">GitHub ↗</a></div></section>
 </main>
-
-<footer>
-  <div class="wrap footer-inner">
-    <span>煩躁胖子｜貼圖工作站</span>
-    <span>部分免費工具與 APP 提供原始碼；各專案授權方式以 <a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener">GitHub</a> 專案說明為準。</span>
-  </div>
-</footer>
-
+<footer><div class="wrap footer-inner"><span>© 2026 煩躁胖子</span><span>部分專案採開放原始碼；授權方式以各 GitHub 專案說明為準。</span></div></footer>
 <script>
 const SHOWCASE_ITEMS = [
   { id:"36816346", kind:"LINE 貼圖", cls:"static", url:"https://store.line.me/stickershop/product/36816346/zh-Hant" },
