@@ -769,7 +769,23 @@ body{font-size:17px}
 .restored-counter{display:flex;justify-content:flex-end;padding:4px 0 24px}
 .restored-counter .visitor-count{margin:0}
 @media(max-width:650px){.restored-counter{justify-content:center;padding-bottom:18px}}
-</style></head>
+</style>
+<style id="decor-live-v11">
+.product-bento .p-card{padding-right:92px!important}
+.product-bento .p-card.major{padding-right:112px!important}
+.site-decor{position:absolute;width:76px;height:66px;background-image:url("./assets/decor/decor-sprite.webp");background-size:500% 200%;background-repeat:no-repeat;pointer-events:none;z-index:1;opacity:.92;filter:saturate(.78)}
+.p-card .site-decor{right:10px;bottom:8px}
+.p-card.major .site-decor{width:94px;height:82px;right:14px;bottom:7px}
+.d1{background-position:0% 0%}.d2{background-position:25% 0%}.d3{background-position:50% 0%}.d4{background-position:75% 0%}.d5{background-position:100% 0%}
+.d6{background-position:0% 100%}.d7{background-position:25% 100%}.d8{background-position:50% 100%}.d9{background-position:75% 100%}.d10{background-position:100% 100%}
+.opensource-strip,#works{position:relative}
+.section-decor{position:absolute;width:68px;height:60px;background-image:url("./assets/decor/decor-sprite.webp");background-size:500% 200%;background-repeat:no-repeat;pointer-events:none;opacity:.72;filter:saturate(.7)}
+.opensource-strip .section-decor{right:18px;top:-44px}
+#works>.section-decor:nth-of-type(1){right:4px;top:-42px}
+#works>.section-decor:nth-of-type(2){left:-8px;bottom:-28px}
+@media(max-width:650px){.product-bento .p-card,.product-bento .p-card.major{padding-right:78px!important}.p-card .site-decor,.p-card.major .site-decor{width:64px;height:56px;right:7px}.section-decor{display:none}}
+</style>
+</head>
 <body>
 <header><div class="wrap topbar"><a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a><nav class="new-nav"><a href="#products">工具與產品</a><a href="#open-source">開放原始碼</a><a href="#works">LINE 作品</a><details class="external-menu"><summary>外部連結 ↗</summary><div class="external-pop"><a href="https://store.line.me/search/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener"><b>LINE STORE</b><small>全部作品</small></a><a href="https://www.facebook.com/profile.php?id=61592913950425" target="_blank" rel="noopener"><b>Facebook</b><small>最新作品與消息</small></a><a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><b>GitHub</b><small>公開原始碼專案</small></a></div></details></nav></div></header>
 <main>
@@ -836,5 +852,14 @@ function renderShowcase(){
 renderShowcase();
 </script>
 <script src="assets/i18n.js"></script>
+
+<script id="decor-live-script-v11">
+(()=>{
+ const cards=[...document.querySelectorAll('.product-bento .p-card')];
+ cards.slice(0,7).forEach((card,i)=>{const d=document.createElement('span');d.className='site-decor d'+(i+1);d.setAttribute('aria-hidden','true');card.appendChild(d);});
+ const oss=document.querySelector('.opensource-strip'); if(oss){const d=document.createElement('span');d.className='section-decor d8';d.setAttribute('aria-hidden','true');oss.appendChild(d);}
+ const works=document.querySelector('#works'); if(works){[9,10].forEach(n=>{const d=document.createElement('span');d.className='section-decor d'+n;d.setAttribute('aria-hidden','true');works.appendChild(d);});}
+})();
+</script>
 </body>
 </html>
