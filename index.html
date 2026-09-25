@@ -847,6 +847,34 @@ body{background:linear-gradient(180deg,#f7f3ec 0%,#eee8de 100%)!important;color:
   .oss-sticker{width:48px;height:42px;opacity:.9}
 }
 </style>
+
+<style id="homepage-stickers-v17">
+/* 0925 V17｜修正裝飾圖位置與載入失敗：圖只放卡片右下角，不佔文字區 */
+.product-bento .p-card{position:relative;overflow:hidden}
+.product-bento .p-card .card-sticker{
+  position:absolute!important;right:14px!important;bottom:10px!important;top:auto!important;left:auto!important;
+  width:76px!important;height:66px!important;object-fit:contain!important;z-index:1!important;pointer-events:none!important;
+  transform:none!important;
+}
+.product-bento .p-card.major .card-sticker{width:88px!important;height:76px!important}
+.product-bento .p-card .p-top,.product-bento .p-card h3,.product-bento .p-card p,.product-bento .p-card .p-foot{position:relative;z-index:2}
+.product-bento .p-card p{padding-right:0!important;max-width:calc(100% - 92px)}
+.product-bento .p-card.major p{max-width:calc(100% - 104px)}
+.opensource-strip{position:relative;overflow:hidden}
+.opensource-strip .oss-sticker{
+  position:absolute!important;bottom:6px!important;top:auto!important;width:58px!important;height:50px!important;
+  object-fit:contain!important;z-index:1!important;pointer-events:none!important;transform:none!important
+}
+.opensource-strip .oss-sticker-a{left:18px!important;right:auto!important}
+.opensource-strip .oss-sticker-b{left:105px!important;right:auto!important}
+@media(max-width:760px){
+ .product-bento .p-card .card-sticker{width:58px!important;height:50px!important;right:8px!important;bottom:8px!important}
+ .product-bento .p-card.major .card-sticker{width:66px!important;height:56px!important}
+ .product-bento .p-card p,.product-bento .p-card.major p{max-width:calc(100% - 68px)}
+ .opensource-strip .oss-sticker{width:44px!important;height:38px!important}
+ .opensource-strip .oss-sticker-a{left:10px!important}.opensource-strip .oss-sticker-b{left:66px!important}
+}
+</style>
 </head>
 <body>
 <header><div class="wrap topbar"><a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a><nav class="new-nav"><a href="#products">工具與產品</a><a href="#open-source">開放原始碼</a><a href="#works">LINE 作品</a><details class="external-menu"><summary>外部連結 ↗</summary><div class="external-pop"><a href="https://store.line.me/search/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener"><b>LINE STORE</b><small>全部作品</small></a><a href="https://www.facebook.com/profile.php?id=61592913950425" target="_blank" rel="noopener"><b>Facebook</b><small>最新作品與消息</small></a><a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><b>GitHub</b><small>公開原始碼專案</small></a></div></details></nav></div></header>
@@ -912,29 +940,30 @@ function renderShowcase(){
 renderShowcase();
 </script>
 
-<script id="homepage-stickers-script-v16">
+
+<script id="homepage-stickers-script-v17">
 (()=>{
-  const productStickers=[
-    ["./assets/decor/libaitang.png?v=16","禮拜堂"],
-    ["./assets/decor/zhaocai.png?v=16","招財"],
-    ["./assets/decor/bobeia.png?v=16","博杯啊"],
-    ["./assets/decor/youyingmou.png?v=16","有影謀"],
-    ["./assets/decor/chaojitaila.png?v=16","超級台啦"],
-    ["./assets/decor/xintong.png?v=16","心痛"],
-    ["./assets/decor/chidao.png?v=16","遲到"]
-  ];
-  document.querySelectorAll(".product-bento .p-card").forEach((card,i)=>{
-    const item=productStickers[i]; if(!item) return;
-    const img=document.createElement("img");
-    img.className="card-sticker"; img.src=item[0]; img.alt=item[1]; img.loading="lazy";
-    card.appendChild(img);
-  });
-  const strip=document.querySelector(".opensource-strip");
-  if(strip){
-    [["./assets/decor/xinren.png?v=16","新人","oss-sticker oss-sticker-a"],["./assets/decor/diuxiediuxie.png?v=16","丟謝丟謝","oss-sticker oss-sticker-b"]].forEach(item=>{
-      const img=document.createElement("img"); img.src=item[0]; img.alt=item[1]; img.className=item[2]; img.loading="lazy"; strip.appendChild(img);
-    });
-  }
+ const productStickers=[
+  ["./assets/decor/libaitang.png?v=17","禮拜堂"],
+  ["./assets/decor/zhaocai.png?v=17","招財"],
+  ["./assets/decor/bobeia.png?v=17","博杯啊"],
+  ["./assets/decor/youyingmou.png?v=17","有影謀"],
+  ["./assets/decor/chaojitaila.png?v=17","超級台啦"],
+  ["./assets/decor/xintong.png?v=17","心痛"],
+  ["./assets/decor/chidao.png?v=17","遲到"]
+ ];
+ document.querySelectorAll(".product-bento .p-card").forEach((card,i)=>{
+   const item=productStickers[i]; if(!item)return;
+   card.querySelectorAll(".card-sticker").forEach(n=>n.remove());
+   const img=document.createElement("img"); img.className="card-sticker"; img.src=item[0]; img.alt=item[1]; img.loading="eager"; card.appendChild(img);
+ });
+ const strip=document.querySelector(".opensource-strip");
+ if(strip){
+   strip.querySelectorAll(".oss-sticker").forEach(n=>n.remove());
+   [["./assets/decor/xinren.png?v=17","新人","oss-sticker oss-sticker-a"],["./assets/decor/diuxiediuxie.png?v=17","丟謝丟謝","oss-sticker oss-sticker-b"]].forEach(item=>{
+    const img=document.createElement("img"); img.src=item[0]; img.alt=item[1]; img.className=item[2]; img.loading="eager"; strip.appendChild(img);
+   });
+ }
 })();
 </script>
 <script src="assets/i18n.js"></script>
