@@ -693,6 +693,22 @@ footer{border-color:#d5cec2}
 .creator-note{border-top:1px solid rgba(89,76,60,.12)}
 @media(max-width:650px){.product-bento .p-card p{max-width:82%}}
 </style>
+
+<style id="card-art-v6">
+/* Product cards: denser copy area + illustrated lower band */
+.product-bento .p-card{position:relative;overflow:hidden;padding-bottom:72px;isolation:isolate}
+.product-bento .p-card:after{content:"";position:absolute;right:-12px;bottom:-18px;width:120px;height:76px;border-radius:55% 45% 0 0;background:rgba(255,255,255,.24);transform:rotate(-7deg);z-index:-1}
+.product-bento .p-card:nth-child(odd):after{right:auto;left:-20px;width:145px;background:rgba(255,255,255,.18);transform:rotate(8deg)}
+.product-bento .p-card:nth-child(1):before,.product-bento .p-card:nth-child(2):before{content:"";position:absolute;bottom:-7px;width:118px;height:102px;background-repeat:no-repeat;background-position:center bottom;background-size:contain;opacity:.94;pointer-events:none}
+.product-bento .p-card:nth-child(1):before{right:20px;background-image:url("./assets/hero-left.png");transform:rotate(-4deg)}
+.product-bento .p-card:nth-child(2):before{right:18px;background-image:url("./assets/hero-right.png");transform:rotate(3deg)}
+.product-bento .p-card:nth-child(1),.product-bento .p-card:nth-child(2){padding-bottom:82px}
+.p-card p{max-width:76%}.p-card:nth-child(n+3) p{max-width:88%}
+.p-foot{position:absolute;left:16px;bottom:15px;z-index:2}
+.section-head p{color:#756e65}
+.hero-stage{border-radius:22px}
+@media(max-width:650px){.product-bento .p-card{padding-bottom:66px}.product-bento .p-card:nth-child(1):before,.product-bento .p-card:nth-child(2):before{width:92px;height:82px;right:10px}.p-card p{max-width:72%}}
+</style>
 </head>
 <body>
 <header><div class="wrap topbar"><a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a><nav class="new-nav"><a href="#products">工具與產品</a><a href="#open-source">開放原始碼</a><a href="#works">LINE 作品</a><details class="external-menu"><summary>外部連結 ↗</summary><div class="external-pop"><a href="https://store.line.me/search/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener"><b>LINE STORE</b><small>全部作品</small></a><a href="https://www.facebook.com/profile.php?id=61592913950425" target="_blank" rel="noopener"><b>Facebook</b><small>最新作品與消息</small></a><a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><b>GitHub</b><small>公開原始碼專案</small></a></div></details></nav></div></header>
