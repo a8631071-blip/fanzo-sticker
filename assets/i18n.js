@@ -36,8 +36,11 @@
     'common.current': ['目前', 'Current'],
 
     'home.title': ['煩躁胖子｜貼圖工作站', 'Fanzo Sticker Workshop'],
-    'home.description': ['貼圖去背切割、LINE 上架檔案檢查、自製 QR Code、素材拼板 2.0 與自由排列，四套工具免費使用。', 'Free tools for sticker background removal and slicing, LINE upload checks, custom QR codes, and Collage Board 2.0 with free layout.'],
+    'home.description': ['煩躁胖子貼圖工作站：四套免費工具、Android APP，以及 Chrome 海報製作台。', 'Fanzo Sticker Workshop: four free tools, an Android app, and a Chrome poster studio.'],
     'home.hero': ['有需要，就拿去用。', 'Use what you need.'],
+    'home.heroDescription': ['免費網頁工具、Android App、Chrome 擴充功能與 LINE 創作。把實際會用到的東西整理在這裡。', 'Free web tools, an Android app, Chrome extensions, and LINE creations. Practical things you can use, gathered in one place.'],
+    'home.webToolsTag': ['網頁工具', 'Web tools'],
+    'home.lineCreationTag': ['LINE 創作', 'LINE creations'],
     'home.externalAria': ['煩躁胖子外部連結', 'Fanzo external links'],
     'home.works': ['煩躁胖子作品專區', 'Fanzo Works'],
     'home.lineWorks': ['LINE 貼圖・表情貼・主題', 'LINE stickers, emoji & themes'],
@@ -53,15 +56,15 @@
     'home.toolStickerDesc': ['去浮水印、去背、切格、上架檔名整理、ZIP 打包，一站完成。', 'Remove watermarks and backgrounds, slice images, organize upload filenames, and export a ZIP in one workflow.'],
     'home.toolCheck': ['LINE 上架檔案檢查', 'LINE Upload File Check'],
     'home.toolCheckDesc': ['上傳圖片或 ZIP，上架前快速檢查尺寸、數量與檔案。', 'Upload images or a ZIP to quickly verify dimensions, counts, and files before submission.'],
-    'home.toolQr': ['自製 QR Code 神器', 'Custom QR Code Maker'],
+    'home.toolQr': ['自製 QR Code', 'Custom QR Code Maker'],
     'home.toolQrDesc': ['網址轉 QR Code，還能自製專屬 QR 背板，完成後直接下載。', 'Turn a URL into a QR code, customize the design, and download the result.'],
     'home.toolCollage': ['素材拼板 2.0', 'Collage Board 2.0'],
     'home.toolCollageDesc': ['制式格快速拼板，也可自由拖曳、縮放、旋轉圖片與加入文字。', 'Build fast grid collages or freely drag, scale, rotate images, and add text.'],
     'home.recent': ['最近作品', 'Recent Works'],
     'home.recentNote': ['動態、靜態都有，看到喜歡的就點進去看看。', 'Animated and static releases are both included. Open any item to view it.'],
-    'home.allStickers': ['看全部 LINE 貼圖', 'View all LINE stickers'],
-    'home.allEmoji': ['看 LINE 表情貼', 'View LINE emoji'],
-    'home.allThemes': ['看 LINE 主題', 'View LINE themes'],
+    'home.allStickers': ['全部 LINE 貼圖', 'All LINE stickers'],
+    'home.allEmoji': ['LINE 表情貼', 'LINE emoji'],
+    'home.allThemes': ['LINE 主題', 'LINE themes'],
     'home.viewsTitle': ['首頁累積瀏覽次數', 'Total homepage views'],
     'home.viewsAlt': ['累積瀏覽次數', 'Total views'],
     'home.footer': ['本工具免費提供使用，原始碼同步公開於 GitHub，採 MIT License 授權。', 'These tools are free to use. The source code is available on GitHub under the MIT License.'],
@@ -80,6 +83,25 @@
     'home.chromeExtension': ['Chrome 擴充功能', 'Chrome Extension'],
     'home.emoji': ['LINE 表情貼', 'LINE Emoji'],
     'home.viewEmoji': ['看看這組表情貼', 'View this emoji set'],
+    'home.productSummary': ['網頁工具、APP 與擴充功能集中在同一層級。', 'Web tools, apps, and extensions, all in one place.'],
+    'home.productStickerDesc': ['從原始圖片去背開始，一路處理母圖切割、單格預覽與修整，再整理成可下載的 ZIP。把原本要分開處理的步驟集中在同一套流程，適合 LINE 貼圖與表情貼製作。', 'Start by removing the background, then slice a source sheet, preview and refine individual stickers, and package everything into a downloadable ZIP. This brings the steps together for making LINE stickers and emoji.'],
+    'home.productPoster': ['海報製作台', 'Poster Studio'],
+    'home.productPosterDesc': ['把圖片、文字、背景、QR Code、圖層與版面配置集中在同一個編輯畫面。可製作 LINE 貼圖宣傳海報，也能處理一般圖文海報；支援自由排版與素材組合，不受固定模板限制。', 'Create posters in one editor with images, text, backgrounds, QR codes, layers, and layout controls. Make LINE sticker promo posters or general image-and-text posters with flexible layouts and asset combinations, without being locked to templates.'],
+    'home.productCheckDesc': ['上傳圖片或 ZIP，上架前快速檢查尺寸、數量與檔案。', 'Upload images or a ZIP to quickly check dimensions, item counts, and files before publishing.'],
+    'home.productCollageDesc': ['制式拼板與自由排列，支援拖曳、縮放、旋轉與文字。', 'Choose a preset grid or arrange assets freely. Drag, scale, rotate, and add text.'],
+    'home.productQrDesc': ['網址轉 QR Code，也能搭配自製 QR 背板後下載。', 'Turn a URL into a QR code, pair it with a custom QR background, and download it.'],
+    'home.productStride': ['步跡', 'Stride'],
+    'home.productStrideDesc': ['GPS 運動軌跡＋日常計步器。記錄步行、跑步、騎乘、距離、配速與步數。', 'GPS activity tracking and a daily step counter. Record walks, runs, rides, distance, pace, and steps.'],
+    'home.productMp4Desc': ['圖片、文字與音訊快速整理成 MP4 圖文影片。', 'Quickly combine images, text, and audio into an MP4 video.'],
+    'home.openTool': ['直接使用 →', 'Open tool →'],
+    'home.posterTrial': ['完整試用 3 天 · NT$199 一次買斷 →', 'Full 3-day trial · NT$199 one-time purchase →'],
+    'home.ossDescription': ['部分工具與 APP 公開程式碼', 'Source code is available for some tools and apps.'],
+    'home.ossWebTool': ['免費網頁工具', 'Free web tools'],
+    'home.ossStride': ['步跡 Android APP', 'Stride Android app'],
+    'home.recentSummary': ['近期靜態貼圖與表情貼，12 組作品直接展開查看。', 'Recent sticker and emoji releases, with all 12 sets shown below.'],
+    'home.creatorDescription': ['工具、APP、擴充功能與 LINE 創作的公開入口。', 'A public hub for tools, apps, extensions, and LINE creations.'],
+    'home.copyright': ['© 2026 煩躁胖子', '© 2026 Fanzo'],
+    'home.footerLicense': ['部分專案採開放原始碼；授權方式以各 GitHub 專案說明為準。', 'Some projects are open source. See each GitHub repository for its license.'],
 
 
     'check.title': ['LINE 上架前自主檢查 0723V2', 'LINE Pre-Submission Check 0723V2'],
@@ -615,12 +637,12 @@
 
     document.querySelectorAll('head meta[content], head [title], head [aria-label]').forEach(translateAttributes);
 
-    const counter = document.querySelector('img[src*="hits.sh"]');
+    const counter = document.querySelector('img[src*="hits.sh"], img[src*="api.visitorbadge.io/api/visitors"]');
     if (counter) {
       if (!counter.dataset.i18nSrc) counter.dataset.i18nSrc = counter.getAttribute('src') || '';
       const original = counter.dataset.i18nSrc;
       if (currentLanguage === 'en') {
-        counter.setAttribute('src', original.replace(/label=%E7%B4%AF%E7%A9%8D%E7%80%8F%E8%A6%BD/, 'label=Views'));
+        counter.setAttribute('src', original.replace(/label=(?:%E7%B4%AF%E7%A9%8D%E7%80%8F%E8%A6%BD|累積瀏覽)/, 'label=Views'));
       } else {
         counter.setAttribute('src', original);
       }

@@ -778,22 +778,22 @@ html,body{background:#f4f0e8!important}
 body{background:linear-gradient(180deg,#f7f3ec 0%,#eee8de 100%)!important;color:#222321}
 .site-header,header{background:rgba(247,243,236,.94)!important}
 .hero-stage{
-  grid-template-columns:190px minmax(0,1fr)!important;
-  gap:24px!important;
+  grid-template-columns:145px minmax(0,1fr) 145px!important;
+  gap:16px!important;
   background:#e2d7c8!important;
   border:1px solid #cfc0ae!important;
   padding:22px 34px!important;
   min-height:220px!important;
 }
-.featured-sticker{
-  width:180px;height:156px;overflow:hidden;position:relative;z-index:3;
-  filter:drop-shadow(0 9px 12px rgba(55,43,31,.12));
-  transform:rotate(-3deg)
-}
-.featured-sticker img{display:block;width:100%;height:100%;object-fit:contain}
-.hero-copy{text-align:left!important}
-.hero-copy p{margin-left:0!important;margin-right:0!important}
-.hero-tags{justify-content:flex-start!important}
+.hero-character{height:148px;z-index:3}
+.hero-character img{width:100%;height:100%;max-width:145px;object-fit:contain;filter:drop-shadow(0 9px 12px rgba(55,43,31,.12))}
+.hero-character-left{transform:translateX(-4px) rotate(-4deg)}
+.hero-character-right{transform:translateX(4px) rotate(4deg)}
+.hero-character-left img{max-width:145px}
+.hero-character-right img{max-width:145px;transform:scale(1.16)}
+.hero-copy{text-align:center!important}
+.hero-copy p{margin-left:auto!important;margin-right:auto!important}
+.hero-tags{justify-content:center!important}
 .product-bento .p-card{
   border:1px solid rgba(65,55,45,.13)!important;
   box-shadow:0 8px 18px rgba(58,47,36,.055)!important
@@ -811,94 +811,123 @@ body{background:linear-gradient(180deg,#f7f3ec 0%,#eee8de 100%)!important;color:
 #works .work-card{background:#faf7f1!important;border-color:#d5c8b8!important}
 #works .work-image{background:#eee7dc!important}
 @media(max-width:760px){
-  .hero-stage{grid-template-columns:105px minmax(0,1fr)!important;gap:10px!important;padding:16px!important;min-height:170px!important}
-  .featured-sticker{width:105px;height:91px}
-  .hero-copy{text-align:left!important}
+  .hero-stage{grid-template-columns:76px minmax(0,1fr) 76px!important;gap:8px!important;padding:16px!important;min-height:170px!important}
+  .hero-character{height:96px}
+  .hero-character-left img{max-width:80px}
+  .hero-character-right img{max-width:74px;transform:scale(1.05)}
+  .hero-copy{text-align:center!important}
 }
 @media(max-width:430px){
-  .hero-stage{grid-template-columns:88px minmax(0,1fr)!important;padding:13px 10px!important}
-  .featured-sticker{width:88px;height:76px}
+  .hero-stage{grid-template-columns:58px minmax(0,1fr) 58px!important;padding:13px 8px!important}
+  .hero-character{height:70px}
+  .hero-character-left img{max-width:58px}
+  .hero-character-right img{max-width:54px}
   .hero-copy h1{font-size:25px!important}
 }
 </style>
 
-<style id="homepage-stickers-v16">
-/* 0925 V16｜九張 PNG 分散裝飾；不遮主要文字與操作區 */
-.product-bento .p-card,.opensource-strip{position:relative;overflow:hidden}
-.card-sticker{
-  position:absolute;right:12px;bottom:10px;width:76px;height:66px;
-  object-fit:contain;z-index:1;pointer-events:none;
-  filter:drop-shadow(0 5px 7px rgba(55,43,31,.10));
+<style id="homepage-product-art-v18">
+/* Product illustrations occupy their own card column, leaving every label readable. */
+.product-bento .p-card{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) clamp(88px,22%,132px);
+  grid-template-rows:auto auto auto 1fr auto;
+  column-gap:12px;
+  align-content:stretch;
 }
-.product-bento .p-card:nth-child(2n) .card-sticker{right:14px;transform:rotate(3deg)}
-.product-bento .p-card:nth-child(2n+1) .card-sticker{transform:rotate(-3deg)}
-.product-bento .p-card.major .card-sticker{width:92px;height:80px}
-.product-bento .p-card .p-top,.product-bento .p-card h3,.product-bento .p-card p,.product-bento .p-card .p-foot{position:relative;z-index:2}
-.product-bento .p-card p{padding-right:58px}
-.product-bento .p-card.major p{padding-right:78px}
-.oss-sticker{position:absolute;width:64px;height:56px;object-fit:contain;pointer-events:none;z-index:1;filter:drop-shadow(0 4px 6px rgba(55,43,31,.10))}
-.oss-sticker-a{left:38%;bottom:3px;transform:rotate(-4deg)}
-.oss-sticker-b{right:1.5%;bottom:3px;transform:rotate(4deg)}
-.opensource-strip>*{position:relative;z-index:2}
-@media(max-width:760px){
-  .card-sticker{width:62px;height:54px;right:8px;bottom:8px}
-  .product-bento .p-card.major .card-sticker{width:70px;height:62px}
-  .product-bento .p-card p,.product-bento .p-card.major p{padding-right:48px}
-  .oss-sticker{width:48px;height:42px;opacity:.9}
+.product-bento .p-card .p-top{grid-column:1/-1;grid-row:1}
+.product-bento .p-card h3{grid-column:1;grid-row:2;margin:14px 0 5px!important}
+.product-bento .p-card p{grid-column:1;grid-row:3;max-width:none}
+.product-bento .p-card .p-foot{grid-column:1;grid-row:5;margin-top:auto;padding-top:12px}
+.product-bento .p-card .product-art{
+  grid-column:2;grid-row:2/6;align-self:center;justify-self:end;
+  display:block;width:100%;max-width:132px;aspect-ratio:1;object-fit:contain;
+  padding:6px;border:1px solid rgba(78,65,53,.12);border-radius:12px;
+  background:rgba(255,255,255,.48);filter:drop-shadow(0 5px 9px rgba(55,43,31,.09));
+}
+@media(max-width:900px){
+  .product-bento .p-card{grid-template-columns:minmax(0,1fr) clamp(82px,24%,118px);column-gap:10px}
+  .product-bento .p-card .product-art{max-width:118px;padding:5px}
+}
+@media(max-width:650px){
+  .product-bento .p-card,.product-bento .p-card.major{grid-template-columns:minmax(0,1fr) 82px;column-gap:10px}
+  .product-bento .p-card .product-art{max-width:82px;padding:4px;border-radius:10px}
 }
 </style>
 
-<style id="homepage-stickers-v17">
-/* 0925 V17｜修正裝飾圖位置與載入失敗：圖只放卡片右下角，不佔文字區 */
-.product-bento .p-card{position:relative;overflow:hidden}
-.product-bento .p-card .card-sticker{
-  position:absolute!important;right:14px!important;bottom:10px!important;top:auto!important;left:auto!important;
-  width:76px!important;height:66px!important;object-fit:contain!important;z-index:1!important;pointer-events:none!important;
-  transform:none!important;
+<style id="homepage-decorations-v18">
+.section-head{position:relative;min-height:42px}
+.section-title-decorations{position:absolute;left:27%;right:29%;top:-2px;height:48px;pointer-events:none}
+.section-title-decorations img,.creator-decorations img{
+  position:absolute;display:block;height:auto;object-fit:contain;
+  filter:drop-shadow(0 4px 7px rgba(55,43,31,.10));
 }
-.product-bento .p-card.major .card-sticker{width:88px!important;height:76px!important}
-.product-bento .p-card .p-top,.product-bento .p-card h3,.product-bento .p-card p,.product-bento .p-card .p-foot{position:relative;z-index:2}
-.product-bento .p-card p{padding-right:0!important;max-width:calc(100% - 92px)}
-.product-bento .p-card.major p{max-width:calc(100% - 104px)}
-.opensource-strip{position:relative;overflow:hidden}
-.opensource-strip .oss-sticker{
-  position:absolute!important;bottom:6px!important;top:auto!important;width:58px!important;height:50px!important;
-  object-fit:contain!important;z-index:1!important;pointer-events:none!important;transform:none!important
+#products .section-title-decorations .decor-a{left:3%;top:8px;width:32px;transform:rotate(-9deg)}
+#products .section-title-decorations .decor-b{left:42%;top:-2px;width:26px;transform:rotate(7deg)}
+#products .section-title-decorations .decor-c{left:74%;top:15px;width:30px;transform:rotate(-5deg)}
+#works .section-title-decorations .decor-a{left:7%;top:13px;width:28px;transform:rotate(8deg)}
+#works .section-title-decorations .decor-b{left:52%;top:-4px;width:33px;transform:rotate(-7deg)}
+#works .section-title-decorations .decor-c{left:82%;top:14px;width:25px;transform:rotate(6deg)}
+.creator-note{position:relative;min-height:76px}
+.creator-note>div:first-child{max-width:45%}
+.creator-decorations{position:absolute;left:48%;top:14px;width:150px;height:48px;margin:0;pointer-events:none}
+.creator-decorations .decor-a{left:2px;top:12px;width:36px;transform:rotate(-11deg)}
+.creator-decorations .decor-b{left:78px;top:-2px;width:31px;transform:rotate(9deg)}
+.oss-card{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 72px auto;align-items:center;column-gap:12px;overflow:hidden;min-height:82px;padding:10px 13px}
+.oss-card>span{position:relative;z-index:1}
+.oss-card>span:first-child{grid-column:1;grid-row:1;padding-right:0}
+.oss-card>span:last-child{grid-column:3;grid-row:1;justify-self:end}
+.oss-card-art{position:static;grid-column:2;grid-row:1;width:64px;height:64px;justify-self:center;object-fit:contain;filter:drop-shadow(0 5px 8px rgba(50,42,34,.13));pointer-events:none}
+.oss-card-art-sticker{transform:rotate(-6deg)}
+.oss-card-art-emoji{transform:rotate(5deg)}
+@media(min-width:1320px){
+  #products .section-title-decorations .decor-a{width:38px}
+  #products .section-title-decorations .decor-b{width:31px}
+  #products .section-title-decorations .decor-c{width:36px}
+  #works .section-title-decorations .decor-a{width:34px}
+  #works .section-title-decorations .decor-b{width:38px}
+  #works .section-title-decorations .decor-c{width:31px}
+  .creator-decorations .decor-a{width:40px}
+  .creator-decorations .decor-b{width:34px;left:82px}
 }
-.opensource-strip .oss-sticker-a{left:18px!important;right:auto!important}
-.opensource-strip .oss-sticker-b{left:105px!important;right:auto!important}
+@media(max-width:1050px){
+  .section-title-decorations{left:25%;right:31%}
+  #products .section-title-decorations .decor-c{display:none}
+  #works .section-title-decorations .decor-c{display:none}
+}
 @media(max-width:760px){
- .product-bento .p-card .card-sticker{width:58px!important;height:50px!important;right:8px!important;bottom:8px!important}
- .product-bento .p-card.major .card-sticker{width:66px!important;height:56px!important}
- .product-bento .p-card p,.product-bento .p-card.major p{max-width:calc(100% - 68px)}
- .opensource-strip .oss-sticker{width:44px!important;height:38px!important}
- .opensource-strip .oss-sticker-a{left:10px!important}.opensource-strip .oss-sticker-b{left:66px!important}
+  .section-title-decorations,.creator-decorations{display:none}
+  .oss-card{grid-template-columns:minmax(0,1fr) 58px auto;column-gap:10px;min-height:78px;padding:10px 12px}
+  .oss-card-art{width:58px;height:58px}
 }
+@media(max-width:900px){.creator-decorations{display:none}}
 </style>
+
 </head>
 <body>
 <header><div class="wrap topbar"><a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a><nav class="new-nav"><a href="#products">工具與產品</a><a href="#open-source">開放原始碼</a><a href="#works">LINE 作品</a><details class="external-menu"><summary>外部連結 ↗</summary><div class="external-pop"><a href="https://store.line.me/search/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener"><b>LINE STORE</b><small>全部作品</small></a><a href="https://www.facebook.com/profile.php?id=61592913950425" target="_blank" rel="noopener"><b>Facebook</b><small>最新作品與消息</small></a><a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><b>GitHub</b><small>公開原始碼專案</small></a></div></details></nav></div></header>
 <main>
 <section class="hero wrap"><div class="hero-shell"><div class="hero-stage">
-<div class="featured-sticker"><img src="./assets/decor/wagazai.png?v=15" alt="挖阿災"></div>
-<div class="hero-copy"><h1>有需要，就拿去用。</h1><p>免費網頁工具、Android App、Chrome 擴充功能與 LINE 創作。把實際會用到的東西整理在這裡。</p><div class="hero-tags"><span>網頁工具</span><span>Android APP</span><span>Chrome 擴充功能</span><span>開放原始碼</span><span>LINE 創作</span></div></div></div></div></section>
+<div class="hero-character hero-character-left" aria-hidden="true"><img src="./assets/hero/27.png" alt=""></div>
+<div class="hero-copy"><h1>有需要，就拿去用。</h1><p>免費網頁工具、Android App、Chrome 擴充功能與 LINE 創作。把實際會用到的東西整理在這裡。</p><div class="hero-tags"><span>網頁工具</span><span>Android APP</span><span>Chrome 擴充功能</span><span>開放原始碼</span><span>LINE 創作</span></div></div>
+<div class="hero-character hero-character-right" aria-hidden="true"><img src="./assets/hero/13.png" alt=""></div></div></div></section>
 
-<section class="section wrap" id="products"><div class="section-head"><div><h2>工具與產品</h2></div><p>網頁工具、APP 與擴充功能集中在同一層級。</p></div>
+<section class="section wrap" id="products"><div class="section-head"><div><h2>工具與產品</h2></div><p>網頁工具、APP 與擴充功能集中在同一層級。</p><div class="section-title-decorations" aria-hidden="true"><img class="decor-a" src="./assets/decor/wagazai.png" alt="" loading="eager"><img class="decor-b" src="./assets/decor/zhaocai.png" alt="" loading="eager"><img class="decor-c" src="./assets/decor/chaojitaila.png" alt="" loading="eager"></div></div>
 <div class="product-bento">
-<a class="p-card major" href="./sticker/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><h3>去背・切割一站搞定</h3><p>從原始圖片去背開始，一路處理母圖切割、單格預覽與修整，再整理成可下載的 ZIP。把原本要分開處理的步驟集中在同一套流程，適合 LINE 貼圖與表情貼製作。</p><div class="p-foot">直接使用 →</div></a>
-<a class="p-card major" href="https://chromewebstore.google.com/detail/%E6%B5%B7%E5%A0%B1%E8%A3%BD%E4%BD%9C%E5%8F%B0/giccbkmkanojfniioocgnfmainpafenc?utm_source=threads&utm_medium=social&utm_content=link_in_bio" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">Chrome 擴充功能</span><span class="p-arrow">↗</span></div><h3>海報製作台</h3><p>把圖片、文字、背景、QR Code、圖層與版面配置集中在同一個編輯畫面。可製作 LINE 貼圖宣傳海報，也能處理一般圖文海報；支援自由排版與素材組合，不受固定模板限制。</p><div class="p-foot">完整試用 3 天 · NT$199 一次買斷 →</div></a>
-<a class="p-card" href="./line-check/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><h3>LINE 上架檔案檢查</h3><p>上傳圖片或 ZIP，上架前快速檢查尺寸、數量與檔案。</p><div class="p-foot">直接使用 →</div></a>
-<a class="p-card" href="./collage/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><h3>素材拼板 2.0</h3><p>制式拼板與自由排列，支援拖曳、縮放、旋轉與文字。</p><div class="p-foot">直接使用 →</div></a>
-<a class="p-card" href="./qr/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><h3>自製 QR Code</h3><p>網址轉 QR Code，也能搭配自製 QR 背板後下載。</p><div class="p-foot">直接使用 →</div></a>
-<a class="p-card" href="https://play.google.com/store/apps/details?id=com.app.strideroute" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">Android APP・免費</span><span class="p-arrow">↗</span></div><h3>步跡</h3><p>GPS 運動軌跡＋日常計步器。記錄步行、跑步、騎乘、距離、配速與步數。</p><div class="p-foot">Google Play →</div></a>
-<a class="p-card" href="https://play.google.com/store/apps/details?id=com.fanzaopangzi.simplemp4maker" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">Android APP・免費</span><span class="p-arrow">↗</span></div><h3>MP4 圖文影片合成器</h3><p>圖片、文字與音訊快速整理成 MP4 圖文影片。</p><div class="p-foot">Google Play →</div></a>
+<a class="p-card major" href="./sticker/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><img class="product-art" src="./assets/products/01.png" alt="" loading="eager"><h3>去背・切割一站搞定</h3><p>從原始圖片去背開始，一路處理母圖切割、單格預覽與修整，再整理成可下載的 ZIP。把原本要分開處理的步驟集中在同一套流程，適合 LINE 貼圖與表情貼製作。</p><div class="p-foot">直接使用 →</div></a>
+<a class="p-card major" href="https://chromewebstore.google.com/detail/%E6%B5%B7%E5%A0%B1%E8%A3%BD%E4%BD%9C%E5%8F%B0/giccbkmkanojfniioocgnfmainpafenc?utm_source=threads&utm_medium=social&utm_content=link_in_bio" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">Chrome 擴充功能</span><span class="p-arrow">↗</span></div><img class="product-art" src="./assets/products/01_%E5%95%86%E5%BA%97%E5%9C%96%E7%A4%BA_512%20X%20512.png" alt="" loading="eager"><h3>海報製作台</h3><p>把圖片、文字、背景、QR Code、圖層與版面配置集中在同一個編輯畫面。可製作 LINE 貼圖宣傳海報，也能處理一般圖文海報；支援自由排版與素材組合，不受固定模板限制。</p><div class="p-foot">完整試用 3 天 · NT$199 一次買斷 →</div></a>
+<a class="p-card" href="./line-check/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><img class="product-art" src="./assets/products/02.png" alt="" loading="eager"><h3>LINE 上架檔案檢查</h3><p>上傳圖片或 ZIP，上架前快速檢查尺寸、數量與檔案。</p><div class="p-foot">直接使用 →</div></a>
+<a class="p-card" href="./collage/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><img class="product-art" src="./assets/products/03.png" alt="" loading="eager"><h3>素材拼板 2.0</h3><p>制式拼板與自由排列，支援拖曳、縮放、旋轉與文字。</p><div class="p-foot">直接使用 →</div></a>
+<a class="p-card" href="./qr/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><img class="product-art" src="./assets/products/04.png" alt="" loading="eager"><h3>自製 QR Code</h3><p>網址轉 QR Code，也能搭配自製 QR 背板後下載。</p><div class="p-foot">直接使用 →</div></a>
+<a class="p-card" href="https://play.google.com/store/apps/details?id=com.app.strideroute" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">Android APP・免費</span><span class="p-arrow">↗</span></div><img class="product-art" src="./assets/products/%E6%AD%A5%E8%B7%A1_GooglePlay_512x512_%E9%AB%98%E7%95%AB%E8%B3%AA_%E7%B4%84900KB.png" alt="" loading="eager"><h3>步跡</h3><p>GPS 運動軌跡＋日常計步器。記錄步行、跑步、騎乘、距離、配速與步數。</p><div class="p-foot">Google Play →</div></a>
+<a class="p-card" href="https://play.google.com/store/apps/details?id=com.fanzaopangzi.simplemp4maker" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">Android APP・免費</span><span class="p-arrow">↗</span></div><img class="product-art" src="./assets/products/512-512.png" alt="" loading="eager"><h3>MP4 圖文影片合成器</h3><p>圖片、文字與音訊快速整理成 MP4 圖文影片。</p><div class="p-foot">Google Play →</div></a>
 </div></section>
 
-<section class="section wrap" id="open-source"><div class="opensource-strip"><div class="oss-title"><b>開放原始碼</b><small>部分工具與 APP 公開程式碼</small></div><a class="oss-card" href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><span><b>免費網頁工具</b><small>fanzo-sticker</small></span><span>↗</span></a><a class="oss-card" href="https://github.com/a8631071-blip/stride-route" target="_blank" rel="noopener"><span><b>步跡 Android APP</b><small>stride-route</small></span><span class="oss-license">MIT · ↗</span></a></div></section>
+<section class="section wrap" id="open-source"><div class="opensource-strip"><div class="oss-title"><b>開放原始碼</b><small>部分工具與 APP 公開程式碼</small></div><a class="oss-card" href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><span><b>免費網頁工具</b><small>fanzo-sticker</small></span><img class="oss-card-art oss-card-art-sticker" src="./assets/decor/bobeia.png" alt="" loading="eager"><span>↗</span></a><a class="oss-card" href="https://github.com/a8631071-blip/stride-route" target="_blank" rel="noopener"><span><b>步跡 Android APP</b><small>stride-route</small></span><img class="oss-card-art oss-card-art-emoji" src="./assets/decor/youyingmou.png" alt="" loading="eager"><span class="oss-license">MIT · ↗</span></a></div></section>
 
-<section class="section wrap" id="works"><div class="section-head"><div><h2>最近作品</h2></div><p>近期靜態貼圖與表情貼，12 組作品直接展開查看。</p></div><div class="showcase-box showcase-static"><div class="showcase-grid" id="showcaseTrack"></div></div><div class="store-links"><a href="https://store.line.me/search/sticker/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">全部 LINE 貼圖</a><a href="https://store.line.me/search/emoji/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE 表情貼</a><a href="https://store.line.me/search/theme/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE 主題</a></div></section>
+<section class="section wrap" id="works"><div class="section-head"><div><h2>最近作品</h2></div><p>近期靜態貼圖與表情貼，12 組作品直接展開查看。</p><div class="section-title-decorations" aria-hidden="true"><img class="decor-a" src="./assets/decor/libaitang.png" alt="" loading="eager"><img class="decor-b" src="./assets/decor/xinren.png" alt="" loading="eager"><img class="decor-c" src="./assets/decor/xintong.png" alt="" loading="eager"></div></div><div class="showcase-box showcase-static"><div class="showcase-grid" id="showcaseTrack"></div></div><div class="store-links"><a href="https://store.line.me/search/sticker/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">全部 LINE 貼圖</a><a href="https://store.line.me/search/emoji/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE 表情貼</a><a href="https://store.line.me/search/theme/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE 主題</a></div></section>
 
-<section class="wrap creator-note"><div><b>煩躁胖子｜貼圖工作站</b><p>工具、APP、擴充功能與 LINE 創作的公開入口。</p></div></section>
+<section class="wrap creator-note"><div><b>煩躁胖子｜貼圖工作站</b><p>工具、APP、擴充功能與 LINE 創作的公開入口。</p></div><div class="creator-decorations" aria-hidden="true"><img class="decor-a" src="./assets/decor/diuxiediuxie.png" alt="" loading="eager"><img class="decor-b" src="./assets/decor/chidao.png" alt="" loading="eager"></div></section>
 <section class="wrap restored-counter"><div class="visitor-count" title="首頁累積瀏覽次數">
   <img src="https://api.visitorbadge.io/api/visitors?path=a8631071-blip.fanzo-sticker.home&label=%E7%B4%AF%E7%A9%8D%E7%80%8F%E8%A6%BD&labelColor=%23d8d3ca&countColor=%23c4beb5&style=flat&labelStyle=lower" alt="累積瀏覽次數" referrerpolicy="no-referrer">
 </div></section>
@@ -941,31 +970,6 @@ renderShowcase();
 </script>
 
 
-<script id="homepage-stickers-script-v17">
-(()=>{
- const productStickers=[
-  ["./assets/decor/libaitang.png?v=17","禮拜堂"],
-  ["./assets/decor/zhaocai.png?v=17","招財"],
-  ["./assets/decor/bobeia.png?v=17","博杯啊"],
-  ["./assets/decor/youyingmou.png?v=17","有影謀"],
-  ["./assets/decor/chaojitaila.png?v=17","超級台啦"],
-  ["./assets/decor/xintong.png?v=17","心痛"],
-  ["./assets/decor/chidao.png?v=17","遲到"]
- ];
- document.querySelectorAll(".product-bento .p-card").forEach((card,i)=>{
-   const item=productStickers[i]; if(!item)return;
-   card.querySelectorAll(".card-sticker").forEach(n=>n.remove());
-   const img=document.createElement("img"); img.className="card-sticker"; img.src=item[0]; img.alt=item[1]; img.loading="eager"; card.appendChild(img);
- });
- const strip=document.querySelector(".opensource-strip");
- if(strip){
-   strip.querySelectorAll(".oss-sticker").forEach(n=>n.remove());
-   [["./assets/decor/xinren.png?v=17","新人","oss-sticker oss-sticker-a"],["./assets/decor/diuxiediuxie.png?v=17","丟謝丟謝","oss-sticker oss-sticker-b"]].forEach(item=>{
-    const img=document.createElement("img"); img.src=item[0]; img.alt=item[1]; img.className=item[2]; img.loading="eager"; strip.appendChild(img);
-   });
- }
-})();
-</script>
 <script src="assets/i18n.js"></script>
 
 </body>
