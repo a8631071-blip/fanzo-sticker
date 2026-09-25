@@ -596,6 +596,35 @@ footer{padding:14px 0 24px}.footer-inner{border-top:0;padding-top:0}
 @media(max-width:900px){.product-bento .p-card,.product-bento .p-card.major{grid-column:span 6}.opensource-strip{grid-template-columns:1fr 1fr}.oss-title{grid-column:1/-1}.hero-stage{grid-template-columns:105px minmax(0,1fr) 105px;padding:22px}.hero-character img{height:120px}}
 @media(max-width:650px){.wrap{width:min(100% - 22px,1180px)}.new-nav{display:none}.hero-stage{grid-template-columns:58px minmax(0,1fr) 58px;min-height:190px;padding:14px 8px}.hero-copy h1{font-size:31px}.hero-copy p{font-size:11px}.hero-character{height:85px}.hero-character img{height:72px}.product-bento .p-card,.product-bento .p-card.major{grid-column:1/-1;min-height:155px}.opensource-strip{grid-template-columns:1fr}.oss-title{grid-column:auto}.creator-note{grid-template-columns:1fr}.creator-links{flex-wrap:wrap}.section{padding:22px 0}}
 </style>
+
+<style id="professional-redesign-v2">
+/* 0925 V2 — tighter product rhythm, lighter OSS, less template-like hero */
+:root{--accent:#9f2d31;--accent-soft:#f7eeee}
+.hero-stage{min-height:228px;grid-template-columns:118px minmax(0,1fr) 96px;padding:24px 38px;overflow:visible}
+.hero-character-left{transform:translate(-10px,18px) rotate(-5deg);align-self:end}
+.hero-character-right{transform:translate(12px,-18px) rotate(4deg);align-self:start}
+.hero-character-left img{height:132px}.hero-character-right img{height:112px}
+.hero-copy h1{font-size:clamp(40px,4.6vw,60px)}
+.hero-tags span{background:transparent;border-color:#d9dde0;color:#747b82;padding:5px 9px}
+.section{padding:24px 0}.section-head{margin-bottom:12px}
+.product-bento{grid-template-columns:repeat(12,1fr);gap:10px}
+.product-bento .p-card,.product-bento .p-card.major{grid-column:span 4;min-height:146px;padding:16px;border-radius:13px}
+.product-bento .p-card:nth-child(1){grid-column:span 6;min-height:166px}
+.product-bento .p-card:nth-child(2){grid-column:span 6;min-height:166px}
+.p-card h3{font-size:17px;margin:18px 0 5px}.p-card p{font-size:10.5px;line-height:1.5}.p-foot{padding-top:12px}
+.p-type{background:#f1f2f3;color:#555d64;border:1px solid #e2e5e7;letter-spacing:.08em}
+.p-card:nth-child(1) .p-type,.p-card:nth-child(2) .p-type{background:var(--accent-soft);color:var(--accent);border-color:#efdddd}
+.opensource-strip{grid-template-columns:160px 1fr 1fr;background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:13px;padding:9px;box-shadow:none}
+.oss-title{padding:10px 12px}.oss-title b{font-size:15px}.oss-title small{color:var(--muted)}
+.oss-card{background:#f7f8f9;border:1px solid #e3e6e8;color:var(--ink);border-radius:9px;padding:10px 13px}
+.oss-card small,.oss-license{color:var(--muted)}
+#open-source{padding-top:14px;padding-bottom:20px}
+#works{padding-top:24px}
+.creator-note{padding-top:18px}
+@media(min-width:901px){.product-bento .p-card:nth-child(n+6){grid-column:span 6}}
+@media(max-width:900px){.hero-stage{grid-template-columns:90px minmax(0,1fr) 72px}.product-bento .p-card,.product-bento .p-card.major,.product-bento .p-card:nth-child(1),.product-bento .p-card:nth-child(2){grid-column:span 6}.opensource-strip{grid-template-columns:140px 1fr 1fr}}
+@media(max-width:650px){.hero-stage{grid-template-columns:46px minmax(0,1fr) 38px;min-height:178px;padding:12px 7px}.hero-character-left{transform:translate(-4px,12px) rotate(-5deg)}.hero-character-right{transform:translate(4px,-10px) rotate(4deg)}.hero-character-left img{height:64px}.hero-character-right img{height:56px}.hero-copy h1{font-size:29px}.hero-tags{display:none}.product-bento .p-card,.product-bento .p-card.major,.product-bento .p-card:nth-child(1),.product-bento .p-card:nth-child(2),.product-bento .p-card:nth-child(n+6){grid-column:1/-1;min-height:132px}.opensource-strip{grid-template-columns:1fr}.oss-title{padding:7px 9px}}
+</style>
 </head>
 <body>
 <header><div class="wrap topbar"><a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a><nav class="new-nav"><a href="#products">工具與產品</a><a href="#open-source">開放原始碼</a><a href="#works">LINE 作品</a></nav></div></header>
