@@ -709,6 +709,34 @@ footer{border-color:#d5cec2}
 .hero-stage{border-radius:22px}
 @media(max-width:650px){.product-bento .p-card{padding-bottom:66px}.product-bento .p-card:nth-child(1):before,.product-bento .p-card:nth-child(2):before{width:92px;height:82px;right:10px}.p-card p{max-width:72%}}
 </style>
+
+<style id="editorial-palette-v7">
+/* restrained studio/product palette — low saturation, no candy-pastel cards */
+html,body{background:#e7e3dc}
+body{background:linear-gradient(180deg,#e9e5de 0%,#e3e0da 52%,#dedbd5 100%);color:#222321}
+.site-header{background:rgba(231,227,220,.93);border-color:#d0ccc5}
+.hero-stage{background:#d8d3ca;border-color:#c8c2b9;box-shadow:none}
+.hero-copy h1{color:#20211f}.hero-copy p{color:#68665f}
+.hero-tags span{background:rgba(255,255,255,.28)!important;border-color:rgba(54,54,50,.13)!important;color:#55544f!important}
+.product-bento .p-card{box-shadow:none;border-color:rgba(45,45,42,.13)}
+.product-bento .p-card:nth-child(1){background:#d9d2c8}
+.product-bento .p-card:nth-child(2){background:#cfd4cf}
+.product-bento .p-card:nth-child(3){background:#d6d2cb}
+.product-bento .p-card:nth-child(4){background:#cbd0cc}
+.product-bento .p-card:nth-child(5){background:#d2cfd0}
+.product-bento .p-card:nth-child(6){background:#cbd2d1}
+.product-bento .p-card:nth-child(7){background:#d5d0c9}
+.product-bento .p-card:after{background:rgba(255,255,255,.12)}
+.product-bento .p-card .p-type{background:rgba(246,244,239,.52);border-color:rgba(50,50,46,.11);color:#4f504c}
+.p-card:nth-child(1) .p-type,.p-card:nth-child(2) .p-type{background:rgba(246,244,239,.52);color:#4f504c;border-color:rgba(50,50,46,.11)}
+.opensource-strip{background:#cbc8c1;border-color:#bbb7af}
+.oss-card{background:rgba(244,242,237,.36)}
+#works .work-card{background:#efede8;border-color:#cec9c1;box-shadow:none}
+#works .work-image{background:#dedbd5}
+.emoji-preview{display:grid!important;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:5px;padding:10px!important}
+.emoji-preview img{width:100%!important;height:100%!important;min-width:0;min-height:0;object-fit:contain!important}
+.badge.emoji{background:#d8d4cd!important;color:#55534e!important}
+</style>
 </head>
 <body>
 <header><div class="wrap topbar"><a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a><nav class="new-nav"><a href="#products">工具與產品</a><a href="#open-source">開放原始碼</a><a href="#works">LINE 作品</a><details class="external-menu"><summary>外部連結 ↗</summary><div class="external-pop"><a href="https://store.line.me/search/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener"><b>LINE STORE</b><small>全部作品</small></a><a href="https://www.facebook.com/profile.php?id=61592913950425" target="_blank" rel="noopener"><b>Facebook</b><small>最新作品與消息</small></a><a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><b>GitHub</b><small>公開原始碼專案</small></a></div></details></nav></div></header>
@@ -757,9 +785,10 @@ function renderShowcase(){
   const track = document.getElementById("showcaseTrack");
   track.innerHTML = SHOWCASE_ITEMS.map((item) => `
     <a class="work-card" href="${item.url}" target="_blank" rel="noopener" aria-label="${item.kind}">
-      <div class="work-image">
-        <img src="${item.type==='emoji' ? 'https://stickershop.line-scdn.net/sticonshop/v1/sticon/'+item.id+'/iPhone/001.png?v=1' : 'https://stickershop.line-scdn.net/stickershop/v1/product/'+item.id+'/LINEStorePC/main.png?v=1'}"
-             alt="${item.kind}" loading="lazy" referrerpolicy="no-referrer">
+      <div class="work-image ${item.type==='emoji' ? 'emoji-preview' : ''}">
+        ${item.type==='emoji'
+          ? [1,2,3,4].map(n => '<img src="https://stickershop.line-scdn.net/sticonshop/v1/sticon/'+item.id+'/iPhone/'+String(n).padStart(3,'0')+'.png?v=1" alt="" loading="lazy" referrerpolicy="no-referrer">').join('')
+          : '<img src="https://stickershop.line-scdn.net/stickershop/v1/product/'+item.id+'/LINEStorePC/main.png?v=1" alt="'+item.kind+'" loading="lazy" referrerpolicy="no-referrer">'}
       </div>
       <div class="work-meta">
         <span class="badge ${item.cls}">${item.kind}</span>
