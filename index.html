@@ -737,6 +737,16 @@ body{background:linear-gradient(180deg,#e9e5de 0%,#e3e0da 52%,#dedbd5 100%);colo
 .emoji-preview img{width:100%!important;height:100%!important;min-width:0;min-height:0;object-fit:contain!important}
 .badge.emoji{background:#d8d4cd!important;color:#55534e!important}
 </style>
+
+<style id="major-card-fix-v8">
+/* Major product cards should carry product information, not repeat hero mascots. */
+.product-bento .p-card:nth-child(1):before,.product-bento .p-card:nth-child(2):before{content:none!important;background-image:none!important}
+.product-bento .p-card:nth-child(1),.product-bento .p-card:nth-child(2){padding-bottom:62px!important;min-height:220px!important}
+.product-bento .p-card:nth-child(1) p,.product-bento .p-card:nth-child(2) p{max-width:94%!important;font-size:12px!important;line-height:1.72!important;margin-top:2px}
+.product-bento .p-card:nth-child(1) h3,.product-bento .p-card:nth-child(2) h3{font-size:20px;margin-top:20px}
+.product-bento .p-card:nth-child(1):after,.product-bento .p-card:nth-child(2):after{width:190px;height:80px;right:-28px;left:auto;bottom:-34px;border-radius:50% 0 0 0;background:rgba(255,255,255,.10);transform:none}
+@media(max-width:650px){.product-bento .p-card:nth-child(1),.product-bento .p-card:nth-child(2){min-height:205px!important;padding-bottom:58px!important}.product-bento .p-card:nth-child(1) p,.product-bento .p-card:nth-child(2) p{font-size:11.5px!important}}
+</style>
 </head>
 <body>
 <header><div class="wrap topbar"><a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a><nav class="new-nav"><a href="#products">工具與產品</a><a href="#open-source">開放原始碼</a><a href="#works">LINE 作品</a><details class="external-menu"><summary>外部連結 ↗</summary><div class="external-pop"><a href="https://store.line.me/search/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener"><b>LINE STORE</b><small>全部作品</small></a><a href="https://www.facebook.com/profile.php?id=61592913950425" target="_blank" rel="noopener"><b>Facebook</b><small>最新作品與消息</small></a><a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><b>GitHub</b><small>公開原始碼專案</small></a></div></details></nav></div></header>
@@ -749,8 +759,8 @@ body{background:linear-gradient(180deg,#e9e5de 0%,#e3e0da 52%,#dedbd5 100%);colo
 
 <section class="section wrap" id="products"><div class="section-head"><div><h2>工具與產品</h2></div><p>網頁工具、APP 與擴充功能集中在同一層級。</p></div>
 <div class="product-bento">
-<a class="p-card major" href="./sticker/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><h3>去背・切割一站搞定</h3><p>去背、母圖切割、單格修整與 ZIP 打包，一套流程完成。</p><div class="p-foot">直接使用 →</div></a>
-<a class="p-card major" href="https://chromewebstore.google.com/detail/%E6%B5%B7%E5%A0%B1%E8%A3%BD%E4%BD%9C%E5%8F%B0/giccbkmkanojfniioocgnfmainpafenc?utm_source=threads&utm_medium=social&utm_content=link_in_bio" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">Chrome 擴充功能</span><span class="p-arrow">↗</span></div><h3>海報製作台</h3><p>圖片、文字、背景、QR Code、圖層與版面配置。LINE 宣傳海報與一般圖文海報都能製作。</p><div class="p-foot">完整試用 3 天 · NT$199 一次買斷 →</div></a>
+<a class="p-card major" href="./sticker/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><h3>去背・切割一站搞定</h3><p>從原始圖片去背開始，一路處理母圖切割、單格預覽與修整，再整理成可下載的 ZIP。把原本要分開處理的步驟集中在同一套流程，適合 LINE 貼圖與表情貼製作。</p><div class="p-foot">直接使用 →</div></a>
+<a class="p-card major" href="https://chromewebstore.google.com/detail/%E6%B5%B7%E5%A0%B1%E8%A3%BD%E4%BD%9C%E5%8F%B0/giccbkmkanojfniioocgnfmainpafenc?utm_source=threads&utm_medium=social&utm_content=link_in_bio" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">Chrome 擴充功能</span><span class="p-arrow">↗</span></div><h3>海報製作台</h3><p>把圖片、文字、背景、QR Code、圖層與版面配置集中在同一個編輯畫面。可製作 LINE 貼圖宣傳海報，也能處理一般圖文海報；支援自由排版與素材組合，不受固定模板限制。</p><div class="p-foot">完整試用 3 天 · NT$199 一次買斷 →</div></a>
 <a class="p-card" href="./line-check/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><h3>LINE 上架檔案檢查</h3><p>上傳圖片或 ZIP，上架前快速檢查尺寸、數量與檔案。</p><div class="p-foot">直接使用 →</div></a>
 <a class="p-card" href="./collage/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><h3>素材拼板 2.0</h3><p>制式拼板與自由排列，支援拖曳、縮放、旋轉與文字。</p><div class="p-foot">直接使用 →</div></a>
 <a class="p-card" href="./qr/" target="_blank" rel="noopener"><div class="p-top"><span class="p-type">網頁工具・免費</span><span class="p-arrow">↗</span></div><h3>自製 QR Code</h3><p>網址轉 QR Code，也能搭配自製 QR 背板後下載。</p><div class="p-foot">直接使用 →</div></a>
