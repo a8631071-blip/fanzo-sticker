@@ -69,6 +69,18 @@
     'home.staticSticker': ['靜態貼圖', 'Static sticker'],
     'home.viewSticker': ['看看這組貼圖', 'View this sticker set'],
     'home.lineStore': ['前往 LINE STORE →', 'Open LINE STORE →'],
+    'home.productNav': ['工具與產品', 'Tools & Products'],
+    'home.openSourceNav': ['開放原始碼', 'Open Source'],
+    'home.lineWorksNav': ['LINE 作品', 'LINE Works'],
+    'home.externalLinks': ['外部連結 ↗', 'External Links ↗'],
+    'home.allWorks': ['全部作品', 'All works'],
+    'home.publicProjects': ['公開原始碼專案', 'Public source projects'],
+    'home.webFree': ['網頁工具・免費', 'Web Tool · Free'],
+    'home.androidFree': ['Android APP・免費', 'Android App · Free'],
+    'home.chromeExtension': ['Chrome 擴充功能', 'Chrome Extension'],
+    'home.emoji': ['LINE 表情貼', 'LINE Emoji'],
+    'home.viewEmoji': ['看看這組表情貼', 'View this emoji set'],
+
 
     'check.title': ['LINE 上架前自主檢查 0723V2', 'LINE Pre-Submission Check 0723V2'],
     'check.dropOverlay': ['放開即可匯入 PNG / APNG / ZIP / 資料夾', 'Drop to import PNG / APNG / ZIP / folder'],
