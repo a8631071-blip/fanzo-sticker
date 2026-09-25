@@ -631,6 +631,12 @@ footer{padding:14px 0 24px}.footer-inner{border-top:0;padding-top:0}
 .creator-note{grid-template-columns:1fr}.work-card .badge.emoji{background:#eee9f6;color:#65547c}
 @media(max-width:650px){.external-menu{display:none}}
 </style>
+
+<style id="showcase-grid-v4">
+.showcase-static{overflow:visible}.showcase-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.showcase-grid .work-card{min-width:0;width:auto}.showcase-grid .work-image{aspect-ratio:1/1}.showcase-grid .work-image img{width:100%;height:100%;object-fit:contain}.showcase-foot{display:none}
+@media(max-width:1050px){.showcase-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:650px){.showcase-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}}
+</style>
 </head>
 <body>
 <header><div class="wrap topbar"><a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a><nav class="new-nav"><a href="#products">工具與產品</a><a href="#open-source">開放原始碼</a><a href="#works">LINE 作品</a><details class="external-menu"><summary>外部連結 ↗</summary><div class="external-pop"><a href="https://store.line.me/search/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener"><b>LINE STORE</b><small>全部作品</small></a><a href="https://www.facebook.com/profile.php?id=61592913950425" target="_blank" rel="noopener"><b>Facebook</b><small>最新作品與消息</small></a><a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><b>GitHub</b><small>公開原始碼專案</small></a></div></details></nav></div></header>
@@ -654,7 +660,7 @@ footer{padding:14px 0 24px}.footer-inner{border-top:0;padding-top:0}
 
 <section class="section wrap" id="open-source"><div class="opensource-strip"><div class="oss-title"><b>開放原始碼</b><small>部分工具與 APP 公開程式碼</small></div><a class="oss-card" href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><span><b>免費網頁工具</b><small>fanzo-sticker</small></span><span>↗</span></a><a class="oss-card" href="https://github.com/a8631071-blip/stride-route" target="_blank" rel="noopener"><span><b>步跡 Android APP</b><small>stride-route</small></span><span class="oss-license">MIT · ↗</span></a></div></section>
 
-<section class="section wrap" id="works"><div class="section-head"><div><h2>最近作品</h2></div><p>近期 LINE 貼圖作品，完整作品可由下方分類查看。</p></div><div class="showcase-box"><div class="showcase-viewport" id="showcaseViewport"><div class="showcase-track" id="showcaseTrack"></div></div><div class="showcase-foot"><div class="showcase-dots" id="showcaseDots"></div><div class="showcase-arrows"><button class="showcase-arrow" type="button" aria-label="上一頁" onclick="moveShowcase(-1)">‹</button><button class="showcase-arrow" type="button" aria-label="下一頁" onclick="moveShowcase(1)">›</button></div></div></div><div class="store-links"><a href="https://store.line.me/search/sticker/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">全部 LINE 貼圖</a><a href="https://store.line.me/search/emoji/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE 表情貼</a><a href="https://store.line.me/search/theme/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE 主題</a></div></section>
+<section class="section wrap" id="works"><div class="section-head"><div><h2>最近作品</h2></div><p>近期 LINE 貼圖與表情貼，12 組作品直接展開查看。</p></div><div class="showcase-box showcase-static"><div class="showcase-grid" id="showcaseTrack"></div></div><div class="store-links"><a href="https://store.line.me/search/sticker/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">全部 LINE 貼圖</a><a href="https://store.line.me/search/emoji/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE 表情貼</a><a href="https://store.line.me/search/theme/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener">LINE 主題</a></div></section>
 
 <section class="wrap creator-note"><div><b>煩躁胖子｜貼圖工作站</b><p>工具、APP、擴充功能與 LINE 創作的公開入口。</p></div></section>
 </main>
@@ -675,20 +681,9 @@ const SHOWCASE_ITEMS = [
   { id:"6aacf4b7c427d714c65b6734", kind:"LINE 表情貼", cls:"emoji", type:"emoji", url:"https://store.line.me/emojishop/product/6aacf4b7c427d714c65b6734/zh-Hant" }
 ];
 
-let showcasePage = 0;
-let showcaseTimer = null;
-
-function cardsPerPage(){
-  if(window.innerWidth <= 760) return 1;
-  if(window.innerWidth <= 1050) return 4;
-  return 6;
-}
-function totalPages(){
-  return Math.ceil(SHOWCASE_ITEMS.length / cardsPerPage());
-}
 function renderShowcase(){
   const track = document.getElementById("showcaseTrack");
-  track.innerHTML = SHOWCASE_ITEMS.map((item, i) => `
+  track.innerHTML = SHOWCASE_ITEMS.map((item) => `
     <a class="work-card" href="${item.url}" target="_blank" rel="noopener" aria-label="${item.kind}">
       <div class="work-image">
         <img src="${item.type==='emoji' ? 'https://stickershop.line-scdn.net/sticonshop/v1/sticon/'+item.id+'/iPhone/001.png?v=1' : 'https://stickershop.line-scdn.net/stickershop/v1/product/'+item.id+'/LINEStorePC/main.png?v=1'}"
@@ -701,51 +696,8 @@ function renderShowcase(){
       </div>
     </a>
   `).join("");
-
-  showcasePage = Math.min(showcasePage, totalPages()-1);
-  renderDots();
-  updateShowcase(false);
 }
-function renderDots(){
-  const dots = document.getElementById("showcaseDots");
-  dots.innerHTML = Array.from({length:totalPages()}, (_,i) =>
-    `<button class="showcase-dot${i===showcasePage?' active':''}" type="button" aria-label="第 ${i+1} 頁" onclick="goShowcase(${i})"></button>`
-  ).join("");
-}
-function updateShowcase(animate=true){
-  const track = document.getElementById("showcaseTrack");
-  if(!animate) track.style.transition = "none";
-  const per = cardsPerPage();
-  const gap = window.innerWidth <= 760 ? 10 : 14;
-  const viewport = document.getElementById("showcaseViewport");
-  const cardWidth = per === 1
-    ? viewport.clientWidth * .78
-    : (viewport.clientWidth - gap * (per - 1)) / per;
-  track.style.transform = `translateX(-${showcasePage * per * (cardWidth + gap)}px)`;
-  requestAnimationFrame(()=>{ track.style.transition = ""; });
-  document.querySelectorAll(".showcase-dot").forEach((d,i)=>d.classList.toggle("active",i===showcasePage));
-}
-function goShowcase(page){
-  const total = totalPages();
-  showcasePage = (page + total) % total;
-  updateShowcase();
-}
-function moveShowcase(dir){ goShowcase(showcasePage + dir); restartShowcase(); }
-function startShowcase(){
-  clearInterval(showcaseTimer);
-  showcaseTimer = setInterval(()=>goShowcase(showcasePage+1), 5200);
-}
-function restartShowcase(){ startShowcase(); }
-
 renderShowcase();
-startShowcase();
-
-document.getElementById("showcaseViewport").addEventListener("mouseenter",()=>clearInterval(showcaseTimer));
-document.getElementById("showcaseViewport").addEventListener("mouseleave",startShowcase);
-window.addEventListener("resize",()=>{
-  clearTimeout(window.__showcaseResize);
-  window.__showcaseResize=setTimeout(renderShowcase,120);
-});
 </script>
 <script src="assets/i18n.js"></script>
 </body>
