@@ -821,6 +821,32 @@ body{background:linear-gradient(180deg,#f7f3ec 0%,#eee8de 100%)!important;color:
   .hero-copy h1{font-size:25px!important}
 }
 </style>
+
+<style id="homepage-stickers-v16">
+/* 0925 V16｜九張 PNG 分散裝飾；不遮主要文字與操作區 */
+.product-bento .p-card,.opensource-strip{position:relative;overflow:hidden}
+.card-sticker{
+  position:absolute;right:12px;bottom:10px;width:76px;height:66px;
+  object-fit:contain;z-index:1;pointer-events:none;
+  filter:drop-shadow(0 5px 7px rgba(55,43,31,.10));
+}
+.product-bento .p-card:nth-child(2n) .card-sticker{right:14px;transform:rotate(3deg)}
+.product-bento .p-card:nth-child(2n+1) .card-sticker{transform:rotate(-3deg)}
+.product-bento .p-card.major .card-sticker{width:92px;height:80px}
+.product-bento .p-card .p-top,.product-bento .p-card h3,.product-bento .p-card p,.product-bento .p-card .p-foot{position:relative;z-index:2}
+.product-bento .p-card p{padding-right:58px}
+.product-bento .p-card.major p{padding-right:78px}
+.oss-sticker{position:absolute;width:64px;height:56px;object-fit:contain;pointer-events:none;z-index:1;filter:drop-shadow(0 4px 6px rgba(55,43,31,.10))}
+.oss-sticker-a{left:38%;bottom:3px;transform:rotate(-4deg)}
+.oss-sticker-b{right:1.5%;bottom:3px;transform:rotate(4deg)}
+.opensource-strip>*{position:relative;z-index:2}
+@media(max-width:760px){
+  .card-sticker{width:62px;height:54px;right:8px;bottom:8px}
+  .product-bento .p-card.major .card-sticker{width:70px;height:62px}
+  .product-bento .p-card p,.product-bento .p-card.major p{padding-right:48px}
+  .oss-sticker{width:48px;height:42px;opacity:.9}
+}
+</style>
 </head>
 <body>
 <header><div class="wrap topbar"><a class="brand" href="./">煩躁胖子<span>｜貼圖工作站</span></a><nav class="new-nav"><a href="#products">工具與產品</a><a href="#open-source">開放原始碼</a><a href="#works">LINE 作品</a><details class="external-menu"><summary>外部連結 ↗</summary><div class="external-pop"><a href="https://store.line.me/search/zh-Hant?q=%E7%85%A9%E8%BA%81%E8%83%96%E5%AD%90" target="_blank" rel="noopener"><b>LINE STORE</b><small>全部作品</small></a><a href="https://www.facebook.com/profile.php?id=61592913950425" target="_blank" rel="noopener"><b>Facebook</b><small>最新作品與消息</small></a><a href="https://github.com/a8631071-blip/fanzo-sticker" target="_blank" rel="noopener"><b>GitHub</b><small>公開原始碼專案</small></a></div></details></nav></div></header>
@@ -884,6 +910,32 @@ function renderShowcase(){
   `).join("");
 }
 renderShowcase();
+</script>
+
+<script id="homepage-stickers-script-v16">
+(()=>{
+  const productStickers=[
+    ["./assets/decor/libaitang.png?v=16","禮拜堂"],
+    ["./assets/decor/zhaocai.png?v=16","招財"],
+    ["./assets/decor/bobeia.png?v=16","博杯啊"],
+    ["./assets/decor/youyingmou.png?v=16","有影謀"],
+    ["./assets/decor/chaojitaila.png?v=16","超級台啦"],
+    ["./assets/decor/xintong.png?v=16","心痛"],
+    ["./assets/decor/chidao.png?v=16","遲到"]
+  ];
+  document.querySelectorAll(".product-bento .p-card").forEach((card,i)=>{
+    const item=productStickers[i]; if(!item) return;
+    const img=document.createElement("img");
+    img.className="card-sticker"; img.src=item[0]; img.alt=item[1]; img.loading="lazy";
+    card.appendChild(img);
+  });
+  const strip=document.querySelector(".opensource-strip");
+  if(strip){
+    [["./assets/decor/xinren.png?v=16","新人","oss-sticker oss-sticker-a"],["./assets/decor/diuxiediuxie.png?v=16","丟謝丟謝","oss-sticker oss-sticker-b"]].forEach(item=>{
+      const img=document.createElement("img"); img.src=item[0]; img.alt=item[1]; img.className=item[2]; img.loading="lazy"; strip.appendChild(img);
+    });
+  }
+})();
 </script>
 <script src="assets/i18n.js"></script>
 
