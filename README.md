@@ -85,6 +85,16 @@ This tool is intended as a final pre-publish review step and does not replace LI
 
 ---
 
+### 05. AI 靜態貼圖 Prompt 生成器｜Public Static Sticker Prompt Generator
+
+路徑 / Path: `/prompt/`
+
+**用途：** 提供 20 個主題、每主題 60 句（共 1,200 句）、20 種字體風格，支援三批文字切換、個別修改與一鍵複製 20 格靜態貼圖生成指令。全程在瀏覽器內執行，不需要帳號或 API。
+
+**Use case:** Build prompts for a 5×4 LINE static sticker sheet. Includes 20 public themes, 60 phrases per theme, 20 font styles, editable batches, and one-click prompt copying. Runs entirely in the browser.
+
+---
+
 ## 專案特色｜Key Features
 
 - **免費使用｜Free to use** — 公開網站可直接使用，不需要安裝專用程式。
@@ -93,7 +103,7 @@ This tool is intended as a final pre-publish review step and does not replace LI
 - **MIT License** — 允許使用、修改、再散布與商業使用，但須保留原授權聲明。
 - **瀏覽器工作流程｜Browser workflow** — 核心工具以 HTML / CSS / JavaScript 為主，可直接透過 GitHub Pages 使用。
 - **針對 LINE Creator 工作流程｜Built for LINE creator workflows** — 功能源自實際貼圖製作流程，而不是一般用途的影像編輯器。
-- **單一入口｜One workspace** — 四套工具集中在同一個首頁，減少在不同服務之間切換。
+- **單一入口｜One workspace** — 五套工具集中在同一個首頁，減少在不同服務之間切換。
 - **持續維護｜Actively maintained** — 專案依實際使用需求持續調整與擴充。
 
 ---
@@ -119,6 +129,7 @@ The site may still load third-party resources such as JavaScript libraries, font
 ├─ line-check/         # LINE 上架前檢查 / Pre-publish checking
 ├─ qr/                 # QR Code 產生器 / QR Code generator
 ├─ collage/            # 素材拼板 2.0 / Asset Collage 2.0
+├─ prompt/             # 靜態貼圖 Prompt 生成 / Prompt generator
 ├─ assets/             # 首頁與共用素材 / Shared homepage assets
 ├─ LICENSE             # MIT License
 └─ README.md

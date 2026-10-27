@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f8f4ee">
+  <meta name="description" content="免費 LINE 靜態貼圖 Prompt 生成器：20 個主題、每主題 60 句、20 種字體風格。">
+  <title>靜態貼圖 Prompt 生成器｜公開測試版 1027V1</title>
+  <link rel="stylesheet" href="./style.css">
+  <script defer src="./public-data.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="mast-inner">
+      <div class="brand-mark" aria-hidden="true">字</div>
+      <div class="brand-copy">
+        <div class="eyebrow">煩躁胖子・免費創作者工具</div>
+        <h1>靜態貼圖 <span>Prompt 生成器</span></h1>
+        <p>挑主題、換句子、選字體，把 20 格貼圖的生成規格整理成可直接複製的指令。</p>
+      </div>
+      <div class="version">公開測試版 <b>1027V1</b><small>不需登入・不需 API</small></div>
+    </div>
+  </header>
+  <main class="app-shell">
+    <aside class="settings" aria-label="貼圖設定">
+      <div class="panel-head"><span class="panel-label">01</span><h2>設定你的貼圖</h2></div>
+      <section class="setting-block">
+        <label for="topicSelect">文字主題 <span class="mini-label">20 選 1</span></label>
+        <select id="topicSelect" aria-describedby="topicMeta"></select>
+        <div class="select-help" id="topicMeta">每個主題提供 60 句。</div>
+        <div class="field-label">句子批次</div>
+        <div class="segmented" role="group" aria-label="切換句子批次">
+          <button type="button" class="batch-btn active" data-batch="1" aria-pressed="true">第 1 批<small>01–20</small></button>
+          <button type="button" class="batch-btn" data-batch="2" aria-pressed="false">第 2 批<small>21–40</small></button>
+          <button type="button" class="batch-btn" data-batch="3" aria-pressed="false">第 3 批<small>41–60</small></button>
+        </div>
+        <p class="tip">切批不會自動改變字體；手動修改在此頁開啟期間會保留。</p>
+      </section>
+      <section class="setting-block">
+        <label for="refMode">角色參照方式</label>
+        <select id="refMode">
+          <option value="none">無母圖：依文字描述生成角色</option>
+          <option value="identity">有母圖：保留角色特徵，套用選定畫風</option>
+          <option value="full">有母圖：連同人物畫風一起沿用</option>
+        </select>
+        <label for="characterDesc" class="sublabel">角色描述</label>
+        <textarea id="characterDesc" rows="3" maxlength="1000" spellcheck="false" placeholder="自行描述角色的外型、衣著與辨識特徵">一隻原創的可愛小動物，外型簡單、輪廓清楚、表情豐富。</textarea>
+        <div class="select-help" id="refHint">沒有角色母圖時，使用上方文字描述生成。</div>
+        <label for="artStyle" class="sublabel">角色畫風</label>
+        <select id="artStyle">
+          <option value="童趣手繪風，2D平面、自然不規則筆觸">童趣手繪</option>
+          <option value="可愛Q版，2D插畫、頭身比例活潑">可愛 Q 版</option>
+          <option value="簡約扁平插畫，乾淨色塊與清晰輪廓">扁平插畫</option>
+          <option value="日系Chibi，頭大身短、表情明顯">日系 Chibi</option>
+          <option value="黑白線稿手繪，粗細自然、辨識度高">黑白線稿</option>
+          <option value="柔和水彩手繪，色彩淡雅、輪廓仍清楚">柔和水彩</option>
+          <option value="90年代美式卡通，厚線條與復古配色">美式卡通</option>
+          <option value="簡筆火柴人，表情與肢體動作鮮明">簡筆火柴人</option>
+        </select>
+      </section>
+      <section class="setting-block">
+        <label for="fontSelect">文字字體風格 <span class="mini-label">20 種</span></label>
+        <select id="fontSelect"></select>
+        <div class="font-description" id="fontDescription"></div>
+        <div class="field-2col">
+          <div><label for="fillColor" class="sublabel">文字填色</label><div class="color-field"><input id="fillColor" type="color" value="#FFE17B" aria-label="文字填色"><span id="fillColorCode">#FFE17B</span></div></div>
+          <div><label for="outlineColor" class="sublabel">描邊</label><select id="outlineColor"><option value="dark">深色描邊</option><option value="white">白色描邊</option><option value="black">黑色描邊</option><option value="none">不描邊</option></select></div>
+        </div>
+        <div class="field-2col">
+          <div><label for="textPosition" class="sublabel">文字位置</label><select id="textPosition"><option value="bottom">下方（預設）</option><option value="top">上方</option><option value="side">角色側邊</option><option value="adaptive">自動避開臉部</option></select></div>
+          <div><label for="background" class="sublabel">背景</label><select id="background"><option value="transparent">真正透明 Alpha</option><option value="green">純綠幕 #00FF00</option></select></div>
+        </div>
+      </section>
+      <div class="privacy-note">所有操作都在目前瀏覽器頁面完成。沒有登入、雲端紀錄，也不需要上傳圖片到本工具。</div>
+    </aside>
+
+    <section class="workspace" aria-label="文字編輯與 Prompt 輸出">
+      <section class="workspace-card" aria-labelledby="linesTitle">
+        <div class="workspace-card-head">
+          <div><div class="panel-head compact"><span class="panel-label">02</span><h2 id="linesTitle">20 格文字內容</h2></div><p class="muted" id="batchSummary">日常招呼・第 1 批・01–20 句</p></div>
+          <button type="button" class="ghost-button" id="resetBatch">還原本批原句</button>
+        </div>
+        <div class="line-grid" id="lineGrid" aria-label="20 格句子編輯區"></div>
+        <div class="editor-foot"><span id="lineCount">目前 20 / 20 句</span><span>留空的格子將明確要求不顯示文字；不會自動亂補。</span></div>
+      </section>
+      <section class="workspace-card result-card" aria-labelledby="resultTitle">
+        <div class="workspace-card-head result-title-row">
+          <div><div class="panel-head compact"><span class="panel-label">03</span><h2 id="resultTitle">生成 Prompt</h2></div><p class="muted">固定 2000 × 1600｜5 × 4｜每格 400 × 400</p></div>
+          <div class="action-row"><button type="button" id="generateBtn" class="action-button secondary">重新生成</button><button type="button" id="copyBtn" class="action-button primary">複製 Prompt</button></div>
+        </div>
+        <textarea id="promptOutput" spellcheck="false" readonly aria-label="生成的完整 Prompt"></textarea>
+        <div class="output-meta"><span id="promptStatus" aria-live="polite">可直接複製使用</span><span id="charCount">0 字元</span></div>
+      </section>
+      <p class="bottom-note">這套工具只產生文字指令，不會直接生圖。選擇「有母圖」時，請在使用的 AI 生圖平台另外上傳角色參考圖片。</p>
+    </section>
+  </main>
+</body>
+</html>
