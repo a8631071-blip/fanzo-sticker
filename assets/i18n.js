@@ -98,7 +98,7 @@
     'home.ossDescription': ['部分工具與 APP 公開程式碼', 'Source code is available for some tools and apps.'],
     'home.ossWebTool': ['免費網頁工具', 'Free web tools'],
     'home.ossStride': ['步跡 Android APP', 'Stride Android app'],
-    'home.recentSummary': ['近期靜態貼圖與表情貼，12 組作品直接展開查看。', 'Recent sticker and emoji releases, with all 12 sets shown below.'],
+    'home.recentSummary': ['近期靜態、動態貼圖與表情貼，14 組作品直接展開查看。', 'Recent static and animated stickers plus emoji, with all 14 sets shown below.'],
     'home.creatorDescription': ['工具、APP、擴充功能與 LINE 創作的公開入口。', 'A public hub for tools, apps, extensions, and LINE creations.'],
     'home.copyright': ['© 2026 煩躁胖子', '© 2026 Fanzo'],
     'home.footerLicense': ['部分專案採開放原始碼；授權方式以各 GitHub 專案說明為準。', 'Some projects are open source. See each GitHub repository for its license.'],
